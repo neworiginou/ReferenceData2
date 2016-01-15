@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="9531" systemVersion="15C50" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES">
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="9529"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="CellID" rowHeight="164" id="1FR-GE-Smg" customClass="TableViewCell">
+            <rect key="frame" x="0.0" y="0.0" width="359" height="164"/>
+            <autoresizingMask key="autoresizingMask"/>
+            <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="1FR-GE-Smg" id="w3s-dr-Zen">
+                <rect key="frame" x="0.0" y="0.0" width="359" height="163.5"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="s3x-aO-E8Y">
+                        <rect key="frame" x="10" y="5" width="339" height="153.5"/>
+                        <subviews>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="67v-xd-7Z3">
+                                <rect key="frame" x="0.0" y="0.0" width="339" height="51"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="51" id="fxN-wY-ZEr"/>
+                                </constraints>
+                            </view>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="MPI-wk-n6M">
+                                <rect key="frame" x="0.0" y="51" width="339" height="51"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                            </view>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="8H9-xk-XPK">
+                                <rect key="frame" x="0.0" y="102" width="339" height="51"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="51" id="jaG-i9-I88"/>
+                                </constraints>
+                            </view>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstAttribute="trailing" secondItem="8H9-xk-XPK" secondAttribute="trailing" id="3SS-uP-oEB"/>
+                            <constraint firstItem="67v-xd-7Z3" firstAttribute="top" secondItem="s3x-aO-E8Y" secondAttribute="top" id="6AO-0x-o3W"/>
+                            <constraint firstAttribute="trailing" secondItem="67v-xd-7Z3" secondAttribute="trailing" id="MKT-99-i8s"/>
+                            <constraint firstItem="67v-xd-7Z3" firstAttribute="leading" secondItem="s3x-aO-E8Y" secondAttribute="leading" id="Q7B-8Q-aFB"/>
+                            <constraint firstAttribute="trailing" secondItem="MPI-wk-n6M" secondAttribute="trailing" id="RLT-SA-ZFh"/>
+                            <constraint firstItem="8H9-xk-XPK" firstAttribute="leading" secondItem="s3x-aO-E8Y" secondAttribute="leading" id="Tzl-bo-TFz"/>
+                            <constraint firstItem="MPI-wk-n6M" firstAttribute="bottom" secondItem="8H9-xk-XPK" secondAttribute="top" priority="750" id="cT5-c3-DZX"/>
+                            <constraint firstItem="67v-xd-7Z3" firstAttribute="bottom" secondItem="MPI-wk-n6M" secondAttribute="top" priority="750" id="ec2-ie-ZoM"/>
+                            <constraint firstItem="MPI-wk-n6M" firstAttribute="leading" secondItem="s3x-aO-E8Y" secondAttribute="leading" id="hwI-ye-z7A"/>
+                            <constraint firstAttribute="bottom" secondItem="8H9-xk-XPK" secondAttribute="bottom" id="wVG-j5-faj"/>
+                        </constraints>
+                    </view>
+                </subviews>
+                <constraints>
+                    <constraint firstItem="s3x-aO-E8Y" firstAttribute="top" secondItem="w3s-dr-Zen" secondAttribute="top" constant="5" id="TsQ-cg-jvZ"/>
+                    <constraint firstAttribute="bottom" secondItem="s3x-aO-E8Y" secondAttribute="bottom" constant="5" id="dKn-Pi-Kxu"/>
+                    <constraint firstItem="s3x-aO-E8Y" firstAttribute="leading" secondItem="w3s-dr-Zen" secondAttribute="leading" constant="10" id="gue-rQ-UzE"/>
+                    <constraint firstAttribute="trailing" secondItem="s3x-aO-E8Y" secondAttribute="trailing" constant="10" id="oj9-d8-1Fo"/>
+                </constraints>
+            </tableViewCellContentView>
+            <connections>
+                <outlet property="bottomHeightConstraint" destination="jaG-i9-I88" id="1mw-K4-B22"/>
+                <outlet property="bottomView" destination="8H9-xk-XPK" id="Xti-nb-NsF"/>
+                <outlet property="middleView" destination="MPI-wk-n6M" id="fK3-eT-Psd"/>
+                <outlet property="myContentView" destination="s3x-aO-E8Y" id="E9Y-73-9GC"/>
+                <outlet property="topHeightConstraint" destination="fxN-wY-ZEr" id="Ykh-nq-3lZ"/>
+                <outlet property="topView" destination="67v-xd-7Z3" id="kRu-Pf-rGU"/>
+            </connections>
+            <point key="canvasLocation" x="278.5" y="221"/>
+        </tableViewCell>
+    </objects>
+</document>
