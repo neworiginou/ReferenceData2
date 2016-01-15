@@ -1,0 +1,122 @@
+//
+//  HWMyOrderView.m
+//  Community
+//
+//  Created by niedi on 15/7/7.
+//  Copyright (c) 2015年 caijingpeng. All rights reserved.
+//
+
+#import "HWMyOrderView.h"
+#import "HWMyOrderCell.h"
+
+@interface HWMyOrderView ()
+{
+    NSArray *_titleArr;
+    NSArray *_imgArr;
+}
+@end
+
+@implementation HWMyOrderView
+
+- (instancetype)initWithFrame:(CGRect)frame
+{
+    if (self = [super initWithFrame:frame])
+    {
+        [self loadUI];
+        
+        if ([[HWUserLogin currentUserLogin].coStatus isEqualToString:@"0"])
+        {
+            _titleArr = @[@"原产递团购", @"服务订单", @"无底线订单"];
+            _imgArr = @[@"tianTianTuanOrder", @"homeServiceOrder", @"bargainOrder"];
+        }
+        else
+        {
+            _titleArr = @[@"原产递团购", @"无底线订单"];
+            _imgArr = @[@"homeServiceOrder", @"bargainOrder"];
+        }
+        
+        //刷新钱包
+        [self getWalletMoney];
+    }
+    return self;
+}
+
+- (void)queryListData
+{
+    isLastPage = YES;
+    [self performSelector:@selector(doneLoadingTableViewData) withObject:nil afterDelay:0.1];
+}
+
+- (void)loadUI
+{
+    DView *tableHeaderV = [DView viewFrameX:0 y:0 w:kScreenWidth h:10.0f];
+    DImageV *line = [DImageV imagV:@"" frameX:0 y:9.5f w:kScreenWidth h:0.5f];
+    line.backgroundColor = THEME_COLOR_LINE;
+    [tableHeaderV addSubview:line];
+    
+    self.baseTable.tableHeaderView = tableHeaderV;
+}
+
+#pragma - mark 获取钱包余额
+- (void)getWalletMoney
+{
+    HWUserLogin *user = [HWUserLogin currentUserLogin];
+    HWHTTPRequestOperationManager *manage = [HWHTTPRequestOperationManager accountManager];
+    NSMutableDictionary *dict = [[NSMutableDictionary alloc] init];
+    [dict setPObject:user.key forKey:@"key"];
+    
+    [manage POST:kWalletRemainMoney parameters:dict queue:nil success:^(id responseObject) {
+        [Utility hideMBProgress:self];
+        NSDictionary *respDic = (NSDictionary *)[responseObject dictionaryObjectForKey:@"data"];
+        [HWUserLogin currentUserLogin].totalMoney = [respDic stringObjectForKey:@"amount"];
+        NSString * _walletMoneyStr = [respDic stringObjectForKey:@"amount"];
+        if([_walletMoneyStr length]==0)
+        {
+            _walletMoneyStr = @"0";
+            [HWUserLogin currentUserLogin].totalMoney = _walletMoneyStr;
+        }
+        else
+        {
+            [HWUserLogin currentUserLogin].totalMoney = _walletMoneyStr;
+        }
+    } failure:^(NSString *code, NSString *error) {
+        [HWUserLogin currentUserLogin].totalMoney = @"0";
+    }];
+}
+
+#pragma mark - tableViewDelegate
+#pragma mark - tableViewDelegate
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
+{
+    return _titleArr.count;
+}
+
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    NSString *cellId = @"cell";
+    HWMyOrderCell *cell = [tableView dequeueReusableCellWithIdentifier:cellId];
+    if (!cell)
+    {
+        cell = [[HWMyOrderCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellId];
+    }
+    
+    [cell fillDataWithTitle:[_titleArr pObjectAtIndex:indexPath.row] imgName:[_imgArr pObjectAtIndex:indexPath.row]];
+    return cell;
+}
+
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    return 65.0f;
+}
+
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    [tableView deselectRowAtIndexPath:indexPath animated:YES];
+    
+    if (self.delegate && [self.delegate respondsToSelector:@selector(didClickedWithRow:)])
+    {
+        [self.delegate didClickedWithRow:indexPath.row];
+    }
+}
+
+@end

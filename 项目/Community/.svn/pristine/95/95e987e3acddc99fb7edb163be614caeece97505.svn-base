@@ -1,0 +1,286 @@
+//
+//  HWNeighbourViewController.m
+//  Community
+//
+//  Created by niedi on 15/4/14.
+//  Copyright (c) 2015年 caijingpeng. All rights reserved.
+//
+//  功能描述：邻里圈 首页ViewController
+//
+//  修改记录：
+//      姓名          日期                      修改内容
+//      聂迪        2015-04-15                 创建文件
+//      陆晓波      2015-04-15                添加新手游客引导页相关initialGuideView initialGuideViewAfterPublish removeGuideView等方法
+//      陆晓波      2015-04-27                 添加HWCustomGuideAlertView.h，改变引导页样式
+//
+
+#import "HWNeighbourViewController.h"
+#import "AppDelegate.h"
+#import "HWChannelTableView.h"
+#import "HWCustomGuideAlertView.h"
+#import "HWTreasureRuleViewController.h"
+#import "HWGoodsDetailViewController.h"
+
+@interface HWNeighbourViewController ()<hwsearchListTableDelegate>
+{
+    BOOL hadShowGuide;
+}
+@end
+
+@implementation HWNeighbourViewController
+
+- (instancetype)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
+{
+    if (self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil])
+    {
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(refreshList) name:HWNeighbourDragRefresh object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(refreshList) name:RELOAD_APP_DATA object:nil];
+        //[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(initialGuideViewAfterPublish) name:InitialGuideViewAfterPublish object:nil];
+    }
+    return self;
+}
+
+/**
+ *	@brief	刷新数据
+ *
+ *	@return	N/A
+ */
+- (void)refreshList
+{
+    [_recommendView refreshList];
+    [_pastRecordView refreshList];
+}
+
+- (void)viewWillAppear:(BOOL)animated
+{
+    [super viewWillAppear:animated];
+}
+
+- (void)viewDidLoad
+{
+    [super viewDidLoad];
+    
+    _recommendView = [[HWRecommendView alloc] initWithFrame:CGRectMake(0, 0, kScreenWidth, CONTENT_HEIGHT - 49)];
+    _recommendView.delegate = self;
+    [self.view addSubview:_recommendView];
+    
+    _pastRecordView = [[HWChannelTableView alloc]initWithFrame:CGRectMake(0, 0, kScreenWidth, CONTENT_HEIGHT - 49) WithIsMoreRecommendWithPastRecord:NO personalUserId:nil];
+    _pastRecordView.delegate = self;
+    _pastRecordView.hidden = YES;
+    [self.view addSubview:_pastRecordView];
+    
+    HWSearchListTableView *searchListTableView = [_pastRecordView valueForKeyPath:@"searchView.searchListTableView"];
+    searchListTableView.delegate = self;
+}
+
+- (void)viewDidAppear:(BOOL)animated
+{
+    [super viewDidAppear:animated];
+    
+    if ([[NSUserDefaults standardUserDefaults] integerForKey:kGuideStep] == 1)
+    {
+        [self initialGuideView];
+    }
+    [self.navigationController setNavigationBarHidden:NO animated:NO];
+
+    [self initialGuideViewAfterPublish];
+}
+
+-(void)viewDidDisappear:(BOOL)animated
+{
+    [self removeGuideView:nil];
+}
+
+
+#pragma mark -
+#pragma mark - HWCustomSegmentControlDelegate
+- (void)segmentControl:(HWCustomSegmentControl *)sControl didSelectSegmentIndex:(int)index
+{
+    _segmentSelectIndex = index;
+    if (index == 0)
+    {
+        _recommendView.hidden = NO;
+        _pastRecordView.hidden = YES;
+    }
+    else
+    {
+        _pastRecordView.hidden = NO;
+        _recommendView.hidden = YES;
+    }
+}
+
+#pragma mark - 
+#pragma mark - HWRecommendViewDelegate
+- (void)pushVC:(HWBaseViewController *)vc
+{
+    [self.navigationController pushViewController:vc animated:YES];
+}
+
+- (void)recommendView:(HWRecommendView *)neighbourView pushVC:(HWChannelModel *)model
+{
+    HWTopicListViewController *vc = [[HWTopicListViewController alloc]init];
+    vc.channelModel = model;
+    [self.navigationController pushViewController:vc animated:YES];
+}
+
+- (void)tableViewHeaderPictureClick:(HWNeighbourBannerModel *)model
+{
+    HWApplicationDetailViewController *appDetailVC = [[HWApplicationDetailViewController  alloc] init];
+    appDetailVC.navigationItem.titleView = [Utility navTitleView:model.activityName];
+    appDetailVC.appUrl = model.activityURL;
+    [self.navigationController pushViewController:appDetailVC animated:YES];
+}
+
+#pragma mark -
+#pragma mark - HWChannelTableViewDelegate
+- (void)channelTableView:(HWChannelTableView *)chanelTableView pushCtroller:(HWChannelModel *)model
+{
+    HWTopicListViewController *vc = [[HWTopicListViewController alloc]init];
+    vc.channelModel = model;
+    [self.navigationController pushViewController:vc animated:YES];
+}
+
+- (void)searchListTableView:(HWSearchListTableView *)searchListTableView pushCtroller:(HWChannelModel *)model
+{
+    HWTopicListViewController *vc = [[HWTopicListViewController alloc]init];
+    vc.channelModel = model;
+    vc.isSearchBarPush = YES;
+    self.navigationController.navigationBarHidden = NO;
+    [self.navigationController pushViewController:vc animated:YES];
+}
+
+- (void)delegatePushVC:(HWBaseViewController *)vc
+{
+    [self.navigationController pushViewController:vc animated:YES];
+}
+
+#pragma mark -
+#pragma mark - 引导页相关
+//添加引导页
+-(void)initialGuideView
+{
+    UIImage *img = [UIImage imageNamed:@"new1"];
+    gView = [UIImageView newAutoLayoutView];
+    gView.userInteractionEnabled = YES;
+    AppDelegate *appDel = SHARED_APP_DELEGATE;
+    [appDel.window addSubview:gView];
+    gView.image = img;
+    [gView autoPinEdge:ALEdgeTop toEdge:ALEdgeTop ofView:appDel.window withOffset:64];
+    [gView autoPinEdge:ALEdgeRight toEdge:ALEdgeRight ofView:appDel.window withOffset:-10];
+    [gView autoSetDimensionsToSize:CGSizeMake(img.size.width * kScreenRate, img.size.height * kScreenRate)];
+    
+    UIView *iKnowView = [UIView newAutoLayoutView];
+    [gView addSubview:iKnowView];
+    [iKnowView autoAlignAxis:ALAxisVertical toSameAxisOfView:gView];
+    [iKnowView autoSetDimension:ALDimensionHeight toSize:(ceilf([gView systemLayoutSizeFittingSize:UILayoutFittingCompressedSize].height/4))];
+    [iKnowView autoPinEdge:ALEdgeBottom toEdge:ALEdgeBottom ofView:gView];
+    [iKnowView autoMatchDimension:ALDimensionWidth toDimension:ALDimensionWidth ofView:gView];
+
+    UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(updateIsNeedGuideView)];
+    [iKnowView addGestureRecognizer:tap];
+}
+
+//点击 我知道了
+-(void)updateIsNeedGuideView
+{
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    if ([defaults integerForKey:kGuideStep] == 1)
+    {
+        [defaults setInteger:-1 forKey:kGuideStep];
+        [defaults synchronize];
+    }
+    [self removeGuideView:nil];
+}
+
+//移除引导页
+- (void)removeGuideView:(id)sender
+{
+    if (gView != nil)
+    {
+        [UIView animateWithDuration:0.3f animations:^{
+            gView.alpha = 0;
+        }completion:^(BOOL finished) {
+            [gView removeFromSuperview];
+        }];
+    }
+}
+
+//成功发表主题引导页
+-(void)initialGuideViewAfterPublish
+{
+    if (([[NSUserDefaults standardUserDefaults] integerForKey:kGuideStep] == 2 || [[NSUserDefaults standardUserDefaults] integerForKey:kGuideStep] == 3) && hadShowGuide == NO)// == 2
+    {
+        HWCustomGuideAlertView *alert = [[HWCustomGuideAlertView alloc]initWithAlertType:1];
+        hadShowGuide = YES;
+        [alert showCustomGuideAlertViewWithCompleteBlock:^(NSInteger buttonTag) {
+            hadShowGuide = NO;
+            if (buttonTag == 0)
+            {
+                NSUserDefaults *userDefault = [NSUserDefaults standardUserDefaults];
+                [userDefault setInteger:-1 forKey:kGuideStep];
+                [userDefault synchronize];
+            }
+            else
+            {
+                //结束引导
+                NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+                if ([defaults integerForKey:kGuideStep] == 3)
+                {
+                    [defaults setInteger:-1 forKey:kGuideStep];
+                    [defaults synchronize];
+                }
+                
+                [Utility showMBProgress:self.view message:@"数据请求中..."];
+                //去花考拉币 跳转砍价第一个商品详情
+                NSMutableDictionary *param = [[NSMutableDictionary alloc] init];
+                [param setPObject:@"0" forKey:@"pageNumber"];
+                [param setPObject:[NSString stringWithFormat:@"%d",kPageCount] forKey:@"pageSize"];
+                [param setPObject:[HWUserLogin currentUserLogin].key forKey:@"key"];
+                [param setPObject:@"1" forKey:@"source"];
+                
+                HWHTTPRequestOperationManager *manager = [HWHTTPRequestOperationManager cutManager];
+                [manager POST:kCutProductList parameters:param queue:nil success:^(id responese)
+                {
+                    if ([[responese stringObjectForKey:@"status"] isEqual:@"1"])
+                    {
+                        [Utility hideMBProgress:self.view];
+                        NSArray *array = [[responese dictionaryObjectForKey:@"data"] arrayObjectForKey:@"list"];
+                        //跳转商品详情
+                        HWGoodsDetailViewController *vc = [[HWGoodsDetailViewController alloc]init];
+                        vc.productId = [array firstObject][@"productId"];
+                        [self.navigationController pushViewController:vc animated:YES];
+                    }
+                } failure:^(NSString *code, NSString *error)
+                {
+                    [Utility hideMBProgress:self.view];
+                    //未同意协议 跳转同意协议界面
+                    if ([error isEqual:@"您未同意砍价宝用户协议"])
+                    {
+                        HWTreasureRuleViewController *vc = [[HWTreasureRuleViewController alloc]init];
+                        vc.isGuide = YES;
+                        vc.isAgree = YES;
+                        [self.navigationController pushViewController:vc animated:YES];
+                    }
+                    else if ([error isEqual:@"网络打瞌睡了，稍后再试"])
+                    {
+                        [Utility showToastWithMessage:error inView:self.view];
+                        [self initialGuideViewAfterPublish];
+                    }
+                    else
+                    {
+                        [Utility showToastWithMessage:error inView:self.view];
+                    }
+                }];
+            }
+        }];
+    }
+}
+
+
+- (void)didReceiveMemoryWarning {
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
+}
+
+
+@end

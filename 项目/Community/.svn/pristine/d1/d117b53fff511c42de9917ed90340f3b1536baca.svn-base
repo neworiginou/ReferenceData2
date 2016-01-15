@@ -1,0 +1,27 @@
+//
+//  HWTianTianTuanDetailView.h
+//  Community
+//
+//  Created by niedi on 15/7/31.
+//  Copyright (c) 2015年 caijingpeng. All rights reserved.
+//
+
+#import "HWBaseRefreshView.h"
+
+@protocol HWTianTianTuanDetailViewDelegate <NSObject>
+
+- (void)showCancleOrderBtn:(BOOL)isShow;
+
+- (void)pushToTianTianTuanGoodsDetail:(NSString *)goodsId;
+
+- (void)pushToPayConfirmVC:(NSString *)orderId;
+
+@end
+
+@interface HWTianTianTuanDetailView : HWBaseRefreshView
+
+@property (nonatomic, weak) id<HWTianTianTuanDetailViewDelegate> delegate;
+
+- (instancetype)initWithFrame:(CGRect)frame orderId:(NSString *)orderId;
+
+@end

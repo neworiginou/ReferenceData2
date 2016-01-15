@@ -1,0 +1,226 @@
+//
+//  HWCommodityListView.m
+//  Community
+//
+//  Created by ryder on 7/31/15.
+//  Copyright (c) 2015 caijingpeng. All rights reserved.
+//
+//  功能描述：
+//      天天团商品列表页
+//  修改记录：
+//      姓名         日期              修改内容
+//     程耀均     2015-07-31           创建文件
+
+#import "HWCommodityListView.h"
+#import "HWCommondityDetailViewController.h"
+#import "AppDelegate.h"
+
+@interface HWCommodityListView ()<HWCommondityViewDelegate>
+{
+    NSMutableArray *_dataArray;
+    BOOL isFirst;
+    NSString *selectGoodsId;
+}
+@property (nonatomic, strong) UIPageControl *pageControl;
+@property (nonatomic, strong) UIScrollView *scrollView;
+
+@end
+
+@implementation HWCommodityListView
+
+- (instancetype)initWithFrame:(CGRect)frame
+{
+    self = [super initWithFrame:frame];
+    if (self)
+    {
+        isFirst = YES;
+        _dataArray = [NSMutableArray array];
+        [self initPageControl];
+        [self queryListData];
+    }
+    return self;
+}
+
+- (void)initPageControl
+{
+    _pageControl = [[UIPageControl alloc] initWithFrame:CGRectMake(15, 0, 0, CONTENT_HEIGHT)];
+    _pageControl.backgroundColor = [UIColor grayColor];
+    _pageControl.numberOfPages = _dataArray.count;
+    _pageControl.currentPage = 0;
+    _pageControl.transform = CGAffineTransformMakeRotation(M_PI / 2);
+    [self addSubview:_pageControl];
+}
+
+#pragma mark -
+#pragma mark HWCommondityListView Query Data
+- (void)queryListData
+{
+    /*url：http://172.16.10.110:8080/hw-sq-app-web/grpBuyGoods/getGrpBuyGoodsList.do
+     输入参数说明：
+     key：考拉社区登录成功用户被授权的key(必填)
+     villageId：考拉社区登录用户所属小区(必填)
+     
+     返回结果：
+     {
+     status: "1",
+     data: {
+     content: [
+     { goodsId: 10349274824, goodsName: "红苹果", startTime: 1437840000000, endTime: 1438240641000, marketPrice: 20.44, sellPrice: 50, costPrice: null, postage: null, freePostageType: null, freePostageNum: null, freePostageAmount: null, bigImg: "xxx2", smallImg: "xxx1", orderImg: null, showDistanceEndTime: 1, showDistanceStartTime: 1, stock: null, surplusStock: null, reduceStockType: null, brand: null, brandUrl: null, showSurplus: null, limitCount: null, goodsRemark: "xxx5", goodsInfo: "xxx4", buyGoodsCount: 1, currentTime: 1438254435172, isAuthBuy: null, status: "3", creater: null, createTime: null, modifier: null, modifyTime: null, version: null, disabled: null, surplusStock:30 }
+     
+     ],
+     size: 6,
+     number: 0,
+     sort: null,
+     totalElements: 1,
+     totalPages: 1,
+     numberOfElements: 1,
+     lastPage: true,
+     firstPage: true
+     },
+     detail: "请求数据成功!",
+     key: "3e801f50-10d8-44d7-9ce7-83e57fe582f1"
+     }*/
+    
+    isLastPage = YES;
+    
+    NSMutableDictionary *dictionary = [NSMutableDictionary dictionary];
+    [dictionary setPObject:[HWUserLogin currentUserLogin].key forKey:@"key"];
+    [dictionary setPObject:[HWUserLogin currentUserLogin].villageId forKey:@"villageId"];
+    
+    HWHTTPRequestOperationManager *manager = [HWHTTPRequestOperationManager manager];
+    [manager POST:kTianTianTuanQueryCommondityList parameters:dictionary queue:nil success:^(id responese) {
+        
+        NSLog(@"商品列表成功:%@", responese);
+        
+        if (self.currentPage == 0)
+        {
+            [_dataArray removeAllObjects];
+        }
+        
+        NSArray *dataArr = [[responese dictionaryObjectForKey:@"data"] arrayObjectForKey:@"content"];
+        
+        for (NSDictionary *tmpDict in dataArr)
+        {
+            HWCommondityModel *model = [[HWCommondityModel alloc] initWithdictionary:tmpDict];
+            [_dataArray addObject:model];
+        }
+        
+        [self initContentView];
+        
+        if (_dataArray.count > 0)
+        {
+            [self hideEmptyView];
+        }
+        else
+        {
+            [self showEmptyView:@"暂无团购活动"];
+        }
+        
+        [self doneLoadingTableViewData];
+        
+    } failure:^(NSString *code, NSString *error) {
+        
+        [self doneLoadingTableViewData];
+        [Utility showToastWithMessage:error inView:self];
+        
+        if (_dataArray.count == 0)
+        {
+            [self showEmptyView:@"请求失败，点击重试"];
+        }
+        else
+        {
+            [self hideEmptyView];
+        }
+    }];
+}
+
+#pragma mark -
+
+- (void)initContentView
+{
+    for (UIView *view in _scrollView.subviews)
+    {
+        if ([view isKindOfClass:[HWCommondityView class]])
+        {
+            HWCommondityView *cV = (HWCommondityView *)view;
+            [cV invalidaTimer];
+            [view removeFromSuperview];
+        }
+    }
+    [_scrollView removeFromSuperview];
+    _scrollView = nil;
+    _scrollView = [[UIScrollView alloc] initWithFrame:CGRectMake(0, 0, kScreenWidth, CONTENT_HEIGHT)];
+    _scrollView.delegate = self;
+    _scrollView.contentSize = CGSizeMake(kScreenWidth, CONTENT_HEIGHT * _dataArray.count);
+    _scrollView.pagingEnabled = YES;
+    _scrollView.showsHorizontalScrollIndicator = NO;
+    _scrollView.showsVerticalScrollIndicator = NO;
+    self.baseTable.tableHeaderView = _scrollView;
+    
+    _pageControl.numberOfPages = _dataArray.count;
+    _pageControl.currentPage = 0;
+    
+    for (NSInteger i = 0; i < _dataArray.count; i++)
+    {
+        HWCommondityModel *model = [_dataArray pObjectAtIndex:i];
+        HWCommondityView *subView = [[HWCommondityView alloc] initWithFrame:CGRectMake(0, 0 + CONTENT_HEIGHT * i, kScreenWidth, CONTENT_HEIGHT) model:model];
+        subView.delegate = self;
+        subView.rdelegate = self;
+        [_scrollView addSubview:subView];
+        
+        if ([model.goodsId isEqualToString:selectGoodsId])
+        {
+            self.pageControl.currentPage = i;
+            [_scrollView scrollRectToVisible:CGRectMake(0, i * CONTENT_HEIGHT, kScreenWidth, CONTENT_HEIGHT) animated:NO];
+        }
+    }
+    
+    /**
+     *  默认定位到第一个"立即购买"的商品(只在第一次)
+     */
+    if (isFirst)
+    {
+        isFirst = NO;
+        
+        for (NSInteger i = 0; i < _dataArray.count; i++) {
+            HWCommondityModel *model = [_dataArray pObjectAtIndex:i];
+            if (1 == model.status.integerValue)
+            {
+                self.pageControl.currentPage = i;
+                [_scrollView scrollRectToVisible:CGRectMake(0, i * CONTENT_HEIGHT, kScreenWidth, CONTENT_HEIGHT) animated:NO];
+                break;
+            }
+        }
+    }
+}
+#pragma mark - HWCommondityViewDelegate
+- (void)timerEndAction
+{
+    [self queryListData];
+}
+
+- (void)showGoodsDetailWithModel:(HWCommondityModel *)model
+{
+    if (self.delegate && [self.delegate respondsToSelector:@selector(didShowCommondityDetailWithModel:)])
+    {
+        selectGoodsId = model.goodsId;
+        [self.delegate didShowCommondityDetailWithModel:model];
+    }
+}
+
+#pragma mark - UIScrollViewDelegate
+- (void)scrollViewDidScroll:(UIScrollView *)scrollView
+{
+    [super scrollViewDidScroll:scrollView];
+    
+    if (_dataArray.count > 1 && scrollView == _scrollView)
+    {
+        float contentOffsetY = scrollView.contentOffset.y;
+        float scroHeight = CGRectGetHeight(scrollView.frame);
+        NSUInteger currentPageIndex = 0;
+        currentPageIndex = contentOffsetY / scroHeight;
+        _pageControl.currentPage = currentPageIndex;
+    }
+}
+
+@end

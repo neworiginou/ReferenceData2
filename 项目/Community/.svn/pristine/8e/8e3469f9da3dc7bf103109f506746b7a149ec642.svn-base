@@ -1,0 +1,728 @@
+//
+//  HWSubmitOrderView.m
+//  Community
+//
+//  Created by ryder on 7/29/15.
+//  Copyright (c) 2015 caijingpeng. All rights reserved.
+//
+//  功能描述：
+//      天天团提交订单页面
+//  修改记录：
+//      姓名         日期              修改内容
+//     程耀均     2015-07-29           创建文件
+
+#import "HWSubmitOrderView.h"
+#import "HWSubmitOrderModel.h"
+#import "HWTianTianTuanDetailVC.h"
+#import "HWCommonditySellUpViewController.h"
+
+typedef NS_ENUM(NSInteger, StepperViewTag)
+{
+    StepperViewTagSub = 200,
+    StepperViewTagField = 201,
+    StepperViewTagAdd = 202
+};
+
+@interface HWSubmitOrderView ()
+{
+    BOOL _isEditing; // 判断是否为数量 输入状态
+}
+
+@property (nonatomic, strong) UITableView *contentView;
+@property (nonatomic, strong) UILabel *postageLabel;
+@property (nonatomic, strong) UILabel *totalLabel;
+@property (nonatomic, assign) CGFloat totalPrice;
+@property (nonatomic, assign) NSInteger commondityCount;
+@property (nonatomic, strong) UILabel *purchaseLimitsCountLabel;
+@property (nonatomic, assign) NSInteger commondityStock; // 商品库存
+@property (nonatomic, strong) UITextField *commondityCountField;
+@end
+
+@implementation HWSubmitOrderView
+
+- (instancetype)init
+{
+    CGRect frame = CGRectMake(0, 0, kScreenWidth, kScreecHeight);
+    self = [self initWithFrame:frame];
+    if (self) {
+        
+    }
+    return self;
+}
+
+- (instancetype)initWithFrame:(CGRect)frame
+{
+    self = [super initWithFrame:frame];
+    if (self) {
+        
+        _isEditing = NO;
+        
+        [self setBackgroundColor:[[UIColor blackColor] colorWithAlphaComponent:0.5]];
+        _contentView.transform = CGAffineTransformMakeTranslation(0, kScreecHeight);
+        [UIView animateWithDuration:0.5
+                         animations:^{
+                             _contentView.transform = CGAffineTransformIdentity;
+                         }];
+    }
+    return self;
+}
+
+- (void)checkCommondityStocks
+{
+    HWHTTPRequestOperationManager *manager = [HWHTTPRequestOperationManager manager];
+    NSMutableDictionary *dictionary = [NSMutableDictionary dictionary];
+    [dictionary setPObject:[HWUserLogin currentUserLogin].key forKey:@"key"];
+    [dictionary setPObject:self.model.goodsId forKey:@"goodsId"];
+    [manager POST:kTianTianTuanCommonditySurplusStock
+       parameters:dictionary
+            queue:nil
+          success:^(id responese) {
+              NSString *data = [responese stringObjectForKey:@"data"];
+              NSInteger stocks = data.integerValue;
+              _commondityStock = stocks;
+              
+              if (_commondityStock) {
+                  if (_commondityStock >= _commondityCount) {
+                      if ( _commondityCount > self.model.limitCount.integerValue) { //超过限购数
+//                          NSString *alertStirng = [NSString stringWithFormat:@"限购%@份，是否确认购买？",self.model.limitCount];
+//                          UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"提示" message:alertStirng delegate:nil cancelButtonTitle:@"确定" otherButtonTitles:nil, nil];
+//                          alert.delegate = self;
+//                          alert.tag = 9998;
+//                          [alert show];
+                          _purchaseLimitsCountLabel.hidden = NO;
+                          _purchaseLimitsCountLabel.text = [NSString stringWithFormat:@"限购%zd份", [self.model.limitCount integerValue]];
+                          [_commondityCountField setText:[NSString stringWithFormat:@"%@", self.model.limitCount]];
+                          NSString *text = [_commondityCountField text];
+                          CGFloat value = text.floatValue * self.model.sellPrice.floatValue;
+                          [self setTotal:[NSString stringWithFormat:@"%.2f",value]];
+                      } else {
+                         [self queryListData];
+                      }
+                      
+                  } else  { // 超过库存数
+                      NSString *alertStirng = [NSString stringWithFormat:@"已有%zd份，是否确认购买？",_commondityStock];
+                      UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"提示" message:alertStirng delegate:nil cancelButtonTitle:@"确定" otherButtonTitles:nil, nil];
+                      alert.delegate = self;
+                      [alert show];
+                      alert.tag = 9999;
+                  }
+              } else {  // 商品没有库存
+                  HWCommonditySellUpViewController *sellUpVC = [[HWCommonditySellUpViewController alloc] init];
+                  [self.viewController.navigationController pushViewController:sellUpVC
+                                                                      animated:YES];
+              }
+          }failure:^(NSString *code, NSString *error){
+              NSLog(@"查询库存错误：%@",error);
+              [Utility hideMBProgress:self];
+              [Utility showToastWithMessage:error inView:self];
+          }];
+}
+
+- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex;
+{
+    if (buttonIndex == 0) {
+        if (alertView.tag == 9999) {
+            [_commondityCountField setText:[NSString stringWithFormat:@"%zd", _commondityStock]];
+        } else if (alertView.tag == 9998) {
+            [_commondityCountField setText:[NSString stringWithFormat:@"%@", self.model.limitCount]];
+        }
+        NSString *text = [_commondityCountField text];
+        CGFloat value = text.floatValue * self.model.sellPrice.floatValue;
+        [self setTotal:[NSString stringWithFormat:@"%.2f",value]];
+
+    }
+}
+
+- (void)queryListData
+{
+    HWHTTPRequestOperationManager *manager = [HWHTTPRequestOperationManager manager];
+    NSMutableDictionary *dictionary = [NSMutableDictionary dictionary];
+    [dictionary setPObject:[HWUserLogin currentUserLogin].key forKey:@"key"];
+    [dictionary setPObject:[HWUserLogin currentUserLogin].userId forKey:@"userId"];
+    [dictionary setPObject:self.model.goodsId forKey:@"goodsId"];
+    [dictionary setPObject:[NSString stringWithFormat:@"%zd",_commondityCount] forKey:@"goodsCount"];
+    
+    [manager POST:kTianTianTuanSubmitOrder
+       parameters:dictionary
+            queue:nil
+          success:^(id responese) {              // 下单
+              HWSubmitOrderModel *orderModel = [[HWSubmitOrderModel alloc] initWithdictionary:responese];
+              switch ([orderModel.status integerValue]) {
+                  case HWTianTianTuanOrderStatusSuccess:{
+                      if (orderModel.submitResult.boolValue) {
+                        if ([self.delegate respondsToSelector:@selector(didSubmitOrder:price:orderId:)]) {
+                            [self.delegate didSubmitOrder:_commondityCount price:_totalPrice orderId:orderModel.orderId];
+                        }
+                      } else {
+//                          [Utility showAlertWithMessage:orderModel.submitMsg];
+                          [Utility showToastWithMessage:orderModel.submitMsg inView:self];
+
+                          [self performSelector:@selector(checkOrderDetails:)
+                                     withObject:orderModel.orderId
+                                     afterDelay:1];
+                      }
+                  }
+                      break;
+                  case HWTianTianTuanOrderStatusFailPurchaseLimitaion:{
+                      [Utility showAlertWithMessage:orderModel.detail];
+                  }
+                      break;
+                      break;
+                  default:
+                      break;
+              }
+              
+          } failure:^(NSString *code, NSString *error){
+              NSLog(@"下单错误：%@",error);
+              [Utility hideMBProgress:self];
+              [Utility showToastWithMessage:error inView:self];
+          }];
+}
+
+- (void)checkOrderDetails:(NSString *)orderId
+{
+    HWTianTianTuanDetailVC *dVC = [[HWTianTianTuanDetailVC alloc] init];
+    dVC.orderId = orderId;
+    dVC.delegate = self;
+    [self.viewController.navigationController pushViewController:dVC
+                                                        animated:YES];
+    [Utility hideMBProgress:self];
+}
+
+- (instancetype)initWithModel:(HWCommondityDetailModel *)model
+{
+    self = [self init];
+    if (self) {
+        self.model = model;
+        [self initContentView];
+        UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self
+                                                                              action:@selector(handleTapRecognizer:)];
+        [self addGestureRecognizer:tap];
+        [self setUserInteractionEnabled:YES];
+    }
+    return self;
+}
+
+
+- (void)initContentView
+{
+    CGRect frame = CGRectMake(CGPointZero.x,
+                              CONTENT_HEIGHT/2,
+                              kScreenWidth,
+                              CONTENT_HEIGHT/2);
+    _contentView = [[UITableView alloc] initWithFrame:frame];
+    [_contentView setBackgroundColor:[UIColor whiteColor]];
+    _contentView.delegate = self;
+    _contentView.dataSource = self;
+//    _contentView.tableFooterView = [self submitOrderButton];
+    _contentView.scrollEnabled = NO;
+    _contentView.separatorStyle = UITableViewCellSeparatorStyleNone;
+    [self addSubview:_contentView];
+    [self submitOrderButton];
+}
+
+
+- (void)lineAtView:(UIView *)view;
+{
+    NSInteger pading = 16;
+    UIView *line = [[UIView alloc] initWithFrame:CGRectMake(0, CGRectGetHeight(view.frame) - 1.f, kScreenWidth - pading * 2, 1.f)];
+    line.backgroundColor = [UIColor colorWithRed:216/255.f
+                                           green:216/255.f
+                                            blue:215/255.f
+                                           alpha:1.f];
+    [view addSubview:line];
+}
+
+- (void)setPostage:(NSString *)postage
+{
+    if (!postage.integerValue) {
+        _postageLabel.text = @"包邮";
+        return;
+    }
+     _postageLabel.text = [NSString stringWithFormat:@"%zd元", [postage integerValue]];
+    
+    CGSize size = [Utility calculateStringWidth:_postageLabel.text
+                                           font:FONT(TF16)
+                                constrainedSize:CGSizeMake(CGFLOAT_MAX,
+                                                           CGRectGetHeight(_postageLabel.frame))];
+    CGRect frame = _postageLabel.frame;
+    frame.size = size;
+    frame.origin = CGPointMake(kScreenWidth - 15 * 2 - size.width, CGRectGetMinY(_postageLabel.frame));
+    _postageLabel.frame = frame;
+}
+
+- (void)setTotal:(NSString *)total
+{
+//    _totalLabel.text = total;
+    _totalLabel.text = [NSString stringWithFormat:@"%@元",total];
+    CGSize size = [Utility calculateStringWidth:_totalLabel.text
+                                    font:FONT(TF16)
+                         constrainedSize:CGSizeMake(CGFLOAT_MAX,
+                                                    CGRectGetHeight(_totalLabel.frame))];
+    CGRect frame = _totalLabel.frame;
+    frame.size = size;
+    frame.origin = CGPointMake(kScreenWidth - 15 * 2 - size.width, CGRectGetMinY(_totalLabel.frame));
+    _totalLabel.frame = frame;
+}
+
+- (void)handleTapRecognizer:(UITapGestureRecognizer *)recognizer
+{
+    if (_isEditing)
+    {
+        [self endEditing:YES];
+    }
+    else
+    {
+        CGPoint point = [recognizer locationInView:self.contentView];
+        if (point.y >= 0) {
+            return;
+        }
+        self.transform = CGAffineTransformIdentity;
+        [UIView animateWithDuration:0.3
+                         animations:^{
+                             _contentView.transform = CGAffineTransformMakeTranslation(0, kScreecHeight);
+                             self.alpha = 0.0f;
+                         } completion:^(BOOL finished) {
+                             [self removeFromSuperview];
+                         }];
+    }
+}
+
+#pragma mark -
+#pragma mark UITableViewDataSource
+
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
+{
+    return 2;
+}
+
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath;
+{
+    UITableViewCell *cell = [[UITableViewCell alloc]initWithStyle:UITableViewCellStyleDefault reuseIdentifier:nil];
+    cell.selectionStyle = UITableViewCellSelectionStyleNone;
+    switch (indexPath.row) {
+        case 0: {
+            CGRect frame = CGRectMake(16,
+                                      CGRectGetMinY(cell.frame),
+                                      CGRectGetWidth(cell.frame),
+                                      15);
+            UILabel *label = [[UILabel alloc] initWithFrame:frame];
+            label.font = cell.textLabel.font;
+            label.text = @"数量";
+            [label  setTextColor:THEME_COLOR_TEXT];
+            [cell addSubview:label];
+           
+            
+            frame.origin = CGPointMake(CGRectGetMinX(label.frame) + 50,
+                                       CGRectGetMinY(label.frame));
+            UILabel *purchaseLimitsCountLabel = [[UILabel alloc] initWithFrame:frame];
+            [purchaseLimitsCountLabel setTextColor:[UIColor colorWithRed:226/255
+                                                                   green:92/255
+                                                                    blue:95/255
+                                                                   alpha:1.0]];
+            [purchaseLimitsCountLabel setText:@"限购2份"];
+            [purchaseLimitsCountLabel setFont:label.font];
+            _purchaseLimitsCountLabel = purchaseLimitsCountLabel;
+            [cell addSubview:purchaseLimitsCountLabel];
+            _purchaseLimitsCountLabel.hidden = YES;
+
+            
+            _commondityCount = 1;
+            
+            UIView *controlView = [self stepperView];
+            frame = CGRectMake(kScreenWidth  - CGRectGetWidth(controlView.frame) - 15,
+                               0,
+                               CGRectGetWidth(controlView.frame),
+                               CGRectGetHeight(controlView.frame));
+            controlView.frame = frame;
+            [cell.contentView addSubview:controlView];
+
+            NSInteger pading = 16;
+            UIView *line = [[UIView alloc] initWithFrame:CGRectMake(16, CGRectGetHeight(controlView.frame) - 1.f, kScreenWidth - pading * 2, 0.5f)];
+            line.backgroundColor = THEME_COLOR_LINE;
+            [cell addSubview:line];
+            
+             label.center = CGPointMake(CGRectGetMidX(label.frame), CGRectGetMidY(controlView.frame));
+            purchaseLimitsCountLabel.center = CGPointMake(CGRectGetMidX(purchaseLimitsCountLabel.frame),
+                                                          CGRectGetMidY(controlView.frame));
+        }
+            break;
+        case 1: {
+            NSInteger padding = 15;
+            NSInteger height = 32;
+            CGRect frame = CGRectMake(padding,
+                                      padding,
+                                      CGRectGetWidth(cell.frame),
+                                      height);
+            UILabel *label = [[UILabel alloc] initWithFrame:frame];
+            label.font = cell.textLabel.font;
+            label.text = @"邮费";
+            [label  setTextColor:THEME_COLOR_TEXT];
+            
+            
+            UILabel *postageLabel = [[UILabel alloc] initWithFrame:label.frame];
+            postageLabel.backgroundColor = [UIColor clearColor];
+            postageLabel.font = FONT(TF16);;
+            postageLabel.textAlignment = NSTextAlignmentRight;
+            postageLabel.textColor = label.textColor;
+//            postageLabel.text = @"包邮";
+            if (!self.model.postage.integerValue) {
+                postageLabel.text = @"包邮";
+            } else {
+                 postageLabel.text = [NSString stringWithFormat:@"%zd元", [self.model.postage integerValue]];
+            }
+           
+//            postageLabel.text = @"包邮";
+            [self setPostage:self.model.postage];
+            
+            
+            [cell addSubview:postageLabel];
+            _postageLabel = postageLabel;
+
+            
+            frame = CGRectMake(padding,
+                               CGRectGetMaxY(label.frame),
+                               CGRectGetWidth(cell.frame),
+                               height);
+            UILabel *label2 = [[UILabel alloc] initWithFrame:frame];
+            label2.font = cell.textLabel.font;
+            label2.text = @"总价";
+            label2.textColor = label.textColor;
+           
+            UILabel *totalLabel = [[UILabel alloc] initWithFrame:label2.frame];
+            totalLabel.font = FONT(TF16);;
+            totalLabel.textAlignment = NSTextAlignmentRight;
+            totalLabel.textColor = THEME_COLOR_RED;
+            totalLabel.text = [NSString stringWithFormat:@"%@元",self.model.sellPrice];
+            [cell addSubview:totalLabel];
+            _totalLabel = totalLabel;
+            
+            [label  setTextColor:THEME_COLOR_TEXT];
+            [cell addSubview:label];
+            [cell addSubview:label2];
+            
+            NSInteger pading = 16;
+            UIView *line = [[UIView alloc] initWithFrame:CGRectMake(16, 90 - 1.f, kScreenWidth - pading * 2, 0.5f)];
+            line.backgroundColor = THEME_COLOR_LINE;
+            [cell addSubview:line];
+            
+            CGSize size = [Utility calculateStringWidth:_postageLabel.text
+                                                   font:FONT(TF16)
+                                        constrainedSize:CGSizeMake(CGFLOAT_MAX,
+                                                                   CGRectGetHeight(_postageLabel.frame))];
+            frame = _postageLabel.frame;
+            frame.size = size;
+            frame.origin = CGPointMake(kScreenWidth - padding - size.width, CGRectGetMidY(label.frame) - size.height / 2.0f);
+            _postageLabel.frame = frame;
+            
+            size = [Utility calculateStringWidth:_totalLabel.text
+                                            font:FONT(TF16)
+                                constrainedSize:CGSizeMake(CGFLOAT_MAX,
+                                                           CGRectGetHeight(_totalLabel.frame))];
+            frame = _totalLabel.frame;
+            frame.size = size;
+            frame.origin = CGPointMake(kScreenWidth - padding - size.width, CGRectGetMidY(label2.frame) - size.height / 2.0f);
+            _totalLabel.frame = frame;
+            
+        }
+            
+            break;
+        default:
+            break;
+    }
+    return cell;
+}
+
+- (UIView *)stepperView
+{
+    NSInteger size = 24;
+    CGRect frame = CGRectMake(0, 0, 105, 55);
+    UIView *control = [[UIView alloc] initWithFrame:frame];
+    control.backgroundColor = [UIColor clearColor];
+    
+    UIButton *subButton = [[UIButton alloc] initWithFrame:CGRectMake(0, 15, size, size)];
+    [subButton setButtonGrayStyle];
+    [subButton.layer setCornerRadius:3.5f];
+    [subButton setClipsToBounds:YES];
+    [subButton addTarget:self
+                  action:@selector(changeCommodityCount:)
+        forControlEvents:UIControlEventTouchUpInside];
+    [subButton setImage:[UIImage imageNamed:@"减"] forState:UIControlStateNormal];
+    subButton.tag = StepperViewTagSub;
+    
+    UITextField *field = [[UITextField alloc] initWithFrame:CGRectMake(CGRectGetMaxX(subButton.frame) + 6, 15, 44, size)];
+    field.text = @"1";
+    [field setTextColor:THEME_COLOR_TEXT];
+    field.layer.cornerRadius = 3.5f;
+    field.layer.masksToBounds = YES;
+    field.layer.borderColor = THEME_COLOR_TEXT.CGColor;
+    field.layer.borderWidth = 1.0f;
+    field.font = [UIFont fontWithName:FONTNAME size:14.0f];
+    field.textAlignment = NSTextAlignmentCenter;
+    field.tag = StepperViewTagField;
+    field.keyboardType = UIKeyboardTypeNumberPad;
+    field.delegate = self;
+    _commondityCountField = field;
+//    field.keyboardType = UIKeyboardTypeNumberPad;
+    
+    UIButton *addButton = [[UIButton alloc] initWithFrame:CGRectMake(CGRectGetMaxX(field.frame) + 6, 15, size, size)];
+    
+    [addButton addTarget:self
+                  action:@selector(changeCommodityCount:)
+        forControlEvents:UIControlEventTouchUpInside];
+    addButton.tag = StepperViewTagAdd;
+    [addButton setImage:[UIImage imageNamed:@"加"] forState:UIControlStateNormal];
+    [addButton setButtonOrangeStyle];
+    [addButton setUserInteractionEnabled:YES];
+    
+    [control addSubview:subButton];
+    [control addSubview:field];
+    [control addSubview:addButton];
+    return control;
+}
+
+- (void)changeCommodityCount:(UIButton *)button
+{
+    UITextField *field = (UITextField *)[button.superview viewWithTag:StepperViewTagField];
+    NSInteger limitCount = [self.model.limitCount integerValue];
+    NSInteger count = field.text.integerValue;
+    CGFloat total = _totalLabel.text.floatValue;
+    BOOL isAddCommondity  = (button.tag == StepperViewTagAdd) ? YES : NO;
+    if (isAddCommondity) {
+        if (count >= limitCount) {
+            _purchaseLimitsCountLabel.hidden = NO;
+            _purchaseLimitsCountLabel.text = [NSString stringWithFormat:@"限购%zd份", [self.model.limitCount integerValue]];
+            return;
+        }
+        count++;
+        field.text = [NSString stringWithFormat:@"%zd",count];
+        _commondityCount = count;
+    } else {
+        if (total <= 0) {
+            return;
+        }
+
+        if (count <= 1) {
+            return;
+        }
+
+        NSInteger count = field.text.integerValue;
+        count--;
+        count = (count < 0)?0:count;
+        field.text = [NSString stringWithFormat:@"%zd",count];
+        _commondityCount = count;
+        
+        if (count < limitCount ) {
+            _purchaseLimitsCountLabel.hidden = YES;
+        }
+    }
+    NSString *totalString = [NSString stringWithFormat:@"%.2f", _commondityCount * self.model.sellPrice.floatValue];
+    _totalPrice = totalString.floatValue;
+    [self setTotal:totalString];
+    
+//    UITextField *field = (UITextField *)[button.superview viewWithTag:StepperViewTagField];
+//    NSInteger limitCount = [self.model.limitCount integerValue];
+//    NSInteger count = field.text.integerValue;
+//    if (count > limitCount && limitCount != 0) {
+//        _purchaseLimitsCountLabel.hidden = NO;
+//        _purchaseLimitsCountLabel.text = [NSString stringWithFormat:@"限购%zd份", [self.model.limitCount integerValue]];
+//        [_commondityCountField setText:[NSString stringWithFormat:@"%zd",limitCount]];
+//        return;
+//    } else if (count < limitCount) {
+//        _purchaseLimitsCountLabel.hidden = YES;
+//    }
+//    
+//    
+//    
+//    switch (button.tag) {
+//        case StepperViewTagSub:{
+//            
+//            CGFloat total = _totalLabel.text.floatValue;
+//            if (total <= 0) {
+//                return;
+//            }
+//            
+//            if (count <= 1) {
+//                return;
+//            }
+//            
+//            NSInteger count = field.text.integerValue;
+//            count--;
+//            count = (count < 0)?0:count;
+//            field.text = [NSString stringWithFormat:@"%zd",count];
+//            
+//            CGFloat totalPrice = ([_totalLabel.text floatValue] - self.model.sellPrice.floatValue);
+//            _totalLabel.text = [NSString stringWithFormat:@"%.2f",totalPrice];
+//            _commondityCount = count;
+//            _totalPrice = totalPrice;
+//            
+//            if (count < limitCount ) {
+//                _purchaseLimitsCountLabel.hidden = YES;
+//                return;
+//            }
+//        }
+//            break;
+//        case StepperViewTagAdd:{
+//            if (count > limitCount ) {
+//                return;
+//            }
+//            NSInteger count = field.text.integerValue;
+//            count++;
+//            field.text = [NSString stringWithFormat:@"%zd",count];
+//            
+//            CGFloat totalPrice = ([_totalLabel.text floatValue] + [self.model.sellPrice floatValue]);
+//            _totalLabel.text = [NSString stringWithFormat:@"%.2f",totalPrice];
+//            _commondityCount = count;
+//            _totalPrice = totalPrice;
+//            if (count == limitCount) {
+//                _purchaseLimitsCountLabel.hidden = NO;
+//            }
+//        }
+//            
+//            break;
+//        default:
+//            break;
+//    }
+    
+    CGSize  size = [Utility calculateStringWidth:_totalLabel.text
+                                    font:FONT(TF16)
+                         constrainedSize:CGSizeMake(CGFLOAT_MAX,
+                                                    CGRectGetHeight(_totalLabel.frame))];
+    CGRect frame = _totalLabel.frame;
+    frame.size = size;
+    frame.origin = CGPointMake(kScreenWidth - 15 * 2 - size.width, CGRectGetMinY(_totalLabel.frame));
+    _totalLabel.frame = frame;
+}
+
+#pragma mark -
+#pragma mark UITableViewDelegate
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    CGFloat height = 0;
+    switch (indexPath.section) {
+        case 0:
+            height = 55;
+            break;
+        case 1:
+            height = 83;
+            break;
+            
+        default:
+            break;
+    }
+    return height;
+}
+
+- (CGFloat)tableView:(UITableView *)tableView heightForFooterInSection:(NSInteger)section
+{
+    return 0.f;
+}
+
+//- (UIView *)submitOrderButton
+//{
+//    UIView *view = [[UIView alloc]initWithFrame:CGRectMake(0,
+//                                                           0,
+//                                                           kScreenWidth,
+//                                                           114)];
+//    UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom];
+//    button.frame = CGRectMake(15, 45, kScreenWidth - 30, 45);
+//    [button setTitle:@"提交订单" forState:UIControlStateNormal];
+//    [button addTarget:self action:@selector(submitOrder) forControlEvents:UIControlEventTouchUpInside];
+//    [button setButtonOrangeStyle];
+//    [view addSubview:button];
+//    return view;
+//}
+
+- (void)submitOrderButton
+{
+    UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom];
+    button.frame = CGRectMake(15, CONTENT_HEIGHT - 45 - 20, kScreenWidth - 30, 45);
+    [button setTitle:@"提交订单" forState:UIControlStateNormal];
+    [button addTarget:self action:@selector(submitOrder) forControlEvents:UIControlEventTouchUpInside];
+//    [button setBackgroundColor:THEME_COLOR_ORANGE];
+    [button setButtonOrangeStyle];
+    [self addSubview:button];
+}
+
+
+- (void)submitOrder
+{
+    _totalPrice += [self.model.postage floatValue]; // 算上邮费
+    [self checkCommondityStocks];
+}
+
+
+#pragma mark -
+#pragma mark UITextFieldDelegate
+
+- (BOOL)textFieldShouldBeginEditing:(UITextField *)textField
+{
+    _isEditing = YES;
+    
+    [UIView animateWithDuration:0.3f animations:^{
+        CGRect frame = _contentView.frame;
+        frame.origin.y = CONTENT_HEIGHT / 2 - 40;
+        _contentView.frame = frame;
+    }];
+    
+    return YES;
+}
+
+- (BOOL)textFieldShouldEndEditing:(UITextField *)textField
+{
+    int count = [textField.text intValue];
+    NSInteger limitCount = [self.model.limitCount integerValue];
+    if (count >= limitCount)
+    {
+        _purchaseLimitsCountLabel.hidden = NO;
+        _purchaseLimitsCountLabel.text = [NSString stringWithFormat:@"限购%zd份", [self.model.limitCount integerValue]];
+        
+        textField.text = [NSString stringWithFormat:@"%ld", limitCount];
+        
+        
+        NSString *totalString = [NSString stringWithFormat:@"%.2f", limitCount * self.model.sellPrice.floatValue];
+        _totalPrice = totalString.floatValue;
+        [self setTotal:totalString];
+        
+    }
+    
+    _isEditing = NO;
+    
+    [UIView animateWithDuration:0.3f animations:^{
+        CGRect frame = _contentView.frame;
+        frame.origin.y = CONTENT_HEIGHT / 2;
+        _contentView.frame = frame;
+    }];
+    
+    
+    return YES;
+}
+
+- (BOOL)textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string
+{
+    NSCharacterSet *cs = [[NSCharacterSet characterSetWithCharactersInString:@"1234567890"] invertedSet];
+    NSString *filtered = [[string componentsSeparatedByCharactersInSet:cs] componentsJoinedByString:@""];
+    if ((([string isEqualToString:filtered]))) {
+        NSString *text = [textField text];
+        text = [text stringByReplacingCharactersInRange:range
+                                             withString:string];
+        CGFloat value = text.floatValue * self.model.sellPrice.floatValue;
+        [self setTotal:[NSString stringWithFormat:@"%.2f",value]];
+    }
+    return (([string isEqualToString:filtered]));
+}
+
+- (BOOL)textFieldShouldReturn:(UITextField *)textField
+{
+    [textField resignFirstResponder];
+    return NO;
+}
+
+#pragma mark -
+#pragma mark HWTianTianTuanDetailVCDelegate
+
+- (void)cancleOrderReQueryList
+{
+    [self.viewController.navigationController popViewControllerAnimated:YES];
+}
+@end

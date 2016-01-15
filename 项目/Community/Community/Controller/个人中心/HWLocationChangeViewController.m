@@ -1,0 +1,1010 @@
+//
+//  HWLocationChangeViewController.m
+//  Community
+//
+//  Created by gusheng on 14-9-12.
+//  Copyright (c) 2014年 caijingpeng. All rights reserved.
+//
+
+#import "HWLocationChangeViewController.h"
+#import "HWHTTPRequestOperationManager.h"
+#import "HWRequestConfig.h"
+#import "HWCityViewController.h"
+#import "HWAreaClass.h"
+#import "NoCommunityView.h"
+#import "HWCreateNewCommunityViewController.h"
+#import "HWLocationTableViewCell.h"
+#import "AppDelegate.h"
+#import "APService.h"
+#import "TuiGuangYuanUI.h"
+#import "HWCustomGuideAlertView.h"
+
+@interface HWLocationChangeViewController ()
+{
+    HWSearchBarView *_searchBar;
+    BOOL _pushVCFlag;
+}
+@end
+
+@implementation HWLocationChangeViewController
+@synthesize communities;
+@synthesize cityId;
+@synthesize villageId;
+@synthesize searchResultArry;
+@synthesize locationChangeFlag;
+@synthesize isOtherCommunity;
+@synthesize delegate;
+
+- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
+{
+    self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
+    if (self) {
+        // Custom initialization
+        self.isNickVCPush = NO;
+        self.isCheckIPBindVillageId = NO;
+    }
+    return self;
+}
+//创建测试数据源
+-(void)createDataSource
+{
+    //listCommunityArry
+}
+-(void)popTemp
+{
+    [_searchBar._searchTF resignFirstResponder];
+}
+//创建搜索小区无结果的界面
+-(void)createNoAreaView
+{
+    noCommentGpsLocationView = [[UIView alloc]initWithFrame:CGRectMake(0, 50, kScreenWidth, [UIScreen mainScreen].bounds.size.height)];
+    noCommentGpsLocationView.backgroundColor = UIColorFromRGB(0xf0f0f0);
+    
+    UILabel *noGpsCommentLabel = [[UILabel alloc]initWithFrame:CGRectMake(kScreenWidth/2-100, 100, 200, 14)];
+    noGpsCommentLabel.backgroundColor = [UIColor clearColor];
+    noGpsCommentLabel.text = @"未搜索到你附近小区，输入小";
+    noGpsCommentLabel.textColor = THEME_COLOR_TEXT;
+    noGpsCommentLabel.textAlignment = NSTextAlignmentCenter;
+    noGpsCommentLabel.font = [UIFont systemFontOfSize:14.0];
+    
+    UITapGestureRecognizer *tap1 = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(popTemp)];
+    UILabel *noGpsCommentSubLabel = [[UILabel alloc]initWithFrame:CGRectMake(kScreenWidth/2-100, CGRectGetMaxY(noGpsCommentLabel.frame), 200, 14)];
+    noGpsCommentSubLabel.backgroundColor = [UIColor clearColor];
+    noGpsCommentSubLabel.text = @"区名称进行搜索";
+    noGpsCommentSubLabel.textColor = THEME_COLOR_TEXT;
+    noGpsCommentSubLabel.textAlignment = NSTextAlignmentCenter;
+    noGpsCommentSubLabel.font = [UIFont systemFontOfSize:14.0];
+    [noCommentGpsLocationView addGestureRecognizer:tap1];
+    [noCommentGpsLocationView addSubview:noGpsCommentLabel];
+    [self.view addSubview:noCommentGpsLocationView];
+    
+    noCommentView = [[UIView alloc]initWithFrame:CGRectMake(0, 50, kScreenWidth, [UIScreen mainScreen].bounds.size.height)];
+    UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(popTemp)];
+    noCommentView.backgroundColor = UIColorFromRGB(0xf0f0f0);
+    UIImageView *AvatarImageView = [[UIImageView alloc]initWithFrame:CGRectMake(kScreenWidth/2-167.5/2, 62, 167.5, 124.5)];
+    AvatarImageView.image = [UIImage imageNamed:@"emptyData"];
+    [noCommentView addGestureRecognizer:tap];
+    [noCommentView addSubview:AvatarImageView];
+    
+    UILabel *noCommentLabel = [[UILabel alloc]initWithFrame:CGRectMake(kScreenWidth/2-100, 205, 200, 14)];
+    noCommentLabel.backgroundColor = [UIColor clearColor];
+    noCommentLabel.text = @"当前城市未找到你搜索的小区";
+    noCommentLabel.textColor = THEME_COLOR_TEXT;
+    noCommentLabel.textAlignment = NSTextAlignmentCenter;
+    noCommentLabel.font = [UIFont systemFontOfSize:14.0];
+    [noCommentView addSubview:noCommentLabel];
+    
+    
+    UIButton *commentBtn = [[UIButton alloc]initWithFrame:CGRectMake(kScreenWidth/2-280/2, 264, 280, 44)];
+    commentBtn.backgroundColor = [UIColor clearColor];
+    commentBtn.titleLabel.textColor = [UIColor whiteColor];
+    commentBtn.layer.cornerRadius = 2.0f;
+    commentBtn.layer.masksToBounds = YES;
+    [commentBtn setBackgroundImage:[Utility imageWithColor:THEME_COLOR_ORANGE andSize:CGSizeMake(280, 44)] forState:UIControlStateNormal];
+    [commentBtn addTarget:self action:@selector(clickComment:) forControlEvents:UIControlEventTouchUpInside];
+    [commentBtn setTitle:@"创建小区" forState:UIControlStateNormal];
+    [noCommentView addSubview:commentBtn];
+    [self.view addSubview:noCommentView];
+    
+////    //定位城市可以创建小区
+//  
+//    noCommentGpsLocationView = [[UIView alloc]initWithFrame:CGRectMake(0, 50, kScreenWidth, [UIScreen mainScreen].bounds.size.height)];
+//    noCommentGpsLocationView.backgroundColor = UIColorFromRGB(0xf0f0f0);
+//    
+//    UILabel *noGpsCommentLabelTemp = [[UILabel alloc]initWithFrame:CGRectMake(kScreenWidth/2-100, 205, 200, 14)];
+//    noGpsCommentLabelTemp.backgroundColor = [UIColor clearColor];
+//    noGpsCommentLabelTemp.text = @"未搜索到你附近小区，输入小";
+//    noGpsCommentLabelTemp.textColor = THEME_COLOR_TEXT;
+//    noGpsCommentLabelTemp.textAlignment = NSTextAlignmentCenter;
+//    noGpsCommentLabelTemp.font = [UIFont systemFontOfSize:14.0];
+    
+    
+    UILabel *noGpsCommentSubLabelTemp = [[UILabel alloc]initWithFrame:CGRectMake(kScreenWidth/2-100, CGRectGetMaxY(noGpsCommentLabel.frame), 200, 14)];
+    noGpsCommentSubLabelTemp.backgroundColor = [UIColor clearColor];
+    noGpsCommentSubLabelTemp.text = @"区名称进行搜索";
+    noGpsCommentSubLabelTemp.textColor = THEME_COLOR_TEXT;
+    noGpsCommentSubLabelTemp.textAlignment = NSTextAlignmentCenter;
+    noGpsCommentSubLabelTemp.font = [UIFont systemFontOfSize:14.0];
+    [noCommentGpsLocationView addSubview:noGpsCommentSubLabelTemp];
+    
+}
+//创建小区
+-(void)clickComment:(id)sender
+{
+    HWCreateNewCommunityViewController *createNewCommunityView = [[HWCreateNewCommunityViewController alloc]initWithNibName:@"HWCreateNewCommunityViewController" bundle:nil];
+    createNewCommunityView.cityName = [Utility getCityNameById:cityId];;
+    [self.navigationController pushViewController:createNewCommunityView animated:YES];
+}
+
+#pragma - mark viewWillAppear
+
+-(void)viewDidAppear:(BOOL)animated
+{
+    [self initialSearchDisplay];
+    if (locationChangeFlag == NO)
+    {
+        [self popAlert];
+    }
+}
+
+-(void)popAlert
+{
+    float longtitude = [HWUserLogin currentUserLogin].longitude;
+    float latitude = [HWUserLogin currentUserLogin].latitude;
+    if (longtitude > -0.000001 && longtitude < 0.000011 && latitude > -0.000001 && longtitude < 0.0000011&&!cityId)
+    {
+        UIAlertView *alerView = [[UIAlertView alloc]initWithTitle:@"" message:@"定位失败，请选择城市" delegate:self cancelButtonTitle:@"取消" otherButtonTitles:@"确定", nil];
+        [alerView show];
+    }
+}
+
+#pragma - mark ViewdidLoad
+
+- (void)viewDidLoad
+{
+    [super viewDidLoad];
+    
+    self.navigationController.navigationBarHidden = NO;
+    
+    if (self.isCheckIPBindVillageId)    //如果需要检查Ip是否绑定小区 则调用此接口，如果没走通将isCheckIPBindVillageId至为no，重新走
+    {
+        if (self.isCustomLogin)
+        {
+            self.navigationItem.leftBarButtonItem = nil;
+        }
+        [self queryIsQRCodeIp]; //扫二维码绑定小区
+    }
+    else
+    {
+        isChangeCityFlag = NO;
+        //搜索页默认为0
+        serarchPage = 0;
+        self.isNeedHeadRefresh = NO;
+        isLastPage = YES;
+        //默认搜索页不是最后一页
+        isSearchLastPage = NO;
+        if (locationChangeFlag == NO)
+        {
+            self.navigationItem.titleView = [Utility navTitleView:@"定位中...." action:@selector(changeCity:) target:self];
+        }
+        else
+        {
+            if (![HWUserLogin currentUserLogin].gpsCityName)
+            {
+                if ([HWUserLogin currentUserLogin].locationFailureFlag == YES)
+                {
+                    [HWUserLogin currentUserLogin].locationFailureFlag = NO;
+                    self.navigationItem.titleView = [Utility navTitleView:@"切换城市" action:@selector(changeCity:) target:self];
+                }
+                else
+                {
+                    if ([[HWUserLogin currentUserLogin].changeCity length]!=0)
+                    {
+                        self.navigationItem.titleView = [Utility navTitleView:[HWUserLogin currentUserLogin].changeCity action:@selector(changeCity:) target:self];
+                    }
+                    else
+                    {
+                        self.navigationItem.titleView = [Utility navTitleView:@"切换城市" action:@selector(changeCity:) target:self];
+                    }
+                }
+            }
+            else
+            {
+                self.navigationItem.titleView = [Utility navTitleView:[HWUserLogin currentUserLogin].gpsCityName action:@selector(changeCity:) target:self];
+            }
+        }
+        if (self.isCustomLogin)
+        {
+            self.navigationItem.leftBarButtonItem = nil;
+        }
+        else
+        {
+            self.navigationItem.leftBarButtonItem = [Utility navLeftBackBtn:self action:@selector(backMethod)];
+        }
+        
+        [baseTableView setFrame:CGRectMake(baseTableView.frame.origin.x, baseTableView.frame.origin.y+50, baseTableView.frame.size.width, baseTableView.frame.size.height-50)];
+        //[self initialSearchDisplay];
+        // [self initialTableView];
+        [self initialSearchDisplay];
+        [self createNoAreaView];
+        cityId = nil;
+        [self showHideAllSearchCommunity:NO];
+        float longtitude = [HWUserLogin currentUserLogin].longitude;
+        float latitude = [HWUserLogin currentUserLogin].latitude;
+        if (longtitude > -0.000001 && longtitude < 0.000011 && latitude > -0.000001 && longtitude < 0.0000011)
+        {
+            [self showNoSearchCommunity:NO];
+        }
+        else
+        {
+            [self queryListData];
+        }
+        
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(changeVCFlag) name:@"pushVCFlag" object:nil];
+    }
+}
+
+-(void)changeVCFlag
+{
+    _pushVCFlag = YES;
+}
+
+- (void)backMethod
+{
+    if (self.isNickVCPush)
+    {
+        [self.navigationController popToRootViewControllerAnimated:YES];
+    }
+    else
+    {
+        [self.navigationController popViewControllerAnimated:YES];
+    }
+}
+
+#pragma mark - 验证ip是否通过扫物业二维码下载，是直接绑定到合作物业小区 否走原来的流程
+- (void)queryIsQRCodeIp
+{
+    /*URL：userCertification/queryVillageAddress.do
+     入参：
+     key 用户key
+     返回：
+     villageAddress 小区地址
+     villageId 小区id*/
+    
+    [Utility hideMBProgress:self.view];
+    [Utility showMBProgress:self.view message:LOADING_TEXT];
+    NSMutableDictionary *param = [NSMutableDictionary dictionary];
+    
+    HWHTTPRequestOperationManager *manager = [HWHTTPRequestOperationManager manager];
+    [manager POST:KBindVillageForQRCode parameters:param queue:nil success:^(id responese)
+     {
+         [Utility hideMBProgress:self.view];
+         NSLog(@"responese ========================= %@",responese);
+         NSString *villageIdStr = [responese stringObjectForKey:@"data"];
+         
+         if (villageIdStr.length != 0)
+         {
+             [self sendSelectCommunityRequest:villageIdStr];
+         }
+         else
+         {
+             self.isCheckIPBindVillageId = NO;
+             [self viewDidLoad];
+         }
+         
+     } failure:^(NSString *code, NSString *error) {
+         
+         [Utility hideMBProgress:self.view];
+//         [Utility showToastWithMessage:error inView:self.view];
+         
+         self.isCheckIPBindVillageId = NO;
+         [self viewDidLoad];
+         
+         NSLog(@"error");
+     }];
+}
+
+#pragma mark -  alertviewdelegate
+#pragma 定位城市列表失败
+-(void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
+{
+    if (buttonIndex == 0)
+    {
+        
+    }
+    else
+    {
+        [self comeInCityPage];
+        self.navigationItem.titleView = [Utility navTitleView:@"切换城市" action:@selector(changeCity:) target:self];
+    }
+}
+
+//搜索小区有无接口-flag:yes有结果，no无结果
+-(void)showOrHideCommunity:(BOOL)flag
+{
+    mainTV.hidden = !flag;
+    baseTableView.hidden = !flag;
+    noCommentView.hidden = flag;
+    noCommentGpsLocationView.hidden = YES;
+   
+}
+//非查询小区无接口
+-(void)showNoSearchCommunity:(BOOL)flag
+{
+    mainTV.hidden = !flag;
+    baseTableView.hidden = !flag;
+    noCommentView.hidden = YES;
+    noCommentGpsLocationView.hidden = flag;
+}
+//非查询小区无接口
+-(void)showHideAllSearchCommunity:(BOOL)flag
+{
+    mainTV.hidden = !flag;
+    baseTableView.hidden = !flag;
+    noCommentView.hidden = YES;
+    noCommentGpsLocationView.hidden = YES;
+}
+
+//切换城市
+-(void)changeCity:(id)sender
+{
+    [MobClick event:@"click_cutover_city"];
+    [self comeInCityPage];
+}
+
+//进入城市页面
+-(void)comeInCityPage
+{
+    HWCityViewController *cityView = [[HWCityViewController alloc]init];
+    if (!locationChangeFlag)
+    {
+        cityView.isRegisterChangeCity = YES;
+    }
+    else
+    {
+        cityView.isRegisterChangeCity = NO;
+    }
+    [cityView setSelectedCity:^(NSString *cityIdStr) {
+        [HWUserLogin currentUserLogin].changeCity = [Utility getCityNameById:cityIdStr];
+        self.navigationItem.titleView = [Utility navTitleView:[Utility getCityNameById:cityIdStr] action:@selector(changeCity:) target:self];
+        if ([[HWUserLogin currentUserLogin].gpsCityId isEqualToString:cityIdStr])
+        {
+            cityId = cityIdStr;
+            float longtitude = [HWUserLogin currentUserLogin].longitude;
+            float latitude = [HWUserLogin currentUserLogin].latitude;
+            if (longtitude > -0.000001 && longtitude < 0.000011 && latitude > -0.000001 && longtitude < 0.0000011) {
+                
+            }
+            else
+            {
+                [self queryListData];
+            }
+           
+        }
+        else
+        {
+            cityId = cityIdStr;
+            self.dataList = [NSMutableArray array];
+            [self showNoSearchCommunity:NO];
+            [baseTableView reloadData];
+        }
+    }];
+    [self.navigationController pushViewController:cityView animated:YES];
+
+}
+//发送获取周围小区的列表请求
+-(void)searchNearbyVillageRequest
+{
+    [Utility hideMBProgress:self.view];
+    [Utility showMBProgress:self.view message:@"搜索中..."];
+    NSMutableDictionary *param = [NSMutableDictionary dictionary];
+    [param setPObject:[HWUserLogin currentUserLogin].key forKey:@"key"];
+    [param setPObject:_searchBar._searchTF.text forKey:@"keywords"];
+    [param setPObject:[NSString stringWithFormat:@"%d",_currentPage] forKey:@"page"];
+    [param setPObject:[NSString stringWithFormat:@"%d",kPageCount] forKey:@"size"];
+    [param setPObject:[NSString stringWithFormat:@"%f",[HWUserLogin currentUserLogin].latitude]forKey:@"latitude"] ;
+    [param setPObject:[NSString stringWithFormat:@"%f",[HWUserLogin currentUserLogin].longitude] forKey:@"longitude"];
+    HWHTTPRequestOperationManager *manager = [HWHTTPRequestOperationManager manager];
+    [manager POST:kSearchVillage parameters:param queue:nil settimeout:60 success:^(id responseObject){
+        [Utility hideMBProgress:self.view];
+        NSLog(@"%@",responseObject);
+        NSDictionary *dataDic = [responseObject dictionaryObjectForKey:@"data"];
+        NSArray *array = [dataDic arrayObjectForKey:@"content"];
+        self.dataList = [NSMutableArray array];
+        for (NSDictionary *temp in array) {
+            HWAreaClass *newsM = [[HWAreaClass alloc]initWithDic:temp];
+            [self.dataList addObject:newsM];
+        }
+        if(self.dataList.count==0)
+        {
+            [self showOrHideCommunity:NO];
+        }
+        else
+        {
+            [self showOrHideCommunity:YES];
+        }
+        [baseTableView reloadData];
+    } failure:^(NSString *code, NSString *error) {
+        [Utility hideMBProgress:self.view];
+        [Utility showToastWithMessage:error inView:self.view];
+        NSLog(@"error");
+    }];
+    
+}
+#pragma mark - 发送选定小区请求
+-(void)sendSelectCommunityRequest:(NSString *)villageIdStr
+{
+    if (locationChangeFlag == YES)
+    {
+        [MobClick event:@"click_change_village"];
+    }
+    else
+    {
+        [MobClick event:@"click_choose_village"];
+    }
+    
+    [_searchBar._searchTF resignFirstResponder];
+    NSString *cid;
+    if (cityId == nil)
+    {
+        if (locationChangeFlag== YES) {
+            cid = [HWUserLogin currentUserLogin].gpsCityId;
+            if (!cid || [cid length]==0 ) {
+                cid = [HWUserLogin currentUserLogin].saveFrontGpsCityIdStr;
+            }
+        }
+        else
+        {
+//            float longtitude = [HWUserLogin currentUserLogin].longitude;
+//            float latitude = [HWUserLogin currentUserLogin].latitude;
+//            if (longtitude > -0.000001 && longtitude < 0.000011 && latitude > -0.000001 && longtitude < 0.0000011) {
+//                cid = [HWUserLogin currentUserLogin].cityId;
+//            }
+//            else
+//            {
+                cid = [HWUserLogin currentUserLogin].gpsCityId;
+            if (!cid || [cid length]==0 ) {
+                cid = [HWUserLogin currentUserLogin].saveFrontGpsCityIdStr;
+            }
+           // }
+
+        }
+    }
+    else
+    {
+        cid = cityId;
+    }
+    [Utility hideMBProgress:self.view];
+    [Utility showMBProgress:self.view message:LOADING_TEXT];
+    HWHTTPRequestOperationManager *manager = [HWHTTPRequestOperationManager manager];
+    NSMutableDictionary *dict = [NSMutableDictionary dictionary];
+    [dict setPObject:villageIdStr forKey:@"villageId"];
+    [dict setPObject:[HWUserLogin currentUserLogin].key forKey:@"key"];
+    [dict setPObject:[HWUserLogin currentUserLogin].telephoneNum forKey:@"mobileNumber"];
+    [dict setPObject:cid forKey:@"cityId"];
+    [manager POST:kSelectCommunity parameters:dict queue:nil settimeout:60 success:^(id responseObject){
+        [Utility hideMBProgress:self.view];
+        //用户数据保存本地
+        NSDictionary *dataDic = (NSDictionary *)[responseObject objectForKey:@"data"];
+        [[HWUserLogin currentUserLogin] initUserLogin:dataDic];
+        
+        [HWCoreDataManager saveUserInfo];
+        
+        if (locationChangeFlag == YES)
+        {
+            AppDelegate *appDel = (AppDelegate *)SHARED_APP_DELEGATE;
+            [Utility showToastWithMessage:@"位置更改成功" inView:appDel.window];
+            
+            [[NSNotificationCenter defaultCenter] postNotificationName:RELOAD_APP_DATA object:nil];
+            [[NSNotificationCenter defaultCenter]postNotificationName:RELOAD_PRIVILEDGELIST object:nil];
+            [APService setTags:[NSSet set] alias:@"" callbackSelector:nil object:nil];
+            [APService setTags:[NSSet setWithObjects:[Utility getCityNameById:cityId], [HWUserLogin currentUserLogin].villageId, nil]  alias:[HWUserLogin currentUserLogin].telephoneNum callbackSelector:nil object:nil];
+            
+            [self.navigationController popViewControllerAnimated:YES];
+        }
+        else
+        {
+            [APService setTags:[NSSet set] alias:@"" callbackSelector:nil object:nil];
+            [APService setTags:[NSSet setWithObjects:[Utility getCityNameById:cid], [HWUserLogin currentUserLogin].villageId, nil] alias:[HWUserLogin currentUserLogin].telephoneNum callbackSelector:nil object:nil];
+            
+            [self.navigationController dismissViewControllerAnimated:YES completion:nil];
+            [[NSNotificationCenter defaultCenter] postNotificationName:RELOAD_APP_DATA object:nil];
+            [[NSNotificationCenter defaultCenter]postNotificationName:RELOAD_PRIVILEDGELIST object:nil];
+
+            if (_pushVCFlag == YES)
+            {
+                [self.navigationController popToRootViewControllerAnimated:YES];
+            }
+            else
+            {
+                AppDelegate *appDel = (AppDelegate *)SHARED_APP_DELEGATE;
+                [appDel.tabBarVC.navigationController popToRootViewControllerAnimated:YES];
+                [appDel.tabBarVC setSelectedIndex:0];
+            }
+            
+            [HWCoreDataManager saveUserInfo];
+            //注册成功激活--帮趣
+            //[TuiGuangYuanUI customEventWithAppKey:TuiGuangYuan_APP_KEY AndAppScrect:TuiGuangYuan_APP_SECRECT AndEventCode:@"signup001" andAmount:nil];
+        }
+        
+    } failure:^(NSString *code, NSString *error) {
+        
+        [Utility hideMBProgress:self.view];
+        
+        if (self.isCheckIPBindVillageId)
+        {
+            self.isCheckIPBindVillageId = NO;
+            [self viewDidLoad];
+        }
+        
+        if ([error length]==0) {
+            [Utility showToastWithMessage:@"网络连接失败" inView:self.view];
+        }
+        else
+        {
+            [Utility showToastWithMessage:error inView:self.view];
+        }
+        
+    }];
+
+}
+
+#pragma mark -
+#pragma mark Initial View
+
+- (void)initialSearchDisplay
+{
+    _searchBar = [[HWSearchBarView alloc] initWithFrame:CGRectMake(0, 0, kScreenWidth, 50)];
+    _searchBar.delegate = self;
+    _searchBar.frameMaxHeight = self.view.frame.size.height - 64;
+    [_searchBar setSearchBarPlaceholder:@"输入小区或首字母查询"];
+    _searchBar.cityOrCommunityFlag = YES;//标示回调函数回调给谁
+    [self.view addSubview:_searchBar];
+}
+
+- (void)initialTableView
+{
+    mainTV = [[UITableView alloc] initWithFrame:CGRectMake(0, CGRectGetMaxY(_searchBar.frame), kScreenWidth, CONTENT_HEIGHT - CGRectGetHeight(_searchBar.frame)) style:UITableViewStylePlain];
+    mainTV.delegate = self;
+    mainTV.dataSource = self;
+    mainTV.separatorStyle = UITableViewCellSeparatorStyleNone;
+    [self.view addSubview:mainTV];
+}
+
+#pragma mark -
+#pragma mark Private Method
+/**
+ *	@brief	请求数据，获得周边小区列表数据
+ *
+ *	@return	void
+ */
+- (void)queryListData
+{
+    [Utility hideMBProgress:self.view];
+    [Utility showMBProgress:self.view message:@"定位中，请稍候"];
+    NSMutableDictionary *param = [NSMutableDictionary dictionary];
+    [param setPObject:[NSString stringWithFormat:@"%d",_currentPage] forKey:@"page"];
+    [param setPObject:[NSString stringWithFormat:@"%d",kPageCount] forKey:@"size"];
+    [param setPObject:[NSString stringWithFormat:@"%f",[HWUserLogin currentUserLogin].latitude]forKey:@"latitude"];
+    [param setPObject:[NSString stringWithFormat:@"%f",[HWUserLogin currentUserLogin].longitude] forKey:@"longitude"];
+    [param setPObject:[HWUserLogin currentUserLogin].key forKey:@"key"];
+    HWHTTPRequestOperationManager *manager = [HWHTTPRequestOperationManager manager];
+
+    [manager POST:kGetNearbyVillage parameters:param queue:nil settimeout:60 success:^(id responseObject)  {
+        if ([self.view viewWithTag:1111]) {
+            [[self.view viewWithTag:1111] removeFromSuperview];
+        }
+        NSLog(@"%@",responseObject);
+        NSDictionary *dataDic = [responseObject dictionaryObjectForKey:@"data"];
+        NSArray *array = [dataDic arrayObjectForKey:@"content"];
+//        if(array.count < kPageCount)
+//        {
+//            isLastPage = YES;
+//        }
+//        else
+//        {
+//            isLastPage = NO;
+//        }
+        
+//        if (_currentPage == 0) {
+//            self.dataList = [NSMutableArray array];
+//            for (NSDictionary *temp in array) {
+//                HWAreaClass *newsM = [[HWAreaClass alloc]initWithDic:temp];
+//                [self.dataList addObject:newsM];
+//            }
+//            //保存数据库
+//            if (self.dataList != 0)
+//            {
+//                
+//            }
+//        }
+//        else
+//        {
+         self.dataList = [NSMutableArray array];
+            for (NSDictionary *temp in array)
+            {
+                HWAreaClass *newsM = [[HWAreaClass alloc]initWithDic:temp];
+                [self.dataList addObject:newsM];
+            }
+      //  }
+        
+        if(self.dataList.count == 0)
+        {
+            [self showNoSearchCommunity:NO];
+        }
+        else
+        {
+            [self showNoSearchCommunity:YES];
+            [baseTableView reloadData];
+            
+        }
+        if (![HWUserLogin currentUserLogin].gpsCityName) {
+            
+            self.navigationItem.titleView = [Utility navTitleView:@"切换城市" action:@selector(changeCity:) target:self];
+        }
+        else
+        {
+            self.navigationItem.titleView = [Utility navTitleView:[HWUserLogin currentUserLogin].gpsCityName action:@selector(changeCity:) target:self];
+        }
+        [Utility hideMBProgress:self.view];
+        [self doneLoadingTableViewData];
+    } failure:^(NSString *code, NSString *error) {
+        [self doneLoadingTableViewData];
+        [Utility hideMBProgress:self.view];
+        [Utility showToastWithMessage:@"未能获取位置信息，请输入小区名进行搜索" inView:self.view];
+        if (_currentPage == 0 && [[error description] isEqualToString:@"没有符合条件的"]) {
+            [self.dataList removeAllObjects];
+            [self.baseTableView reloadData];
+            [self showNoSearchCommunity:NO];
+        }
+        else if(self.dataList.count == 0) {
+            [self showNoSearchCommunity:NO];
+           
+        }
+    }];
+}
+
+
+/**
+ *	@brief	请求数据，获得周边小区列表数据
+ *
+ *	@return	void
+ */
+- (void)queryListDataLength
+{
+    [Utility hideMBProgress:self.view];
+    [Utility showMBProgress:self.view message:@"搜索中..."];
+    NSMutableDictionary *param = [NSMutableDictionary dictionary];
+    [param setPObject:[NSString stringWithFormat:@"%d",_currentPage] forKey:@"page"];
+    [param setPObject:[NSString stringWithFormat:@"%d",kPageCount] forKey:@"size"];
+    [param setPObject:[NSString stringWithFormat:@"%f",[HWUserLogin currentUserLogin].latitude]forKey:@"latitude"];
+    [param setPObject:[NSString stringWithFormat:@"%f",[HWUserLogin currentUserLogin].longitude] forKey:@"longitude"];
+    [param setPObject:[HWUserLogin currentUserLogin].key forKey:@"key"];
+    HWHTTPRequestOperationManager *manager = [HWHTTPRequestOperationManager manager];
+    [manager POST:kGetNearbyVillage parameters:param queue:nil settimeout:60 success:^(id responseObject)  {
+        if ([self.view viewWithTag:1111]) {
+            [[self.view viewWithTag:1111] removeFromSuperview];
+        }
+        [Utility hideMBProgress:self.view];
+        NSLog(@"%@",responseObject);
+        NSDictionary *dataDic = [responseObject dictionaryObjectForKey:@"data"];
+        NSArray *array = [dataDic arrayObjectForKey:@"content"];
+        if(array.count < kPageCount)
+        {
+            isLastPage = YES;
+        }
+        else
+        {
+            isLastPage = NO;
+        }
+        
+        //        if (_currentPage == 0) {
+        //            self.dataList = [NSMutableArray array];
+        //            for (NSDictionary *temp in array) {
+        //                HWAreaClass *newsM = [[HWAreaClass alloc]initWithDic:temp];
+        //                [self.dataList addObject:newsM];
+        //            }
+        //            //保存数据库
+        //            if (self.dataList != 0)
+        //            {
+        //
+        //            }
+        //        }
+        //        else
+        //        {
+        self.dataList = [NSMutableArray array];
+        for (NSDictionary *temp in array)
+        {
+            HWAreaClass *newsM = [[HWAreaClass alloc]initWithDic:temp];
+            [self.dataList addObject:newsM];
+        }
+        //  }
+        
+        if(self.dataList.count == 0)
+        {
+            [self showNoSearchCommunity:NO];
+        }
+        else
+        {
+            [self showNoSearchCommunity:YES];
+            [baseTableView reloadData];
+            
+        }
+        if (![HWUserLogin currentUserLogin].gpsCityName) {
+            
+            self.navigationItem.titleView = [Utility navTitleView:@"切换城市" action:@selector(changeCity:) target:self];
+        }
+        else
+        {
+            self.navigationItem.titleView = [Utility navTitleView:[HWUserLogin currentUserLogin].gpsCityName action:@selector(changeCity:) target:self];
+        }
+        [self doneLoadingTableViewData];
+    } failure:^(NSString *code, NSString *error) {
+        [self doneLoadingTableViewData];
+        [Utility hideMBProgress:self.view];
+        [Utility showToastWithMessage:error inView:self.view];
+        if (_currentPage == 0 && [[error description] isEqualToString:@"没有符合条件的"]) {
+            [self.dataList removeAllObjects];
+            [self.baseTableView reloadData];
+            [self showNoSearchCommunity:NO];
+        }
+        else if(self.dataList.count == 0) {
+            [self showNoSearchCommunity:NO];
+            
+        }
+    }];
+}
+#pragma mark -
+#pragma mark TableView Delegate
+
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
+{
+    return 1;
+}
+
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
+{
+    //    return self.communities.count;
+    return self.dataList.count;
+}
+
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    static NSString *cellIdentifier = @"cell";
+    HWLocationTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:cellIdentifier];
+    if (!cell)
+    {
+        cell = [[HWLocationTableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellIdentifier];
+    }
+    cell.selectionStyle = UITableViewCellSelectionStyleNone;
+    HWAreaClass *area = [self.dataList objectAtIndex:[indexPath row]];
+    cell.titleLab.text = area.villageNameStr;
+    cell.subTitleLab.text = area.villageAddressStr;
+    if ([area.distanceStr length]==0) {
+        cell.distanceLab.text = @"";
+    }
+    else
+    {
+        cell.distanceLab.text = [NSString stringWithFormat:@"%@m",area.distanceStr];
+    }
+    
+    return cell;
+}
+
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    [_searchBar endEditing:YES];
+    [tableView deselectRowAtIndexPath:indexPath animated:YES];
+    HWAreaClass *area = [self.dataList objectAtIndex:[indexPath row]];
+    if (isOtherCommunity) {
+//        NSLog(@"%@\n %@",area.villageAddressStr,area.villageNameStr);
+        [delegate getOtherAddress:area.villageAddressStr Name:area.villageNameStr Community:area];
+        
+        [self.navigationController popViewControllerAnimated:YES];
+    }
+    else
+    {
+        if (area)
+        {
+            [self sendSelectCommunityRequest:area.villageIdStr];
+        }
+    }
+    
+    
+}
+
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    return 70.0f;
+}
+#pragma mark -
+#pragma mark SearchBarDelegate
+- (void)searchBar:(HWSearchBarView *)searchView didSelectSearchResult:(NSString *)text villageId:(NSString *)villageIdStr  flag:(BOOL)flag
+{
+    if (!cityId) {
+        if ([_searchBar._searchTF.text length]==0) {
+            [[self class]cancelPreviousPerformRequestsWithTarget:self selector:@selector(searchNearbyVillageRequest) object:nil];
+            float longtitude = [HWUserLogin currentUserLogin].longitude;
+            float latitude = [HWUserLogin currentUserLogin].latitude;
+            if (longtitude > -0.000001 && longtitude < 0.000011 && latitude > -0.000001 && longtitude < 0.0000011) {
+                
+            }
+            else
+            {
+                 [self queryListDataLength];
+            }
+        }
+        else
+        {
+            [[self class]cancelPreviousPerformRequestsWithTarget:self selector:@selector(searchNearbyVillageRequest) object:nil];
+            float longtitude = [HWUserLogin currentUserLogin].longitude;
+            float latitude = [HWUserLogin currentUserLogin].latitude;
+            if (longtitude > -0.000001 && longtitude < 0.000011 && latitude > -0.000001 && longtitude < 0.0000011) {
+                 [self performSelector:@selector(searchComunityWithCityIDRequestLocationFailure) withObject:nil afterDelay:0.5];
+            }
+            else
+            {
+                 [self performSelector:@selector(searchNearbyVillageRequest) withObject:nil afterDelay:0.5];
+            }
+           
+        }
+        
+    }
+    else
+    {
+        if ([_searchBar._searchTF.text length]==0) {
+            [[self class]cancelPreviousPerformRequestsWithTarget:self selector:@selector(searchNearbyVillageRequest) object:nil];
+        }
+        else
+        {
+            [[self class]cancelPreviousPerformRequestsWithTarget:self selector:@selector(searchComunityWithCityIDRequest) object:nil];
+            [self performSelector:@selector(searchComunityWithCityIDRequest) withObject:nil afterDelay:0.5];
+        }
+        
+    }
+
+}
+- (void)searchBar:(HWSearchBarView *)searchView textChange:(NSString *)text
+{
+    if (!cityId) {
+        if ([_searchBar._searchTF.text length]==0) {
+            [[self class]cancelPreviousPerformRequestsWithTarget:self selector:@selector(searchNearbyVillageRequest) object:nil];
+             //[[self class]cancelPreviousPerformRequestsWithTarget:self selector:@selector(queryListData) object:nil];
+            float longtitude = [HWUserLogin currentUserLogin].longitude;
+            float latitude = [HWUserLogin currentUserLogin].latitude;
+            if (longtitude > -0.000001 && longtitude < 0.000011 && latitude > -0.000001 && longtitude < 0.0000011) {
+                
+            }
+            else
+            {
+                [self queryListDataLength];
+            }
+        }
+        else
+        {
+            float longtitude = [HWUserLogin currentUserLogin].longitude;
+            float latitude = [HWUserLogin currentUserLogin].latitude;
+            if (longtitude > -0.000001 && longtitude < 0.000011 && latitude > -0.000001 && longtitude < 0.0000011) {
+                [[self class]cancelPreviousPerformRequestsWithTarget:self selector:@selector(searchComunityWithCityIDRequestLocationFailure) object:nil];
+                [self searchComunityWithCityIDRequestLocationFailure];
+                return;
+            }
+            [[self class]cancelPreviousPerformRequestsWithTarget:self selector:@selector(searchNearbyVillageRequest) object:nil];
+
+            [self performSelector:@selector(searchNearbyVillageRequest) withObject:nil afterDelay:0.5];
+        }
+
+    }
+    else
+    {
+        if ([_searchBar._searchTF.text length]==0) {
+            [[self class]cancelPreviousPerformRequestsWithTarget:self selector:@selector(searchNearbyVillageRequest) object:nil];
+        }
+        else
+        {
+            [[self class]cancelPreviousPerformRequestsWithTarget:self selector:@selector(searchComunityWithCityIDRequest) object:nil];
+            [self performSelector:@selector(searchComunityWithCityIDRequest) withObject:nil afterDelay:0.5];
+        }
+
+    }
+    
+    
+    
+}
+//发送根据城市ID和关键字搜索
+-(void)searchComunityWithCityIDRequest
+{
+    [Utility hideMBProgress:self.view];
+    [Utility showMBProgress:self.view message:@"搜索中..."];
+    NSMutableDictionary *param = [NSMutableDictionary dictionary];
+    [param setPObject:[HWUserLogin currentUserLogin].key forKey:@"key"];
+    [param setPObject:_searchBar._searchTF.text forKey:@"keywords"];
+    [param setPObject:cityId forKey:@"cityId"];
+    HWHTTPRequestOperationManager *manager = [HWHTTPRequestOperationManager manager];
+    [manager POST:kSearchWithCityID parameters:param queue:nil settimeout:60 success:^(id responseObject){
+        [Utility hideMBProgress:self.view];
+        NSLog(@"%@",responseObject);
+        NSDictionary *dataDic = [responseObject dictionaryObjectForKey:@"data"];
+        NSArray *array = [dataDic arrayObjectForKey:@"content"];
+        self.dataList = [NSMutableArray array];
+        for (NSDictionary *temp in array) {
+            HWAreaClass *newsM = [[HWAreaClass alloc]initWithDic:temp];
+            [self.dataList addObject:newsM];
+        }
+        if(self.dataList.count==0) {
+            [self showOrHideCommunity:NO];
+        }
+        else
+        {
+            [self showOrHideCommunity:YES];
+        }
+        [baseTableView reloadData];
+    } failure:^(NSString *code, NSString *error) {
+        [Utility hideMBProgress:self.view];
+        [Utility showToastWithMessage:error inView:self.view];
+        [self showOrHideCommunity:NO];
+        NSLog(@"error");
+    }];
+    
+}
+
+//发送根据城市ID和关键字搜索--定位失败
+-(void)searchComunityWithCityIDRequestLocationFailure
+{
+    [Utility hideMBProgress:self.view];
+    [Utility showMBProgress:self.view message:@"搜索中..."];
+    NSMutableDictionary *param = [NSMutableDictionary dictionary];
+    [param setPObject:[HWUserLogin currentUserLogin].key forKey:@"key"];
+    [param setPObject:_searchBar._searchTF.text forKey:@"keywords"];
+    [param setPObject:[HWUserLogin currentUserLogin].cityId forKey:@"cityId"];
+    HWHTTPRequestOperationManager *manager = [HWHTTPRequestOperationManager manager];
+    [manager POST:kSearchWithCityID parameters:param queue:nil settimeout:60 success:^(id responseObject){
+        [Utility hideMBProgress:self.view];
+        NSLog(@"%@",responseObject);
+        NSDictionary *dataDic = [responseObject dictionaryObjectForKey:@"data"];
+        NSArray *array = [dataDic arrayObjectForKey:@"content"];
+        self.dataList = [NSMutableArray array];
+        for (NSDictionary *temp in array) {
+            HWAreaClass *newsM = [[HWAreaClass alloc]initWithDic:temp];
+            [self.dataList addObject:newsM];
+        }
+        if(self.dataList.count==0) {
+            [self showOrHideCommunity:NO];
+        }
+        else
+        {
+            [self showOrHideCommunity:YES];
+        }
+        [baseTableView reloadData];
+    } failure:^(NSString *code, NSString *error) {
+        [Utility hideMBProgress:self.view];
+        [Utility showToastWithMessage:error inView:self.view];
+        [self showOrHideCommunity:NO];
+        NSLog(@"error");
+    }];
+    
+}
+#pragma mark -
+#pragma mark System Method
+-(void)viewWillDisappear:(BOOL)animated
+{
+    _searchBar.delegate = nil;
+    _searchBar = nil;
+}
+- (void)didReceiveMemoryWarning
+{
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
+}
+
+/*
+ #pragma mark - Navigation
+ 
+ // In a storyboard-based application, you will often want to do a little preparation before navigation
+ - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
+ {
+ // Get the new view controller using [segue destinationViewController].
+ // Pass the selected object to the new view controller.
+ }
+ */
+@end

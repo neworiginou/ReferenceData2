@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IDESourceControlProjectFavoriteDictionaryKey</key>
+	<false/>
+	<key>IDESourceControlProjectIdentifier</key>
+	<string>86C9E6F3-2260-436E-BF4B-C8D107FDB8A8</string>
+	<key>IDESourceControlProjectName</key>
+	<string>Community</string>
+	<key>IDESourceControlProjectOriginsDictionary</key>
+	<dict>
+		<key>84ebf778-abd7-0f42-b8a0-dddd2e75ff49++9268</key>
+		<string>svn://svn.haowu.com/ios/community1.0/branch</string>
+	</dict>
+	<key>IDESourceControlProjectPath</key>
+	<string>1.7/Community/Community.xcodeproj</string>
+	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
+	<dict>
+		<key>84ebf778-abd7-0f42-b8a0-dddd2e75ff49++9268</key>
+		<string>../../../..</string>
+	</dict>
+	<key>IDESourceControlProjectRepositoryRootDictionary</key>
+	<dict>
+		<key>84ebf778-abd7-0f42-b8a0-dddd2e75ff49++9268</key>
+		<string>svn://svn.haowu.com/ios</string>
+	</dict>
+	<key>IDESourceControlProjectURL</key>
+	<string>svn://svn.haowu.com/ios/community1.0/branch/1.7/Community/Community.xcodeproj</string>
+	<key>IDESourceControlProjectVersion</key>
+	<integer>111</integer>
+	<key>IDESourceControlProjectWCCIdentifier</key>
+	<string>84ebf778-abd7-0f42-b8a0-dddd2e75ff49++9268</string>
+	<key>IDESourceControlProjectWCConfigurations</key>
+	<array>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.subversion</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>84ebf778-abd7-0f42-b8a0-dddd2e75ff49++9268</string>
+			<key>IDESourceControlWCCName</key>
+			<string>branch</string>
+		</dict>
+	</array>
+</dict>
+</plist>

@@ -1,0 +1,24 @@
+//
+//  HWTianTianTuanDetailVC.h
+//  Community
+//
+//  Created by niedi on 15/7/31.
+//  Copyright (c) 2015年 caijingpeng. All rights reserved.
+//
+
+#import "HWBaseViewController.h"
+
+@protocol HWTianTianTuanDetailVCDelegate <NSObject>
+
+- (void)cancleOrderReQueryList;
+
+@end
+
+@interface HWTianTianTuanDetailVC : HWBaseViewController
+
+@property (nonatomic, weak) id<HWTianTianTuanDetailVCDelegate> delegate;
+
+@property (nonatomic, strong) NSString *orderId;
+
+
+@end

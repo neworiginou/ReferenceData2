@@ -1,0 +1,23 @@
+//
+//  ModifiedPwdApi.h
+//  PUClient
+//
+//  Created by RRLhy on 15/8/4.
+//  Copyright (c) 2015年 RRLhy. All rights reserved.
+//
+
+#import "YTKRequest.h"
+
+@interface ModifiedPwdApi : YTKRequest
+/**
+ *  修改密码
+ *
+ *  @param userID 用户id
+ *  @param oldPwd 旧密码
+ *  @param newPwd 新密码
+ *
+ *  @return api
+ */
+- (id)initWithUserId:(NSString*)userID oldPwd:(NSString *)oldPwd newPwd:(NSString*)newPwd;
+
+@end

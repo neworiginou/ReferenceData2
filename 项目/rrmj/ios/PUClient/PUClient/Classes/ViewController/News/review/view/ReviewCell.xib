@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="7706" systemVersion="14B25" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES">
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="7703"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <tableViewCell contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" reuseIdentifier="reviewCell" id="aHx-XR-pMW" customClass="ReviewCell">
+            <rect key="frame" x="0.0" y="0.0" width="320" height="135"/>
+            <autoresizingMask key="autoresizingMask"/>
+            <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="aHx-XR-pMW" id="DOs-Mt-9bF">
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="闪电侠第二季剧透" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="1Iw-yB-N7M">
+                        <rect key="frame" x="10" y="17" width="197" height="20"/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="20" id="Ccy-xh-etM"/>
+                        </constraints>
+                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                        <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="男主角巴里和绿箭侠有着很深的渊源" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ayK-uJ-bsd">
+                        <rect key="frame" x="10" y="43" width="197" height="44"/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="44" id="71d-3o-UKK"/>
+                        </constraints>
+                        <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                        <color key="textColor" red="0.2901960784" green="0.2901960784" blue="0.2901960784" alpha="1" colorSpace="calibratedRGB"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="闪电侠 第二季" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="wHz-CX-jhg">
+                        <rect key="frame" x="10" y="102" width="88.5" height="16"/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="16" id="xJk-qf-AMK"/>
+                        </constraints>
+                        <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                        <color key="textColor" red="0.0" green="0.69803921570000005" blue="0.99215686270000003" alpha="1" colorSpace="calibratedRGB"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                    <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="SFU-Vz-KGN">
+                        <rect key="frame" x="220" y="18" width="90" height="100"/>
+                        <constraints>
+                            <constraint firstAttribute="width" constant="90" id="UmG-en-rY4"/>
+                            <constraint firstAttribute="height" constant="100" id="nVx-xm-z9m"/>
+                        </constraints>
+                    </imageView>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="2015.8.12 11.20" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Iwa-pM-m6b">
+                        <rect key="frame" x="100" y="101" width="110" height="17"/>
+                        <constraints>
+                            <constraint firstAttribute="width" constant="110" id="tf5-Je-Irk"/>
+                            <constraint firstAttribute="height" constant="17" id="xHp-Pk-a4f"/>
+                        </constraints>
+                        <fontDescription key="fontDescription" type="system" pointSize="12"/>
+                        <color key="textColor" red="0.54901960780000003" green="0.54901960780000003" blue="0.54901960780000003" alpha="1" colorSpace="calibratedRGB"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                    <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="XFf-xb-MR7">
+                        <rect key="frame" x="0.0" y="134" width="320" height="0.5"/>
+                        <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="0.5" id="QaX-Zg-CpY"/>
+                            <constraint firstAttribute="height" constant="0.5" id="eNZ-pi-0DA"/>
+                        </constraints>
+                        <variation key="default">
+                            <mask key="constraints">
+                                <exclude reference="eNZ-pi-0DA"/>
+                            </mask>
+                        </variation>
+                    </imageView>
+                </subviews>
+                <constraints>
+                    <constraint firstItem="XFf-xb-MR7" firstAttribute="top" secondItem="wHz-CX-jhg" secondAttribute="bottom" constant="15.5" id="138-QU-yt9"/>
+                    <constraint firstAttribute="trailing" secondItem="SFU-Vz-KGN" secondAttribute="trailing" constant="10" id="2Nw-0e-Mas"/>
+                    <constraint firstItem="XFf-xb-MR7" firstAttribute="leading" secondItem="DOs-Mt-9bF" secondAttribute="leading" id="3Cr-Ul-tXc"/>
+                    <constraint firstItem="XFf-xb-MR7" firstAttribute="leading" secondItem="DOs-Mt-9bF" secondAttribute="leading" id="8iy-Xz-g6v"/>
+                    <constraint firstAttribute="trailing" secondItem="XFf-xb-MR7" secondAttribute="trailing" id="Ca3-zG-kMA"/>
+                    <constraint firstItem="SFU-Vz-KGN" firstAttribute="leading" secondItem="1Iw-yB-N7M" secondAttribute="trailing" constant="13" id="EIR-6C-dUP"/>
+                    <constraint firstItem="ayK-uJ-bsd" firstAttribute="leading" secondItem="DOs-Mt-9bF" secondAttribute="leading" constant="10" id="Fkl-RO-fD1"/>
+                    <constraint firstItem="Iwa-pM-m6b" firstAttribute="leading" secondItem="wHz-CX-jhg" secondAttribute="trailing" constant="2" id="FlF-OE-Vmp"/>
+                    <constraint firstAttribute="bottom" secondItem="XFf-xb-MR7" secondAttribute="bottom" constant="0.5" id="LHq-hL-zqV"/>
+                    <constraint firstItem="Iwa-pM-m6b" firstAttribute="leading" secondItem="wHz-CX-jhg" secondAttribute="trailing" constant="2" id="SaV-h0-Wca"/>
+                    <constraint firstItem="1Iw-yB-N7M" firstAttribute="leading" secondItem="DOs-Mt-9bF" secondAttribute="leading" constant="10" id="Z35-kE-jVz"/>
+                    <constraint firstAttribute="bottom" secondItem="XFf-xb-MR7" secondAttribute="bottom" id="a3V-Ts-b23"/>
+                    <constraint firstItem="SFU-Vz-KGN" firstAttribute="leading" secondItem="ayK-uJ-bsd" secondAttribute="trailing" constant="13" id="fOd-N5-kC8"/>
+                    <constraint firstItem="wHz-CX-jhg" firstAttribute="leading" secondItem="DOs-Mt-9bF" secondAttribute="leading" constant="10" id="h3w-Xt-Gpl"/>
+                    <constraint firstItem="1Iw-yB-N7M" firstAttribute="top" secondItem="DOs-Mt-9bF" secondAttribute="top" constant="17" id="hPb-o2-GKb"/>
+                    <constraint firstItem="XFf-xb-MR7" firstAttribute="top" secondItem="Iwa-pM-m6b" secondAttribute="bottom" constant="15.5" id="oPt-xN-Ycf"/>
+                    <constraint firstItem="SFU-Vz-KGN" firstAttribute="top" secondItem="DOs-Mt-9bF" secondAttribute="top" constant="18" id="peI-PE-1Nu"/>
+                    <constraint firstAttribute="trailing" secondItem="XFf-xb-MR7" secondAttribute="trailing" id="v5L-0k-Rfk"/>
+                    <constraint firstItem="ayK-uJ-bsd" firstAttribute="top" secondItem="1Iw-yB-N7M" secondAttribute="bottom" constant="6" id="vrG-B3-HEM"/>
+                </constraints>
+                <variation key="default">
+                    <mask key="constraints">
+                        <exclude reference="8iy-Xz-g6v"/>
+                        <exclude reference="LHq-hL-zqV"/>
+                        <exclude reference="v5L-0k-Rfk"/>
+                    </mask>
+                </variation>
+            </tableViewCellContentView>
+            <connections>
+                <outlet property="reviewDate" destination="Iwa-pM-m6b" id="1Cy-5r-N9c"/>
+                <outlet property="reviewImage" destination="SFU-Vz-KGN" id="8iN-Hu-38J"/>
+                <outlet property="reviewIntro" destination="ayK-uJ-bsd" id="VAN-4s-aZG"/>
+                <outlet property="reviewSeriesName" destination="wHz-CX-jhg" id="sts-p9-WGb"/>
+                <outlet property="reviewTitle" destination="1Iw-yB-N7M" id="hsA-ts-4vh"/>
+            </connections>
+            <point key="canvasLocation" x="302" y="248.5"/>
+        </tableViewCell>
+    </objects>
+</document>

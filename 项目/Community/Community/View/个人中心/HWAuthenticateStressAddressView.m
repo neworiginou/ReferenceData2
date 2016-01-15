@@ -1,0 +1,385 @@
+//
+//  HWAuthenticateStressAddressView.m
+//  Community
+//
+//  Created by hw500027 on 15/6/15.
+//  Copyright (c) 2015年 caijingpeng. All rights reserved.
+//
+
+#import "HWAuthenticateStressAddressView.h"
+#import "HWInputBackView.h"
+
+@interface HWAuthenticateStressAddressView() <UITextFieldDelegate>
+{
+    UIView *headView;
+    UITextField *_nameTextField;
+    UITextField *_phoneTextField;
+    NSString *_address;
+}
+@end
+
+@implementation HWAuthenticateStressAddressView
+
+- (instancetype)initWithFrame:(CGRect)frame
+{
+    self = [super initWithFrame:frame];
+    if (self)
+    {
+        self.isNeedHeadRefresh = YES;
+        [self queryListData];
+    }
+    return self;
+}
+
+- (void)queryListData
+{
+    isLastPage = YES;
+    [Utility hideMBProgress:self];
+    [Utility showMBProgress:self message:@"请求数据"];
+    
+    NSMutableDictionary *parame = [[NSMutableDictionary alloc] init];
+    [parame setPObject:[HWUserLogin currentUserLogin].key forKey:@"key"];
+    HWHTTPRequestOperationManager *manager = [HWHTTPRequestOperationManager manager];
+    [manager POST:kQueryVillageAddress parameters:parame queue:nil success:^(id responese)
+    {
+        _address = [[responese dictionaryObjectForKey:@"data"] stringObjectForKey:@"villageAddress"];
+        [Utility hideMBProgress:self];
+        [self configUI];
+        [self doneLoadingTableViewData];
+//        HWHTTPRequestOperationManager *manager1 = [HWHTTPRequestOperationManager manager];
+//        [manager1 POST:kQueryAuthenticationInfo parameters:parame queue:nil success:^(id responese)
+//        {
+//            
+//        } failure:^(NSString *code, NSString *error)
+//        {
+//            [self doneLoadingTableViewData];
+//            [Utility hideMBProgress:self];
+//            [Utility showToastWithMessage:error inView:self];
+//        }];
+
+    } failure:^(NSString *code, NSString *error)
+    {
+        [self doneLoadingTableViewData];
+        [Utility hideMBProgress:self];
+        [Utility showToastWithMessage:error inView:self];
+    }];
+}
+
+- (void)didClickconfirmBtn
+{
+    //点击申请认证
+    [Utility hideMBProgress:self];
+    [Utility showMBProgress:self message:@"请求数据"];
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    
+    
+    NSMutableDictionary *parame = [[NSMutableDictionary alloc] init];
+    [parame setPObject:[HWUserLogin currentUserLogin].key forKey:@"key"];
+    [parame setPObject:_nameTextField.text forKey:@"addresseeName"];
+    [parame setPObject:_phoneTextField.text forKey:@"addresseeMobile"];
+    [parame setPObject:[defaults objectForKey:kAuthBuildingNo] forKey:@"buildingNo"];
+    [parame setPObject:[defaults objectForKey:kAuthUnitNo] forKey:@"unitNo"];
+    [parame setPObject:[defaults objectForKey:kAuthRoomNo] forKey:@"roomNo"];
+    [parame setPObject:_address forKey:@"addresseeAddress"];
+    [parame setPObject:[defaults objectForKey:kAuthApplyId] forKey:@"applyId"];
+    
+    HWHTTPRequestOperationManager *manager = [HWHTTPRequestOperationManager manager];
+    [manager POST:kApplyForAuthentication parameters:parame queue:nil success:^(id responese)
+     {
+         [Utility hideMBProgress:self];
+         if ([[responese stringObjectForKey:@"status"] isEqual:@"1"])
+         {
+             if (_delegate && [_delegate respondsToSelector:@selector(didSelectConfirmBtn)])
+             {
+                 [_delegate didSelectConfirmBtn];
+             }
+         }
+     } failure:^(NSString *code, NSString *error)
+     {
+         [Utility hideMBProgress:self];
+         [Utility showToastWithMessage:error inView:self];
+     }];
+}
+
+- (CGFloat)confirmBtn:(CGFloat)originY
+{
+    CGFloat padding_height = 20;
+    CGSize btnSize = CGSizeMake(kScreenWidth - 30, 45);
+    
+    UIButton *confirmBtn = [UIButton newAutoLayoutView];
+    
+    [headView addSubview:confirmBtn];
+    confirmBtn.layer.cornerRadius = 3;
+    confirmBtn.layer.masksToBounds = YES;
+    
+    [confirmBtn setTitle:@"申请认证" forState:UIControlStateNormal];
+    
+    [confirmBtn autoPinEdge:ALEdgeTop toEdge:ALEdgeTop ofView:headView  withOffset:originY + padding_height];
+    [confirmBtn autoPinEdge:ALEdgeLeft toEdge:ALEdgeLeft ofView:headView  withOffset:15];
+    [confirmBtn autoSetDimensionsToSize:btnSize];
+    
+    [confirmBtn setBackgroundImage:[Utility imageWithColor:THEBUTTON_GREEN_NORMAL andSize:btnSize] forState:UIControlStateNormal];
+    [confirmBtn setBackgroundImage:[Utility imageWithColor:THEBUTTON_GREEN_HIGHLIGHT andSize:btnSize] forState:UIControlStateHighlighted];
+    
+    [confirmBtn addTarget:self action:@selector(didClickconfirmBtn) forControlEvents:UIControlEventTouchUpInside];
+    
+    return originY + [confirmBtn systemLayoutSizeFittingSize:UILayoutFittingCompressedSize].height + padding_height;
+}
+
+#pragma mark - UITextFieldDelegate
+- (BOOL)textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string
+{
+    if (textField == _phoneTextField)
+    {
+        NSMutableString *text = [textField.text mutableCopy];
+        [text replaceCharactersInRange:range withString:string];
+        
+        if (text.length > 11 && range.length == 0)
+        {
+            return NO;
+        }
+        else
+        {
+            return YES;
+        }
+    }
+    else
+    {
+        return YES;
+    }
+}
+
+- (void)textFieldDidBeginEditing:(UITextField *)textField
+{
+    if (IPHONE4)
+    {
+        if (textField == _nameTextField)
+        {
+            
+            self.center = CGPointMake(kScreenWidth / 2.0f, CONTENT_HEIGHT / 2.0f - 180.0f);
+        }
+        
+        if (textField == _phoneTextField)
+        {
+            self.center = CGPointMake(kScreenWidth / 2.0f, CONTENT_HEIGHT / 2.0f - 180.0f);
+        }
+    }
+    else if (IPHONE5)
+    {
+        if (textField == _nameTextField)
+        {
+            
+            self.center = CGPointMake(kScreenWidth / 2.0f, CONTENT_HEIGHT / 2.0f - 100.0f);
+        }
+        
+        if (textField == _phoneTextField)
+        {
+            self.center = CGPointMake(kScreenWidth / 2.0f, CONTENT_HEIGHT / 2.0f - 100.0f);
+        }
+    }
+    else if (IPHONE6)
+    {
+        if (textField == _nameTextField)
+        {
+            
+            self.center = CGPointMake(kScreenWidth / 2.0f, CONTENT_HEIGHT / 2.0f - 40.0f);
+        }
+        
+        if (textField == _phoneTextField)
+        {
+            self.center = CGPointMake(kScreenWidth / 2.0f, CONTENT_HEIGHT / 2.0f - 40.0f);
+        }
+    }
+}
+
+- (BOOL)textFieldShouldEndEditing:(UITextField *)textField
+{
+    if (textField == _nameTextField)
+    {
+        self.center = CGPointMake(kScreenWidth / 2.0f, CONTENT_HEIGHT / 2.0f);
+    }
+    
+    if (textField == _phoneTextField)
+    {
+        self.center = CGPointMake(kScreenWidth / 2.0f, CONTENT_HEIGHT / 2.0f);
+    }
+    
+    return YES;
+}
+
+
+//完善收件人手机 label
+- (CGFloat)finishPhoneInfoLabel:(CGFloat)originY
+{
+    HWInputBackView *intputView = [[HWInputBackView alloc] initWithFrame:CGRectMake(0, originY, kScreenWidth, 45) withLineCount:1];
+    [headView addSubview:intputView];
+    
+    UILabel *titleLabel = [UILabel newAutoLayoutView];
+    [intputView addSubview:titleLabel];
+    titleLabel.text = @"收件人手机";
+    titleLabel.font = FONT(15);
+    titleLabel.textColor = THEME_COLOR_SMOKE;
+    [titleLabel autoPinEdge:ALEdgeLeft toEdge:ALEdgeLeft ofView:intputView withOffset:15];
+    [titleLabel autoAlignAxis:ALAxisHorizontal toSameAxisOfView:intputView];
+    
+    //手机
+    _phoneTextField = [UITextField newAutoLayoutView];
+    [intputView addSubview:_phoneTextField];
+    [self configTextField:_phoneTextField toView:intputView];
+    
+    return CGRectGetMaxY(intputView.frame);
+}
+
+//完善收件人姓名 label
+- (CGFloat)finishNameInfoLabel:(CGFloat)originY
+{
+    HWInputBackView *intputView = [[HWInputBackView alloc] initWithFrame:CGRectMake(0, originY, kScreenWidth, 45) withLineCount:1];
+    [headView addSubview:intputView];
+    
+    UILabel *titleLabel = [UILabel newAutoLayoutView];
+    [intputView addSubview:titleLabel];
+    titleLabel.text = @"收件人姓名";
+    titleLabel.font = FONT(15);
+    titleLabel.textColor = THEME_COLOR_SMOKE;
+    [titleLabel autoPinEdge:ALEdgeLeft toEdge:ALEdgeLeft ofView:intputView withOffset:15];
+    [titleLabel autoAlignAxis:ALAxisHorizontal toSameAxisOfView:intputView];
+    
+    //姓名
+    _nameTextField = [UITextField newAutoLayoutView];
+    [intputView addSubview:_nameTextField];
+    [self configTextField:_nameTextField toView:intputView];
+    
+    return CGRectGetMaxY(intputView.frame);
+}
+
+-(void)configTextField:(UITextField *)textField toView:(UIView *)toView
+{
+    textField.textColor = THEME_COLOR_TEXT;
+    textField.font = FONT(15);
+    textField.clearButtonMode = UITextFieldViewModeWhileEditing;
+    textField.backgroundColor = [UIColor whiteColor];
+    textField.textAlignment = NSTextAlignmentRight;
+    if (textField == _phoneTextField)
+    {
+        textField.keyboardType = UIKeyboardTypeNumberPad;
+    }
+    else
+    {
+        textField.keyboardType = UIKeyboardTypeDefault;
+    }
+    textField.delegate = self;
+    
+    //布局
+    [textField autoSetDimensionsToSize:CGSizeMake(kScreenWidth / 2, 15)];
+    [textField autoPinEdge:ALEdgeRight toEdge:ALEdgeRight ofView:toView withOffset:- 15];
+    [textField autoAlignAxis:ALAxisHorizontal toSameAxisOfView:toView];
+}
+
+- (CGFloat)toFinishInfoMessage:(CGFloat)originY
+{
+    UILabel *label = [UILabel newAutoLayoutView];
+    [headView addSubview:label];
+    
+    label.text = @"完善收件人信息";
+    label.textColor = THEME_COLOR_TEXT;
+    label.font = FONT(14);
+    label.numberOfLines = 0;
+    [label setPreferredMaxLayoutWidth:kScreenWidth - 30];
+    
+    [label autoPinEdge:ALEdgeTop toEdge:ALEdgeTop ofView:headView withOffset:12 + originY];
+    [label autoPinEdge:ALEdgeLeft toEdge:ALEdgeLeft ofView:headView withOffset:15];
+    
+    return 12 * 2 + [label systemLayoutSizeFittingSize:UILayoutFittingCompressedSize].height + originY;
+}
+
+- (CGFloat)addAddressLabel:(CGFloat)originY
+{
+    UIView *inputView = [UIView newAutoLayoutView];
+    [headView addSubview:inputView];
+    
+    [inputView autoPinEdge:ALEdgeTop toEdge:ALEdgeTop ofView:headView withOffset:originY];
+    [inputView autoPinEdge:ALEdgeLeft toEdge:ALEdgeLeft ofView:headView withOffset:0];
+    [inputView autoSetDimension:ALDimensionWidth toSize:kScreenWidth];
+    inputView.backgroundColor = [UIColor whiteColor];
+    
+    UILabel *addressLabel = [UILabel newAutoLayoutView];
+    [inputView addSubview:addressLabel];
+    addressLabel.numberOfLines = 0;
+    [addressLabel setPreferredMaxLayoutWidth:kScreenWidth - 30];
+    
+    
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    NSString *unitNo = [defaults objectForKey:kAuthBuildingNo];
+//    [defaults objectForKey:kAuthBuildingNo] forKey:@"buildingNo"];
+//    [parame setPObject:[defaults objectForKey:kAuthUnitNo] forKey:@"unitNo"];
+//    [parame setPObject:[defaults objectForKey:kAuthRoomNo]
+    
+    if (unitNo.length == 0 || [unitNo isEqual:@""])
+    {
+        addressLabel.text = [NSString stringWithFormat:@"%@%@号楼%@室",_address,[defaults objectForKey:kAuthBuildingNo],[defaults objectForKey:kAuthRoomNo]];
+    }
+    else
+    {
+        addressLabel.text = [NSString stringWithFormat:@"%@%@号楼%@单元%@室",_address,[defaults objectForKey:kAuthBuildingNo],[defaults objectForKey:kAuthUnitNo],[defaults objectForKey:kAuthRoomNo]];//@"上海市虹口区景瑞路18号花园城40号楼203室";
+    }
+    
+    addressLabel.font = FONT(15);
+    addressLabel.textColor = THEME_COLOR_SMOKE;
+
+    [addressLabel autoPinEdge:ALEdgeTop toEdge:ALEdgeTop ofView:inputView withOffset:15];
+    [addressLabel autoPinEdge:ALEdgeLeft toEdge:ALEdgeLeft ofView:inputView withOffset:15];
+    [addressLabel autoPinEdge:ALEdgeBottom toEdge:ALEdgeBottom ofView:inputView withOffset:- 15];
+    
+    [Utility topLine:inputView];
+    [Utility bottomLine:inputView];
+    
+    return originY + [inputView systemLayoutSizeFittingSize:UILayoutFittingCompressedSize].height;
+}
+
+- (CGFloat)addPSLabel
+{
+    UILabel *label = [UILabel newAutoLayoutView];
+    [headView addSubview:label];
+    
+    label.text = @"考拉君会邮寄明信片到以下门牌地址，收到后在考拉社区里输入明信片里的验证码即可完成验证。";
+    label.textColor = THEME_COLOR_TEXT;
+    label.font = FONT(14);
+    label.numberOfLines = 0;
+    [label setPreferredMaxLayoutWidth:kScreenWidth - 30];
+    
+    [label autoPinEdge:ALEdgeTop toEdge:ALEdgeTop ofView:headView withOffset:12];
+    [label autoPinEdge:ALEdgeLeft toEdge:ALEdgeLeft ofView:headView withOffset:15];
+    
+    return 12 * 2 + [label systemLayoutSizeFittingSize:UILayoutFittingCompressedSize].height;
+}
+
+- (void)configUI
+{
+    headView = [[UIView alloc] initWithFrame:self.frame];
+    self.baseTable.tableHeaderView = headView;
+    
+    CGFloat height1 = [self addPSLabel];
+    CGFloat height2 = [self addAddressLabel:height1];
+    CGFloat height3 = [self toFinishInfoMessage:height2];
+    CGFloat height4 = [self finishNameInfoLabel:height3];
+    CGFloat height5 = [self finishPhoneInfoLabel:height4];
+    CGFloat height6 = [self confirmBtn:height5];
+    [headView setFrame:CGRectMake(self.frame.origin.x, self.frame.origin.y, self.frame.size.width, height6)];
+    self.baseTable.tableHeaderView = headView;
+    
+    UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(toTap)];
+    [self addGestureRecognizer:tap];
+}
+
+- (void)toTap
+{
+    [self endEditing:YES];
+}
+
+- (void)scrollViewDidScroll:(UIScrollView *)scrollView
+{
+    [super scrollViewDidScroll:scrollView];
+    [self endEditing:YES];
+}
+
+@end

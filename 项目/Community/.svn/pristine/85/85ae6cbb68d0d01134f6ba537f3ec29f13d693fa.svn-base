@@ -1,0 +1,43 @@
+//
+//  HWReceiveAddressModel.h
+//  Community
+//
+//  Created by ryder on 8/3/15.
+//  Copyright (c) 2015 caijingpeng. All rights reserved.
+//
+
+#import <Foundation/Foundation.h>
+#import "HWAddressInfo.h"
+
+@interface HWReceiveAddressModel : NSObject
+@property (nonatomic, strong) NSString *detail;
+@property (nonatomic, strong) NSString *key;
+@property (nonatomic, strong) NSString *status;
+@property (nonatomic, strong) NSDictionary *data;
+@property (nonatomic, strong) NSArray *content;
+
+
+@property (nonatomic, strong) NSString *size;
+@property (nonatomic, strong) NSString *number;
+@property (nonatomic, strong) NSString *sort;
+@property (nonatomic, strong) NSString *totalElements;
+@property (nonatomic, strong) NSString *lastPage;
+@property (nonatomic, strong) NSString *firstPage;
+@property (nonatomic, strong) NSString *totalPages;
+@property (nonatomic, strong) NSString *numberOfElements;
+@property (nonatomic, strong) NSMutableArray *addressArray;
+
+//@property (nonatomic, strong) NSString *creater;
+//@property (nonatomic, strong) NSString *createTime;
+//@property (nonatomic, strong) NSString *modifier;
+//@property (nonatomic, strong) NSString *modifyTime;
+//@property (nonatomic, strong) NSString *version;
+//@property (nonatomic, strong) NSString *disabled;
+//
+////add by gusheng
+//@property (nonatomic,strong)NSString *orderIdStr;
+////end
+
+- (id)initWithDictionary:(NSDictionary *)dictionary;
+
+@end

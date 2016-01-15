@@ -1,0 +1,47 @@
+//
+//  HWTianTianTuanDetailModel.h
+//  Community
+//
+//  Created by niedi on 15/7/31.
+//  Copyright (c) 2015年 caijingpeng. All rights reserved.
+//
+
+#import <Foundation/Foundation.h>
+
+@interface HWTianTianTuanDetailModel : NSObject
+
+@property (nonatomic, strong) NSString *orderId;//订单id
+@property (nonatomic, strong) NSString *orderCode;//订单编号
+@property (nonatomic, strong) NSString *payOrderId;//支付流水号
+@property (nonatomic, strong) NSString *goodsId;//商品编号
+@property (nonatomic, strong) NSString *address;//收货地址
+@property (nonatomic, strong) NSString *sendInfo;
+@property (nonatomic, strong) NSString *orderStatus;//订单状态
+@property (nonatomic, strong) NSString *remark;
+@property (nonatomic, strong) NSString *orderAmount;//订单金额
+@property (nonatomic, strong) NSString *goodsCount;//商品数量
+@property (nonatomic, strong) NSString *payType;
+@property (nonatomic, strong) NSString *payMoney;//支付金额
+@property (nonatomic, strong) NSString *payTime;//支付时间
+@property (nonatomic, strong) NSString *mobile;//电话
+@property (nonatomic, strong) NSString *name;//收货人姓名
+@property (nonatomic, strong) NSString *isExport;
+@property (nonatomic, strong) NSString *expressName;
+@property (nonatomic, strong) NSString *expressNumber;
+@property (nonatomic, strong) NSString *sendGoodsTime;
+@property (nonatomic, strong) NSString *createTime;//下单时间
+@property (nonatomic, strong) NSString *returnMoneyTime;//退货时间
+@property (nonatomic, strong) NSString *returnAmount;//退款金额
+@property (nonatomic, strong) NSString *brand;//供应商
+@property (nonatomic, strong) NSString *sellPrice;//单价
+@property (nonatomic, strong) NSString *goodsName;//商品名称
+@property (nonatomic, strong) NSString *postage;//邮费
+@property (nonatomic, strong) NSString *orderImg;//订单图片
+@property (nonatomic, strong) NSString *userId;//用户id
+@property (nonatomic, strong) NSString *isChange;//状态改变刷新列表
+
+- (instancetype)initWithDict:(NSDictionary *)dict;
+
+@end
+
+/*data =     { "id": 5,订单id "orderCode": null,订单编号 "payOrderId": 1302021545,支付流水号 "goodsId": null,商品编号 "address": "上海最牛逼",收货地址 "sendInfo": null, "orderStatus": 0,订单状态 "remark": null, "orderAmount": 100.0000,订单金额 "goodsCount": 2,商品数量 "payType": null, "payMoney": 105.0000,支付金额 "payTime": null,支付时间 "mobile": "18645050000",电话 "name": "二踢脚",收货人姓名 "isExport": null, "expressName": null, "expressNumber": null, "sendGoodsTime": null, "createTime": 1438220895000,下单时间 "returnMoneyTime": null,退货时间 "brand": "西部商贸有限公司",供应商 "sellPrice": 50.0000,单价 "goodsName": "红苹果",商品名称 "postage": 5.0000,邮费 "orderImg": "xxx3",订单图片 "userId": 1030431030435 用户id }*/

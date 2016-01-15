@@ -1,0 +1,118 @@
+//
+//  HWAuthenticateFinishViewController.m
+//  Community
+//
+//  Created by hw500027 on 15/6/25.
+//  Copyright (c) 2015年 caijingpeng. All rights reserved.
+//
+
+#import "HWAuthenticateFinishViewController.h"
+
+@interface HWAuthenticateFinishViewController ()
+
+@end
+
+@implementation HWAuthenticateFinishViewController
+
+- (void)viewDidLoad
+{
+    [super viewDidLoad];
+    self.navigationItem.titleView = [Utility navTitleView:@"认证门牌"];
+    [self configUI];
+}
+
+- (void)didClickBtn
+{
+    [self.navigationController popToRootViewControllerAnimated:YES];
+}
+
+- (void)configUI
+{
+    UILabel *titleLabel = [UILabel newAutoLayoutView];
+    [self.view addSubview:titleLabel];
+    titleLabel.text = @"合作物业系统识别您为：";
+    titleLabel.font = FONT(15);
+    [titleLabel autoPinEdge:ALEdgeTop toEdge:ALEdgeTop ofView:self.view withOffset:22];
+    [titleLabel autoAlignAxis:ALAxisVertical toSameAxisOfView:self.view];
+    
+    UIImage *img = [UIImage imageNamed:@"property_bg4"];
+    UIImageView *imgV = [UIImageView newAutoLayoutView];
+    [self.view addSubview:imgV];
+    imgV.image = img;
+    [imgV autoAlignAxis:ALAxisVertical toSameAxisOfView:self.view];
+    [imgV autoPinEdge:ALEdgeTop toEdge:ALEdgeTop ofView:self.view withOffset:150/2];
+    [imgV autoSetDimensionsToSize:CGSizeMake(img.size.width * kScreenRate, img.size.height * kScreenRate)];
+    
+    UILabel *addressLabel1 = [UILabel newAutoLayoutView];
+    [imgV addSubview:addressLabel1];
+    addressLabel1.text = [HWUserLogin currentUserLogin].villageName;
+    addressLabel1.font = FONT(15);
+    addressLabel1.textColor = [UIColor whiteColor];
+    addressLabel1.numberOfLines = 1;
+    [addressLabel1 autoSetDimension:ALDimensionWidth toSize:320 / 2 * kScreenRate];
+    addressLabel1.textAlignment = NSTextAlignmentCenter;
+    [addressLabel1 autoAlignAxis:ALAxisVertical toSameAxisOfView:imgV];
+    [addressLabel1 autoPinEdge:ALEdgeBottom toEdge:ALEdgeBottom ofView:imgV withOffset:- 30 * kScreenRate];
+    
+    UILabel *addressLabel2 = [UILabel newAutoLayoutView];
+    [imgV addSubview:addressLabel2];
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    NSString *unitNo = [defaults objectForKey:kAuthUnitNo];
+    if (unitNo.length == 0 || [unitNo isEqual:@"0"])
+    {
+        addressLabel2.text = [NSString stringWithFormat:@"%@幢%@业主",[defaults objectForKey:kAuthBuildingNo],[defaults objectForKey:kAuthRoomNo]];
+    }
+    else
+    {
+        addressLabel2.text = [NSString stringWithFormat:@"%@幢%@单元%@业主",[defaults objectForKey:kAuthBuildingNo],[defaults objectForKey:kAuthUnitNo],[defaults objectForKey:kAuthRoomNo]];
+    }
+    
+    addressLabel2.font = FONT(15);
+    addressLabel2.textColor = [UIColor whiteColor];
+    addressLabel2.numberOfLines = 1;
+    [addressLabel2 autoSetDimension:ALDimensionWidth toSize:320 / 2 * kScreenRate];
+    addressLabel2.textAlignment = NSTextAlignmentCenter;
+    [addressLabel2 autoAlignAxis:ALAxisVertical toSameAxisOfView:imgV];
+    [addressLabel2 autoPinEdge:ALEdgeBottom toEdge:ALEdgeBottom ofView:imgV withOffset:-12 * kScreenRate];
+    
+    UIButton *confirmBtn = [UIButton newAutoLayoutView];
+    CGSize btnSize = CGSizeMake(580 / 2 * kScreenRate, 45);
+    [self.view addSubview:confirmBtn];
+    [confirmBtn setTitle:@"确认成为认证业主" forState:UIControlStateNormal];
+    confirmBtn.layer.masksToBounds = YES;
+    confirmBtn.layer.cornerRadius = 3;
+    [confirmBtn setBackgroundImage:[Utility imageWithColor:THEBUTTON_GREEN_NORMAL andSize:btnSize] forState:UIControlStateNormal];
+    [confirmBtn setBackgroundImage:[Utility imageWithColor:THEBUTTON_GREEN_HIGHLIGHT andSize:btnSize] forState:UIControlStateHighlighted];
+    [confirmBtn autoPinEdge:ALEdgeTop toEdge:ALEdgeBottom ofView:imgV withOffset:25];
+    [confirmBtn autoAlignAxis:ALAxisVertical toSameAxisOfView:self.view];
+    [confirmBtn autoSetDimensionsToSize:btnSize];
+    [confirmBtn addTarget:self action:@selector(didClickBtn) forControlEvents:UIControlEventTouchUpInside];
+    
+    UILabel *describeLabel = [UILabel newAutoLayoutView];
+    [self.view addSubview:describeLabel];
+    describeLabel.numberOfLines = 0;
+    describeLabel.text = @"本小区的认证业主可以自由在邻里圈和邻居交流，对小区内的公共事务进行投诉和建议。";
+    describeLabel.font = FONT(14);
+    describeLabel.textColor = THEME_COLOR_TEXT;
+    [describeLabel autoPinEdge:ALEdgeTop toEdge:ALEdgeBottom ofView:confirmBtn withOffset:15];
+    [describeLabel autoPinEdge:ALEdgeLeft toEdge:ALEdgeLeft ofView:self.view withOffset:15];
+    [describeLabel autoPinEdge:ALEdgeRight toEdge:ALEdgeRight ofView:self.view withOffset:- 15];
+    
+}
+
+- (void)didReceiveMemoryWarning {
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
+}
+
+/*
+#pragma mark - Navigation
+
+// In a storyboard-based application, you will often want to do a little preparation before navigation
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+    // Get the new view controller using [segue destinationViewController].
+    // Pass the selected object to the new view controller.
+}
+*/
+
+@end

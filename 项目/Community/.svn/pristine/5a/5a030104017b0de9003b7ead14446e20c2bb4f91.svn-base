@@ -1,0 +1,117 @@
+//
+//  HWWuYeFeeCell.m
+//  Community
+//
+//  Created by niedi on 15/6/11.
+//  Copyright (c) 2015年 caijingpeng. All rights reserved.
+//
+
+#import "HWWuYeFeeCell.h"
+
+@interface HWWuYeFeeCell ()
+{
+    DImageV *selImgV;
+    DImageV *statusImgV;
+    DLable *roomLab;
+    DLable *nameLab;
+    DLable *feeLab;
+    DLable *toDateLab;
+}
+@end
+
+@implementation HWWuYeFeeCell
+
+- (instancetype)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier
+{
+    if (self = [super initWithStyle:style reuseIdentifier:reuseIdentifier])
+    {
+        self.backgroundColor = BACKGROUND_COLOR;
+        self.contentView.backgroundColor = BACKGROUND_COLOR;
+        
+        CGFloat backViewWidth = kScreenWidth - 2 * 15;
+        
+        DView *backView = [DView viewFrameX:15 y:10 w:kScreenWidth - 2 * 15 h:128];
+        [backView setRadius:3.5f];
+        backView.backgroundColor = THEME_COLOR_White;
+        backView.layer.borderColor = THEME_COLOR_LINE.CGColor;
+        backView.layer.borderWidth = 0.5f;
+        [self.contentView addSubview:backView];
+        
+        DView *titleView = [DView viewFrameX:0 y:0 w:backViewWidth h:35.0f];
+        titleView.backgroundColor = THEME_COLOR_ORANGE;
+        [backView addSubview:titleView];
+        
+        selImgV = [DImageV imagV:@"choose162" frameX:10 y:8.0f w:22.0f h:22.0f];
+        [titleView addSubview:selImgV];
+        
+        statusImgV = [DImageV imagV:@"label_16_03" frameX:kScreenWidth - 2 * 15 - 65.0f y:0 w:65.0f h:65.0f];
+        [backView addSubview:statusImgV];
+        
+        roomLab = [DLable LabTxt:@"房号 " txtFont:TF20 txtColor:THEME_COLOR_White frameX:CGRectGetMaxX(selImgV.frame) + 10 y:10 w:backViewWidth - (CGRectGetMaxX(selImgV.frame) + 10) h:22];
+        [titleView addSubview:roomLab];
+        
+        nameLab = [DLable LabTxt:@"业主：" txtFont:TF16 txtColor:THEME_COLOR_SMOKE frameX:10 y:CGRectGetMaxY(titleView.frame) + 10 w:backViewWidth - 2 * 15 h:18];
+        [backView addSubview:nameLab];
+        
+        feeLab = [DLable LabTxt:@"物业费：" txtFont:TF16 txtColor:THEME_COLOR_SMOKE frameX:10 y:CGRectGetMaxY(nameLab.frame) + 5 w:backViewWidth - 2 * 15 h:18];
+        [backView addSubview:feeLab];
+        
+        toDateLab = [DLable LabTxt:@"当前缴纳至" txtFont:TF16 txtColor:THEME_COLOR_SMOKE frameX:10 y:CGRectGetMaxY(feeLab.frame) + 5 w:backViewWidth - 2 * 15 h:18];
+        [backView addSubview:toDateLab];
+    }
+    return self;
+}
+
+
+- (void)fillDataWithModel:(HWWuYeFeeModel *)model
+{
+    if ([model.typeStr isEqualToString:@"0"])
+    {
+        statusImgV.hidden = YES;
+    }
+    else
+    {
+        statusImgV.hidden = NO;
+    }
+    
+    NSString *roomStr = @"";
+    if (model.unitNoStr.length != 0)
+    {
+        roomStr = [NSString stringWithFormat:@"房号  %@幢%@单元%@室", model.buildingStr, model.unitNoStr, model.roomStr];
+    }
+    else
+    {
+        roomStr = [NSString stringWithFormat:@"房号  %@幢%@室", model.buildingStr, model.roomStr];
+    }
+    
+    roomLab.text = roomStr;
+    nameLab.text = [NSString stringWithFormat:@"业主： %@", model.nameStr];
+    feeLab.text = [NSString stringWithFormat:@"物业费： %@元/月", model.propertyStr];
+    
+    long long time = [model.sDateStr longLongValue] / 1000;
+    NSDate *toDate = [NSDate dateWithTimeIntervalSince1970:time];
+    NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
+    [formatter setDateFormat:@"yyyy年MM月dd日"];
+    NSString *strDate = [formatter stringFromDate:toDate];
+    toDateLab.text = [NSString stringWithFormat:@"当前缴纳至%@", strDate];
+}
+
++ (CGFloat)getCellHeight:(HWWuYeFeeModel *)model
+{
+    return 137;
+}
+
+- (void)cellSelect:(BOOL)isSel
+{
+    if (isSel)
+    {
+        selImgV.image = [UIImage imageNamed:@"choose161"];
+    }
+    else
+    {
+        selImgV.image = [UIImage imageNamed:@"choose162"];
+    }
+}
+
+
+@end

@@ -1,0 +1,682 @@
+//
+//  HWPersonInfoViewController.m
+//  Community
+//
+//  Created by gusheng on 14-9-1.
+//  Copyright (c) 2014年 caijingpeng. All rights reserved.
+//
+//  功能描述：个人主页模块
+//  修改记录：
+//	姓名     日期          修改内容
+//  陆晓波    2015-01-16   修改获取新增个人动态方法
+//  陆晓波    2015-01-19   修改获取新增个人动态信息数量
+//  陆晓波    2015-01-21   新增个人动态信息 显示图片修改
+//  陆晓波    2015-01-22   新增未读信息 数组修改
+//  陆晓波    2015-01-23   新增代理方法
+//  陆晓波    2015-04-13   添加游客登录 绑定手机
+//  聂迪      2015-07-09   去除个人动态，相关功能移到消息中心
+
+#import "HWPersonInfoViewController.h"
+#import "SystemSettinViewController.h"
+#import "PersonInfoTableViewCell.h"
+#import "ApplyVertifyViewController.h"
+#import "TwoDimensionExtendViewController.h"
+#import "HWLocationChangeViewController.h"
+#import "HWModifyPersonInfoViewController.h"
+#import "HWFeedBackViewController.h"
+#import "HWMoneyViewController.h"
+#import "HWLaunchShopViewController.h"
+#import "HWLaunchShopViewController.h"
+#import "HWShopManageViewController.h"
+#import "HWCoreDataManager.h"
+#import "HWMyOrderViewController.h"
+#import "HWChangeViewController.h"
+#import "HWPersonDynamicViewController.h"
+#import "TwoDimensionExtendViewController.h"
+#import "AppDelegate.h"
+#import "HWPersonInfoViewButton.h"
+#import "HWNewUserBindViewController.h"
+@interface HWPersonInfoViewController ()<HWPersonInfoHeadViewDelegate,HWPersonDynamicViewControllerDelegate>
+{
+    //游客模式 绑定手机红点
+    UILabel *_redPoint;
+    BOOL isShowRedPiont;
+}
+@end
+
+@implementation HWPersonInfoViewController
+@synthesize noReadNumStr;
+
+- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
+{
+    self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
+    if (self)
+    {
+        // Custom initialization
+        
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reloadPersionData:) name:RELOAD_APP_DATA object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(showRdPoint) name:KshowRedPoint object:nil];
+    }
+    return self;
+}
+
+-(void)showRdPoint
+{
+    isShowRedPiont = YES;
+}
+
+- (void)reloadPersionData:(NSNotification *)notification
+{
+    [self createDataSource];
+    
+    if (![[HWUserLogin currentUserLogin].coStatus isEqualToString:@"0"])//1 非合作物业
+    {
+        //1.2.1 获取新增个人动态数量方法
+        [self getDynamicIndex];
+    }
+    
+    [self loadPersionData];
+    [self addSubviewToHeadView:view];
+    [personInfoTableView reloadData];
+    [self creatPersonHeadView];
+}
+
+- (void)viewWillAppear:(BOOL)animated
+{
+    [super viewWillAppear:YES];
+    [self reloadPersionData:nil];
+    [self getPersonInfoRequest];
+    [self.navigationController setNavigationBarHidden:NO animated:NO];
+}
+
+- (void)loadPersionData
+{
+    if (personInfoView != nil)
+    {
+        [personInfoView refreshPersonInfo];
+    }
+}
+
+- (void)viewDidLoad
+{
+    [super viewDidLoad];
+    
+    self.navigationItem.titleView = [Utility navTitleView:@"我"];
+    [self creatPersonMainView];
+    noReadNumStr = nil;
+}
+
+/**
+ *	@brief	获取新增个人动态信息数量
+ *
+ *	@return	N/A
+ */
+-(void)getDynamicIndex
+
+{
+    NSMutableDictionary *parameters = [[NSMutableDictionary alloc]init];
+    [parameters setPObject:[HWUserLogin currentUserLogin].key forKey:@"key"];
+    
+    HWHTTPRequestOperationManager *manager = [HWHTTPRequestOperationManager manager];
+    [manager POST:kDynamicIndex parameters:parameters queue:nil success:^(id responese)
+     {
+         NSLog(@"首页新增信息数量%@",responese);
+         NSMutableDictionary *dict = [[NSMutableDictionary alloc]initWithDictionary:[responese dictionaryObjectForKey:@"data"]];
+         NSInteger countNum = 0;
+         NSMutableArray *countArr = [[NSMutableArray alloc]init];
+         [countArr addObject:[dict stringObjectForKey:@"atCount"]];//@我的
+         [countArr addObject:[dict stringObjectForKey:@"replyCount"]];//评论
+         [countArr addObject:[dict stringObjectForKey:@"praiseTopicCount"]];//赞
+         [countArr addObject:[dict stringObjectForKey:@"topicCount"]];//主题
+         
+         for (int i = 0; i < countArr.count; i++)
+         {
+             countNum = countNum + [[countArr pObjectAtIndex:i]integerValue];
+         }
+         noReadNumStr = [NSString stringWithFormat:@"%ld",(long)countNum];
+         if (personInfoTableView)
+         {
+             [personInfoTableView reloadData];
+         }
+     } failure:^(NSString *code, NSString *error)
+     {
+         
+     }];
+}
+
+- (void)getPersonInfoRequest
+{
+    HWHTTPRequestOperationManager *managerTemp = [HWHTTPRequestOperationManager manager];
+    NSMutableDictionary *dict = [NSMutableDictionary dictionary];
+    [dict setPObject:[HWUserLogin currentUserLogin].key forKey:@"key"];
+    [dict setPObject:[HWUserLogin currentUserLogin].telephoneNum forKey:@"mobileNumber"];
+    [managerTemp POST:kPersonInfo parameters:dict queue:nil success:^(id responseObject)
+     {
+         NSDictionary *dataDic = [responseObject objectForKey:@"data"];
+         //用户数据保存本地
+         [[HWUserLogin currentUserLogin] initUserLogin:dataDic];
+         [HWCoreDataManager saveUserInfo]; // 保存数据库
+         [self reloadPersionData:nil];
+         
+     } failure:^(NSString *code, NSString *error) {
+         NSLog(@"error");
+     }];
+}
+
+//返回上一级
+-(void)back:(id)sender
+{
+    [self.navigationController popViewControllerAnimated:YES];
+}
+//创建数据源
+-(void)createDataSource
+{
+    NSArray *arryOne = nil;
+    if ([self isOpenShop])
+    {
+        arryOne = [NSArray arrayWithObjects:@"我的钱包",@"店铺管理",nil];
+    }else
+    {
+        arryOne = [NSArray arrayWithObjects:@"我的钱包",@"申请开店",nil];
+    }
+    
+    NSArray *arryTwo;
+    if (![[HWUserLogin currentUserLogin].coStatus isEqualToString:@"0"])
+    {
+        arryTwo = [NSArray arrayWithObjects:@"个人动态",@"更改小区",@"修改密码",@"邀请朋友", nil];
+    }
+    else
+    {
+        arryTwo = [NSArray arrayWithObjects:@"更改小区",@"修改密码",@"邀请朋友", nil];
+    }
+    NSArray *arryThree = [NSArray arrayWithObjects:@"建议反馈",@"系统设置", nil];
+    
+    listDataDic = [[NSMutableDictionary alloc]initWithObjectsAndKeys:arryOne,@"arryOne",arryTwo,@"arryTwo",arryThree,@"arryThree",nil];
+    
+    NSArray *arryFour = [NSArray arrayWithObjects:@"个人中心－图标2",@"个人中心－图标3",nil];
+    
+    NSArray *arryFive;
+    if (![[HWUserLogin currentUserLogin].coStatus isEqualToString:@"0"])
+    {
+        arryFive = [NSArray arrayWithObjects:@"icon_gerendongtai",@"icon_genggaixiaoqu",@"icon_xiugaimima",@"icon_yaoqingpengyou", nil];
+    }
+    else
+    {
+        arryFive = [NSArray arrayWithObjects:@"icon_genggaixiaoqu",@"icon_xiugaimima",@"icon_yaoqingpengyou", nil];
+    }
+    NSArray *arrySix = [NSArray arrayWithObjects:@"icon_jianyifankui",@"icon_xitongshezhi", nil];
+    
+    imageDataDic = [[NSMutableDictionary alloc]initWithObjectsAndKeys:arryFour,@"arryOne",arryFive,@"arryTwo",arrySix,@"arryThree",nil];
+}
+
+//创建Person的主视图
+-(void)creatPersonMainView
+{
+    personInfoTableView = [[UITableView alloc] initWithFrame:CGRectMake(0, 0, kScreenWidth, CONTENT_HEIGHT - 49.0f)];
+    personInfoTableView.backgroundColor = [UIColor clearColor];
+    [personInfoTableView setSeparatorStyle:UITableViewCellSeparatorStyleNone];
+    personInfoTableView.delegate = self;
+    personInfoTableView.dataSource = self;
+    UIView *viewTemp = [[UIView alloc]init];
+    personInfoTableView.tableFooterView= viewTemp;
+    [self.view addSubview:personInfoTableView];
+    [self creatPersonHeadView];
+}
+
+//创建个人信息的HeadView
+-(void)creatPersonHeadView
+{
+    // 上半部高度
+    personInfoView = [[HWPersonInfoHeadView alloc]initWithFrame:CGRectMake(0, 0, kScreenWidth, 135 * kScreenRate)];
+    personInfoView.delegate = self;
+    
+    float height = CGRectGetHeight(personInfoView.frame) - 50;
+    if (![Utility isGuestLogin])
+    {
+        [personInfoView setHeadCenterY:height / 2.0f];
+        
+        UIImageView *arrowIV = [[UIImageView alloc]initWithFrame:CGRectMake(kScreenWidth - 18 , (height - 12) / 2.0f, 6.5, 12)];
+        arrowIV.image = [UIImage imageNamed:@"redPkgArrow"];
+        [personInfoView addSubview:arrowIV];
+    }
+    
+    view = [[UIView alloc] initWithFrame:CGRectMake(0, height, kScreenWidth, 50)];
+    view.backgroundColor = [UIColor colorWithWhite:0.1 alpha:0.3];
+    [personInfoView addSubview:view];
+    [self addSubviewToHeadView:view];
+    
+    personInfoTableView.tableHeaderView = personInfoView;
+}
+
+#pragma mark - HWPersonInfoHeadViewDelegate
+- (void)didClickEditHead
+{
+    [MobClick event:@"click_headportrait"];
+    HWModifyPersonInfoViewController *modityView = [[HWModifyPersonInfoViewController alloc] init];
+    [self.navigationController pushViewController:modityView animated:YES];
+}
+
+- (void)didClickLoginBtn
+{
+    [HWUserLogin verifyIsLoginWithPresentVC:self toViewController:nil];
+}
+
+#pragma mark -
+- (void)addSubviewToHeadView:(UIView *)viewTemp
+{
+    NSArray * imgArr = @[@"center_wallet",@"center_order"];//@[@"center_wallet",@"center_order",@"center_shop"];
+    NSArray * titleArr;
+    for(UIView *viewTemp in [view subviews])
+    {
+        [viewTemp removeFromSuperview];
+    }
+//    if([self isOpenShop])
+//    {
+//        titleArr = @[@"我的钱包",@"我的订单",@"店铺管理"];
+//    }
+//    else
+//    {
+//        titleArr =  @[@"我的钱包",@"我的订单",@"申请开店"];
+//    }
+    titleArr =  @[@"我的钱包",@"我的订单"];
+    for (int i = 0; i < titleArr.count; i++)
+    {
+        HWPersonInfoViewButton *btn = [[HWPersonInfoViewButton alloc]initWithFrame:CGRectMake(kScreenWidth/2.0f * i,0, kScreenWidth/2.0f, view.frame.size.height)];
+        [btn setTitle:titleArr[i] forState:UIControlStateNormal];
+        [btn setImage:[UIImage imageNamed:imgArr[i]] forState:UIControlStateNormal];
+        [btn addTarget:self action:@selector(headViewButtomBtnClick:) forControlEvents:UIControlEventTouchUpInside];
+        btn.tag = 202 + i;
+        [viewTemp addSubview:btn];
+//        if (i < 2)
+//        {
+//            UILabel * lab = [[UILabel alloc] initWithFrame:CGRectMake(kScreenWidth/3.0f * (i + 1), 13, 1, view.frame.size.height/2)];
+//            lab.backgroundColor = [UIColor colorWithWhite:0.7 alpha:0.5];
+//            [viewTemp addSubview:lab];
+//        }
+    }
+    
+}
+
+- (void)headViewButtomBtnClick:(UIButton *)btn
+{
+    if (btn.tag == 202)
+    {
+        AppDelegate *del = SHARED_APP_DELEGATE;
+        
+        if ([HWUserLogin verifyBindMobileWithPopVC:del.tabBarVC showAlert:YES])
+        {
+            [self tableView:personInfoTableView didSelectRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0]];
+        }
+        
+    }else if (btn.tag == 203)
+    {
+        [MobClick event:@"click_wodedingdan"];
+        if ([HWUserLogin verifyBindMobileWithPopVC:self showAlert:YES])
+        {
+            HWMyOrderViewController *myOrderVC = [[HWMyOrderViewController alloc] init];
+            if ([HWUserLogin verifyIsLoginWithPresentVC:self toViewController:myOrderVC])
+            {
+                [self.navigationController pushViewController:myOrderVC animated:YES];
+            }
+        }
+    }
+#warning 绑定手机号   申请开店 错误
+    else if (btn.tag == 204)
+    {
+        AppDelegate *del = SHARED_APP_DELEGATE;
+        
+        if ([HWUserLogin verifyBindMobileWithPopVC:del.tabBarVC showAlert:YES])
+        {
+            [self tableView:personInfoTableView didSelectRowAtIndexPath:[NSIndexPath indexPathForRow:1 inSection:0]];
+        }
+    }
+}
+
+//判断是否开店
+- (BOOL)isOpenShop
+{
+    if ([NSString stringWithFormat:@"%@",[HWUserLogin currentUserLogin].shopId].length > 0)
+    {
+        return YES;
+    }
+    return NO;
+}
+#pragma - mark tableview delegate method
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    static NSString *cellIdentifier = @"personInfoIdentifier";
+    PersonInfoTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:cellIdentifier];
+    if (!cell)
+    {
+        cell = [[PersonInfoTableViewCell alloc] init];
+    }
+    cell.backgroundColor = [UIColor whiteColor];
+    int section = (int)indexPath.section;
+    int row = (int)indexPath.row;
+    NSString *str = nil;
+    if (section == 0)
+    {
+        str = @"arryOne";
+        cell.titleLabel.text = [[listDataDic objectForKey:str] objectAtIndex:row];
+        cell.iconImage.image = [UIImage imageNamed:[[imageDataDic objectForKey:str]objectAtIndex:row]] ;
+        [cell addLine:45.5f isHide:NO];
+        cell.layer.masksToBounds = YES;
+    }
+    else if(section == 1)
+    {
+        str = @"arryTwo";
+        cell.titleLabel.text = [[listDataDic objectForKey:str] objectAtIndex:row];
+        cell.iconImage.image = [UIImage imageNamed:[[imageDataDic objectForKey:str]objectAtIndex:row]];
+        if (row == 0) {
+            if (noReadNumStr&&[noReadNumStr intValue]>0)
+            {
+                UIImageView * backImageView = [[UIImageView alloc]initWithFrame:CGRectMake(112, 15, 8, 8)];
+                backImageView.image = [UIImage imageNamed:@"unread03"];
+                backImageView.layer.cornerRadius = 4.0f;
+                backImageView.layer.masksToBounds = YES;
+//                UILabel *noReadNumLabel = [[UILabel alloc]initWithFrame:CGRectMake(150, 9, 26, 26)];
+//                noReadNumLabel.textAlignment = NSTextAlignmentCenter;
+//                noReadNumLabel.hidden = YES;
+//                [noReadNumLabel setFont:[UIFont systemFontOfSize:13.0f]];
+//                if (noReadNumStr)
+//                {
+//                    if ([noReadNumStr intValue]<100)
+//                    {
+//                        noReadNumLabel.text = noReadNumStr;
+//                    }
+//                    else
+//                    {
+//                        noReadNumLabel.text = @"99+";
+//                    }
+//                }
+//                noReadNumLabel.textColor = [UIColor whiteColor];
+//                noReadNumLabel.backgroundColor = [UIColor clearColor];
+                [cell.contentView addSubview:backImageView];
+//                [cell.contentView addSubview:noReadNumLabel];
+            }
+        }
+        [cell addLine:45.5f isHide:NO];
+    }
+    else if(section == 2)
+    {
+        str = @"arryThree";
+        cell.titleLabel.text = [[listDataDic objectForKey:str] objectAtIndex:row];
+        cell.iconImage.image = [UIImage imageNamed:[[imageDataDic objectForKey:str] pObjectAtIndex:row]] ;
+        [cell addLine:45.5f isHide:NO];
+        if (indexPath.row == 2)
+        {
+            _redPoint = [[UILabel alloc]initWithFrame:CGRectMake(CGRectGetMinX(cell.titleLabel.frame) + 4*16, CGRectGetMinY(cell.titleLabel.frame) - 5, 8, 8)];
+            _redPoint.layer.cornerRadius = 4;
+            _redPoint.layer.masksToBounds = YES;
+            if (isShowRedPiont == YES)
+            {
+                _redPoint.hidden = NO;
+            }
+            else
+            {
+                _redPoint.hidden = YES;
+            }
+            _redPoint.backgroundColor = [UIColor redColor];
+            [cell addSubview:_redPoint];
+        }
+    }
+    if (indexPath.row == 0)
+    {
+        //对每一个分区第一个Cell加上边框线
+        [cell addLine:0.0 isHide:NO];
+    }
+    cell.titleLabel.textColor = UIColorFromRGB(0x333333);
+    [cell.titleLabel setFont:[UIFont systemFontOfSize:15.0]];
+    cell.selectionStyle = UITableViewCellSelectionStyleNone;
+    return cell;
+}
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
+{
+    return 3;
+}
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    if (indexPath.section == 0)
+    {
+        return 0;
+    }
+    return 45.5f;
+    
+}
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
+{
+    if (section == 0)
+    {
+        return  [[listDataDic objectForKey:@"arryOne"]count];
+    }
+    else if(section == 1)
+    {
+        return  [[listDataDic objectForKey:@"arryTwo"]count];
+    }
+    else if(section == 2)
+    {
+        return  [[listDataDic objectForKey:@"arryThree"]count];
+    }
+    else
+    {
+        return 0;
+    }
+    
+}
+
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    [tableView deselectRowAtIndexPath:indexPath animated:YES];
+    NSInteger section = [indexPath section];
+    NSInteger row = [indexPath row];
+    switch (section)
+    {
+        case 0:
+        {
+            switch (row)
+            {
+                case 0:
+                {
+                    [MobClick event:@"click_mypocket"];
+                    AppDelegate *del = (AppDelegate *)SHARED_APP_DELEGATE;
+                    HWMoneyViewController *moneyVC = [[HWMoneyViewController alloc] init];
+                    if ([HWUserLogin verifyIsLoginWithPresentVC:del.tabBarVC toViewController:moneyVC])
+                    {
+                        [self.navigationController pushViewController:moneyVC animated:YES];
+                    }
+                    break;
+                }
+                case 1:
+                {
+                    if (![self isOpenShop])
+                    {
+                        [MobClick event:@"click_openshop"];
+                        __weak HWPersonInfoViewController *mySelf = self;
+                        HWLaunchShopViewController *openShopView = [[HWLaunchShopViewController alloc]init];
+                        [openShopView setRefershShopStatus:^
+                         {
+                             [mySelf viewWillAppear:YES];
+                         }];
+                        [self.navigationController pushViewController:openShopView animated:YES];
+                    }
+                    else
+                    {
+                        HWShopManageViewController *shopManageView = [[HWShopManageViewController alloc]init];
+                        shopManageView.shopIdStr = [HWUserLogin currentUserLogin].shopId;
+                        shopManageView.renlinFlag = NO;
+                        [self.navigationController pushViewController:shopManageView animated:YES];
+                    }
+                    break;
+                }
+                default:
+                    break;
+            }
+            break;
+        }
+        case 1:
+        {
+            NSLog(@"dafasd%@", [HWUserLogin currentUserLogin].coStatus);
+            if ([[HWUserLogin currentUserLogin].coStatus isEqualToString:@"0"])// 合作的去掉个人动态
+            {
+                row = row + 1;
+            }
+            
+            switch (row)
+            {
+                case 0:
+                {
+                    [MobClick event:@"click_information"];
+                    AppDelegate *del = (AppDelegate *)SHARED_APP_DELEGATE;
+                    if ([HWUserLogin verifyBindMobileWithPopVC:del.tabBarVC showAlert:YES])
+                    {
+                        HWPersonDynamicViewController* personDynamicViewController = [[HWPersonDynamicViewController alloc]init];
+                        personDynamicViewController.delegate = self;
+                        
+                        if ([HWUserLogin verifyIsLoginWithPresentVC:del.tabBarVC toViewController:personDynamicViewController])
+                        {
+                            [self.navigationController pushViewController:personDynamicViewController animated:YES];
+                        }
+                    }
+                    //                        HWPersonInfoDetailViewController *personCenterView = [[HWPersonInfoDetailViewController alloc]init];
+                    //                        [self.navigationController pushViewController:personCenterView animated:YES];
+                    break;
+                }
+                case 1:
+                {
+                    [MobClick event:@"click_change_location"];
+                    HWLocationChangeViewController *communityView = [[HWLocationChangeViewController alloc]init];
+                    communityView.locationChangeFlag = YES;
+                    [self.navigationController pushViewController:communityView animated:YES];
+                    break;
+                    
+                }
+                case 2:
+                {
+                    [MobClick event:@"click_modify_password"];
+                    //                        HWForgetFirstViewController *forgetPWView = [[HWForgetFirstViewController alloc]init];
+                    //                        forgetPWView.navigationItem.titleView = [Utility navTitleView:@"修改密码"];
+                    //                        forgetPWView.isChangePwd = YES;
+                    //                        [self.navigationController pushViewController:forgetPWView animated:YES];
+                    
+                    AppDelegate *del = (AppDelegate *)SHARED_APP_DELEGATE;
+                    if ([HWUserLogin verifyBindMobileWithPopVC:del.tabBarVC showAlert:YES])
+                    {
+                        HWChangeViewController *changeVC = [[HWChangeViewController alloc]init];
+                        if ([HWUserLogin verifyIsLoginWithPresentVC:del.tabBarVC toViewController:changeVC])
+                        {
+                            [self.navigationController pushViewController:changeVC animated:YES];
+                        }
+                    }
+                    
+                    break;
+                }
+                case 3:
+                {
+                    [MobClick event:@"click_invite_friend"];
+                    AppDelegate *del = SHARED_APP_DELEGATE;
+                    if ([HWUserLogin verifyBindMobileWithPopVC:del.tabBarVC showAlert:YES])
+                    {
+                        TwoDimensionExtendViewController *inviteFriendV = [[TwoDimensionExtendViewController alloc]init];
+                        if ([HWUserLogin verifyIsLoginWithPresentVC:del.tabBarVC toViewController:inviteFriendV])
+                        {
+                            [self.navigationController pushViewController:inviteFriendV animated:YES];
+                        }
+                    }
+                    
+                    
+                    //                    InviteFriendViewController *inviteFriendView = [[InviteFriendViewController alloc]init];
+                    //                    [self.navigationController pushViewController:inviteFriendView animated:YES];
+                    //                        HWMyPriviledgeVC *myPriviledgeVc = [[HWMyPriviledgeVC alloc]init];
+                    //                        [self.navigationController pushViewController:myPriviledgeVc animated:YES];
+                    
+                    break;
+                }
+                default:
+                    break;
+            }
+            break;
+            
+        }
+        case 2:
+        {
+            switch (row)
+            {
+                case 0:
+                {
+                    [MobClick event:@"click_feedback"];
+                    HWFeedBackViewController *hwFeedBackVC = [[HWFeedBackViewController alloc]initWithNibName:@"HWFeedBackViewController" bundle:nil];
+                    hwFeedBackVC.appkey = UMENG_APP_KEY;
+                    UINavigationController *naVC = [[UINavigationController alloc]initWithRootViewController:hwFeedBackVC];
+                    [self presentViewController:naVC animated:YES completion:nil];
+                    break;
+                    
+                }
+                case 1:
+                {
+                    [MobClick event:@"click_system_management"];
+                    SystemSettinViewController *systemSettingView = [[SystemSettinViewController alloc]init];
+                    [self.navigationController pushViewController:systemSettingView animated:YES];
+                    break;
+                }
+                case 2:
+                {
+                    if (_redPoint != nil)
+                    {
+                        _redPoint.hidden = YES;
+                        isShowRedPiont = NO;
+                    }
+                    HWNewUserBindViewController *bindVC = [[HWNewUserBindViewController alloc]init];
+                    bindVC.isBind = YES;
+                    bindVC.isGuest = YES;
+                    [self.navigationController pushViewController:bindVC animated:YES];
+                    break;
+                }
+                default:
+                    break;
+            }
+            break;
+            
+        }
+        default:
+            break;
+    }
+}
+-(CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section
+{
+    if (section == 0)
+    {
+        return 0;
+    }
+    return 10.0f;
+}
+
+- (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section
+{
+    UIView *sectionView = [[UIView alloc]initWithFrame:CGRectMake(0, 0, kScreenWidth, 10)];
+    sectionView.backgroundColor = [UIColor clearColor];
+    return sectionView;
+}
+
+- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation
+{
+    return NO;
+}
+- (void)didReceiveMemoryWarning
+{
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
+}
+
+- (void)dealloc
+{
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:RELOAD_APP_DATA object:nil];
+}
+
+@end
+
+
+
+
+
+
+

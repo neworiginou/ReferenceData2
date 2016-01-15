@@ -1,0 +1,14 @@
+PODS:
+  - JTBorderDotAnimation (1.0.0)
+
+DEPENDENCIES:
+  - JTBorderDotAnimation (from `..`)
+
+EXTERNAL SOURCES:
+  JTBorderDotAnimation:
+    :path: ..
+
+SPEC CHECKSUMS:
+  JTBorderDotAnimation: db37d607ad4e88ad35f5430e29398882d75c379a
+
+COCOAPODS: 0.35.0

@@ -1,0 +1,494 @@
+//
+//  HWRequestConfig.h
+//  Community
+//
+//  Created by caijingpeng.haowu on 14-9-5.
+//  Copyright (c) 2014年 caijingpeng. All rights reserved.
+//
+
+#ifndef Community_HWRequestConfig_h
+#define Community_HWRequestConfig_h
+#define kPageCount 15                   //每页请求数据数
+
+//#define kUrlBasePay                       @"http://ios.haowu.com:95"
+//#define kUrlBaseCut                       @"http://ios.haowu.com:94"
+//#define kUrlBase                          @"http://ios.haowu.com:93"
+//#define kSocietyUrlBase                   @"http://ios.haowu.com:83"
+//#define kADUrlBase                        @"http://ios.haowu.com:86"
+//#define kUrlBaseAccount                   @"http://ios.haowu.com:96"
+//#define kUrlBaseGame                      @"http://ios.haowu.com:200"
+//#define KShareInviteCustomUrl             @"http://wuye.kaola.mobi/php/appShare"
+
+//#define kUrlBasePay                       @"http://ios13.haowu.com:95"
+//#define kUrlBaseCut                       @"http://ios13.haowu.com:94"
+//#define kUrlBase                          @"http://ios13.haowu.com:93"
+//#define kSocietyUrlBase                   @"http://ios13.haowu.com:83"
+//#define kADUrlBase                        @"http://ios13.haowu.com:86"
+//#define kUrlBaseAccount                   @"http://ios13.haowu.com:96"
+//#define kUrlBaseGame                      @"http://ios13.haowu.com:200"
+//#define KShareInviteCustomUrl             @"http://wuye.kaola.mobi/php/appShare"
+
+//#define kUrlBasePay                       @"http://172.16.10.79:8080"
+//#define kUrlBaseCut                       @"http://172.16.10.79:8080"
+////#define kUrlBase                          @"http://172.16.10.79:8080"
+//#define kUrlBase                          @"http://172.16.10.110:8080"
+//#define kSocietyUrlBase                   @"http://172.16.10.79:8080"
+//#define kADUrlBase                        @"http://ios5.haowu.com:86"
+//#define kUrlBaseAccount                   @"http://172.16.10.79:8080"
+//#define kUrlBaseGame                      @"http://172.16.10.13"
+
+//#define kUrlBasePay                       @"http://172.16.10.110:8080"
+//#define kUrlBaseCut                       @"http://172.16.10.110:8080"
+//#define kUrlBase                          @"http://172.16.10.110:8080"
+//#define kSocietyUrlBase                   @"http://172.16.10.108:8080"
+//#define kADUrlBase                        @"http://ios5.haowu.com:86"
+//#define kUrlBaseAccount                   @"http://172.16.10.110:8080"
+//#define kUrlBaseGame                      @"http://172.16.10.110:8080"
+//#define KShareInviteCustomUrl             @"http://172.16.10.110/estate_system/php/appShare"
+
+#define kUrlBasePay                         @"http://172.16.10.13"
+#define kUrlBaseCut                         @"http://172.16.10.13"
+#define kUrlBase                            @""@"http://172.16.10.13"
+#define kSocietyUrlBase                     @"http://172.16.10.13"
+#define kADUrlBase                          @"http://ios5.haowu.com:86"
+//#define kADUrlBase                        @"http://172.16.10.13"
+#define kUrlBaseAccount                     @"http://172.16.10.13"
+#define kUrlBaseGame                        @"http://172.16.10.13"
+#define KShareInviteCustomUrl               @"http://172.16.10.13/estate_system/php/appShare"
+
+//#define kUrlBasePay                       @"http://172.16.15.153:8084"
+//#define kUrlBaseCut                       @"http://172.16.15.153:8084"
+//#define kUrlBase                          @"http://172.16.15.153:8084"
+//#define kSocietyUrlBase                   @"http://172.16.15.153:8081"
+//#define kADUrlBase                        @"http://ios5.haowu.com:86"
+////#define kADUrlBase                        @"http://172.16.10.13"
+//#define kUrlBaseAccount                   @"http://172.16.15.153:8081"
+//#define kUrlBaseGame                      @"http://172.16.15.153:8084"
+
+
+//#define kUrlBasePay                       @"http://172.16.10.13"
+//#define kUrlBaseCut                       @"http://172.16.10.13"
+//#define kUrlBase                          @"http://172.16.10.110:8080"
+//#define kSocietyUrlBase                   @"http://172.16.10.13"
+//#define kADUrlBase                        @"http://ios5.haowu.com:86"
+//#define kUrlBaseAccount                   @"http://172.16.10.13"
+//#define kUrlBaseGame                      @"http://172.16.10.13"
+
+#define kBangQuUrl                          @"http://api.app.bangqu.com/qr-code/channel.json"
+
+//帮趣接口
+#define kGetScanAndActiveNum                @"/hw-game-app-web/game/queryKoalaPopularizeSummarize.do"//扫描、激活、注册  //验
+#define kSpreadRecord                       @"/hw-game-app-web/game/queryKoalaPopularizeRecord.do" //推广记录          //验
+#define kDailySpreadStatistics              @"/hw-game-app-web/game/queryKoalaPopularizeStatisticsByDay.do"//每日统计   //验
+
+//#define kSocietyUrlBase                     @"http://service.haowu.com:83"
+#define kGetVerify                          @"/hoss-society/hoss/sys/getVerCode.do"     // 获取验证码
+//#define kGetLastPay             @"/hoss-society/app4/wallets/getLastApplayTime.do"//最后提佣时间
+//#define kSocietyUrlBase                   @"http://172.16.10.35:8080"   //@"http://172.16.10.35:8080"
+
+#define kStatusSuccess          1
+#define kStatusLogout           -99
+#define kStatusQiangQianBao     2
+#define kStatusNetworkError     -100001
+/********           发展团队           ******/
+#define kExpandTeam                     @"http://www.haowu.com/reg?_tjm="
+//服务汇模块
+#define kServiceHomePage                @"/hw-sq-app-web/serviceGather/1.2.1/index.do"                   //服务汇首页
+#define kShopDetail                     @"/hw-sq-app-web/shop/detail.do"                           //商铺详情
+#define kShopCatory                     @"/hw-sq-app-web/common/findCommonDictByDictId.do"
+#define kPropertyDetail                 @"/hw-sq-app-web/wy/detail.do"                             //物业详情
+#define kGetQuestion                    @""                                                        //获取上门问题类型
+#define kPerfect                        @"/hw-sq-app-web/wy/addTenementInfo.do"                    //完善物业资料
+#define kPropertyVisit                  @"/hw-sq-app-web/wy/visit.do"                              //提交预约上门
+#define kRentalhosting                  @"/hw-sq-app-web/wy/rentalhosting.do"                      //提交租售托管
+#define kShopSort                       @"/hw-sq-app-web/shop/sort.do"                             //商户排序 置顶
+#define kPropertyFeedback               @"hw-sq-app-web/wy/feedback.do"                             // 物业 留言反馈
+#define kServiceBaseData                @"/hw-sq-app-web/common/findSonsByParentDictId.do"          //基础数据
+#define kServiceBaseDataSingle          @"/hw-sq-app-web/common/findCommonDictByDictId.do"          //单个基础数据
+
+// ********************  抢钱宝  ************
+
+#define kBindValidate                   @"/hoss-society/app5/bank/bindCreditCardValidate.do" // 申请提现前是否绑定银行卡校验
+#define kCheckMoneyPassword             @"/hoss-society/app5/withdraw/validateWithdrawPasswd.do"  // 验证提现密码
+#define kSetNewMoneyPassword            @"/hoss-society/app5/withdraw/setWithdrawPasswd.do"      // 设置新密码
+#define kCheckLoginPassword             @"/hoss-society/app5/withdraw/validateLoginPasswd.do"    // 验证登录密码
+#define kTiyong                         @"/hoss-society/app5/withdraw/tiyong.do"     //提佣操作
+#define kDeleteCard                     @"/hoss-society/app5/bank/unBindCreditCard.do"   //银行卡解除绑定
+//#define kMyYongjin                      @"/hoss-society/app5/wallets/cashBackList.do" //我的佣金列表
+#define kMyYongjin                      @"/hw-account-web/wallets/V121/dealList.do"
+#define kAddCreditCardValidate          @"/hoss-society/app5/bank/addCreditCardValidate.do"     //添加银行卡前需要提取密码的校验
+//#define kRecordDetail                   @"/hoss-society/app5/wallets/recordDetails.do"  // 返现详情
+#define kRecordDetail                   @"/hw-account-web/wallets/dealDetail.do"
+
+#define kGetRedPocketList               @"/hoss-society/app5/activity/myRedPackage.do"//获取红包列表
+#define kOpenRedPackage                 @"/hoss-society/app5/activity/openRedPackage.do"         //打开红包
+#define kGetLastPay                     @"/hoss-society/app5/withdraw/getLastApplayTime.do"//最后提佣时间
+
+#define kCreditCardList                 @"/hoss-society/app5/bank/getCreditCardList.do"
+#define kSetDefaultCreditCard           @"/hoss-society/app5/bank/setDefaultCreditCard.do"      //设置默认银行卡号
+#define AddCardID_V4                    @"/hoss-society/app5/bank/addCreditCard.do"
+#define GetBankList                     @"/hoss-society/app5/bank/getBankList.do"//获取银行列表
+#define GetProvinceList                 @"/hoss-society/app5/bank/province.do"//省份
+#define GetCityList                     @"/hoss-society/app5/bank/citybyprovince.do"//城市
+#define kDelRedPackage                  @"/hoss-society/app5/activity/delRedPackage.do"          //删除红包
+#define kActiveList                     @"/hoss-society/app5/activity/getActivities.do" //活动列表   // 首页推广活动列表
+#define kShareBefore                    @"/hoss-society/app5/activity/beforeShare.do" //分享前判断是否有返现
+#define kShareSuccess                   @"/hoss-society/app5/activity/sucessShare.do"//分享成功回调
+#define kGetShareContent                @"/hoss-society/app5/activity/activityContent.do"
+#define kHouseDetail                    @"/hoss-society/app5/activity/getNewHousesDetail.do"         //楼盘详情
+#define kNewRedNumber                   @"/hoss-society/app5/activity/newRedNum.do"
+
+// ****************************
+//登录和个人中心模块
+#define kLogin                      @"/hw-sq-app-web/login/enter.do"
+#define kGetCatoryData              @"/hw-sq-app-web/common/findHasIconShopType.do?"
+#define kRegisterSendVertify        @"/hw-sq-app-web/reg/sendVerfiyCode.do"
+#define kForgetSendVertify          @"/hw-sq-app-web/login/sendVerfiyCode.do"
+#define kForgetVertifyCode          @"/hw-sq-app-web/login/checkVerfiyCode.do"
+#define kVertifyCode                @"/hw-sq-app-web/reg/checkVerfiyCode.do"
+#define kSubmitRegister             @"/hw-sq-app-web/reg/commit.do"
+#define kGetCityList                @"/hw-sq-app-web/common/cityList.do"
+#define kSettingNewPassward         @"/hw-sq-app-web/login/forgetPwd.do"
+#define kSettingNickName            @"/hw-sq-app-web/me/setUserNickname.do"
+#define kModifyAvatar               @"/hw-sq-app-web/me/head.do"
+#define kModifySex                  @"/hw-sq-app-web/me/meInfo.do"
+#define kSubmitInterest             @"/hw-sq-app-web/me/meInfo.do"
+#define kModifyAvatar               @"/hw-sq-app-web/me/head.do"
+#define kUploadVertify              @"/hw-sq-app-web/shop/auditUploadMsg.do"
+#define kAddOnePhoto                @"/hw-sq-app-web/shop/addPhoto.do"
+#define kAddPhotos                  @"/hw-sq-app-web/shop/addPhotos.do"
+#define kAddPhotoAsyn               @"/hw-sq-app-web/shop/addPhotoAsyn.do"
+#define kDeleteOnePhoto             @"/hw-sq-app-web/shop/delPhoto.do"
+#define kEditShop                   @"/hw-sq-app-web/shop/infoEdit.do"
+#define kRenLinShop                 @"/hw-sq-app-web/shop/claim.do"
+#define kSubmitShopInfo             @"/hw-sq-app-web/shop/create.do"
+#define kCreatNewArea               @"/hw-sq-app-web/village/create.do"
+#define kSearchVillage              @"/hw-sq-app-web/village/searchByLngLatAndName.do"
+#define kSearchWithCityID           @"/hw-sq-app-web/village/searchByCityIdAndVillageName.do"
+#define kGetNearbyVillage           @"/hw-sq-app-web/village/searchByLngLat.do"
+#define kMakeTelContent             @"/hw-sq-app-web/serviceGather/makeTelContent.do"
+
+
+#define kSelectCommunity            @"/hw-sq-app-web/me/changeVillage.do"
+#define kCityChangeCoodTime         @"/hw-sq-app-web/me/isInColdTime.do"
+#define kNoReadNum                  @"/hw-sq-app-web/me/getDynamicCount.do"
+#define kPersonInfo                 @"/hw-sq-app-web/me/getPersonalInfo.do"
+#define kPersonDymanic              @"/hw-sq-app-web/me/dynamic.do"
+#define kLogout                     @"/hw-sq-app-web/login/logout.do"
+
+
+//修改密码
+#define kSetPass                    @"/hw-sq-app-web/me/resetPass.do"
+#define kInviteUrl                  @"/hw-sq-app-web/common/getQRcodeUrl.do"
+
+//******************** 邻里圈模块 ********************//
+
+//邻里圈列表
+#define kNeighbourList              @"/hw-sq-app-web/topic/v121/index.do"
+//筛选邻里圈
+#define kTopicList                  @"hw-sq-app-web/channel/topicList.do"
+//获取详情头
+//#define kNeighbourDetailHead        @"/hw-sq-app-web/topic/detail.do"
+#define kNeighbourDetailHead        @"/hw-sq-app-web/topic/topicDetail.do"
+//获取详情评论列表
+//#define kNeighbourDetailList        @"/hw-sq-app-web/topic/reply.do"
+#define kNeighbourDetailList        @"/hw-sq-app-web/topic/topicReply.do"
+// 打标签
+#define kSetTag                     @"/hw-sq-app-web/tag/save.do"
+//举报
+#define kReport                     @"/hw-sq-app-web/topic/report.do"
+//删除
+#define kDelete                     @"/hw-sq-app-web/topic/del.do"
+//评论
+#define kComment                    @"/hw-sq-app-web/topic/create.do"
+//设置已读
+#define kSetRead                    @"/hw-sq-app-web/topic/updateReadStatus.do"
+//物业是否联系 0：未联系  1：已联系
+#define kConnectionResult           @"/hw-sq-app-web/wy/connectionResult.do"
+//发布语、图片
+#define kPublishFile                @"/hw-sq-app-web/topic/pubFile.do"
+//发布文本
+#define kPublishContent             @"/hw-sq-app-web/topic/pubContent.do"
+
+#define kTelResult                  @"/hw-sq-app-web/serviceGather/telResult.do"   // 邻里圈 选择拨打 结果
+#define kForceUpdate                @"/hw-sq-app-web/me/updateVersion.do"
+//赞过的人
+#define kClickZanPerson             @"hw-sq-app-web/topic/queryPraiseByTopic.do"
+
+#define kSetSelected                @"doSelect"
+//******************** 邻里圈模块 ********************//
+
+#define kNotificationSetting        @"/hw-sq-app-web/me/setting.do"
+#define kActiveAdvertise            @"/hoss-ad/app4/app/activateAppStatus.do"
+
+
+
+// ************  1.2 首页 ********
+
+#define kApplicationList            @"/hw-sq-app-web/shop/showApplicationInfo.do"
+#define kApplicationFolder          @"/hw-sq-app-web/shop/showApplicationOfFolder.do"
+#define kRemainMoney                @"/hw-account-web/koalaCoin/checkBalance.do"
+#define kActivityHistory            @"/hw-cut-app-web/cutProduct/showCutFinishHistoryList.do"
+#define kGoodsList                  @"/hw-cut-app-web/cutProduct/cutIndex.do"
+#define kJoinedList                 @"/hw-cut-app-web/cutProduct/showJoinCutListByUser.do"
+//#define kJoinedDetail               @"/hw-cut-app-web/cutProduct/showMeJoinCutDetail.do"
+#define kProductCutRecord           @"/hw-cut-app-web/cutProduct/showCutHistoryListByUser.do"
+#define kAgreeCutProtocol           @"/hw-cut-app-web/cutProduct/agreeCutProtocol.do"
+#define kCutCountDown               @"/hw-cut-app-web/cutProduct/showCutProductCountDown.do"
+#define kCutProduct                 @"/hw-cut-app-web/cutLow/guess.do"
+#define kStartDistance              @"/hw-cut-app-web/cutProduct/showCutProductDistanceStartTime.do"
+#define kEndDistance                @"/hw-cut-app-web/cutProduct/showCutProductDistanceEndTime.do"
+#define kHandlingFee                @"/hw-cut-app-web/cutLow/countFee.do"
+#define kJoinedDetail               @"/hw-cut-app-web/cutProduct/myCutDetail.do"
+#define kCreateOrder                @"/hw-cut-app-web/cutProduct/createCutProductOrder.do"
+
+//  *******************福利汇优惠券*******************//
+#define kPriviledgeLists            @"/hw-sq-app-web/coupon/list.do"
+#define kPriviledgeDetail           @"/hw-sq-app-web/coupon/detail.do"
+#define kMinePriviledgeList         @"/hw-sq-app-web/coupon/myCoupon.do"
+#define kGetPriviledge              @"/hw-sq-app-web/coupon/obtain.do"
+
+
+//  *****************考拉币*************************//
+
+#define kCoinDetail                 @"/hw-account-web/koalaCoin/queryKoalaAccountFlowDetail.do"
+#define kKaolaCoinList              @"/hw-account-web/koalaCoin/V121/queryKoalaAccountFlowList.do"
+#define kWalletRemainMoney          @"/hw-account-web/wallets/balance.do"
+#define kKaolaRemain                @"/hw-account-web/koalaCoin/getKoalaAccountInfo.do"
+#define kPriviledgeUse              @"/hw-sq-app-web/coupon/myCouponCount.do"
+
+#define kShopType                   @"/hw-sq-app-web/common/findHasIconShopType.do"
+#define kInsertShop                 @"/hw-sq-app-web/shop/insertShopInfo.do"
+#define kMinePriviledgeList         @"/hw-sq-app-web/coupon/myCoupon.do"
+
+#define kAlixPay                    @"/hw-pay-web/payment/alipay.do?"
+#define kMoneyPay                   @"/hw-pay-web/payment/accountPay.do"
+#define kCoinOrder                  @"/hw-account-web/koalaCoin/createKoalaCoinOrder.do"
+
+//*****************杀价订单*******************
+
+#define kBargainOrder               @"/hw-cut-app-web/cutProduct/showMyCutOrder.do"
+#define kCutProductConfirmPayment   @"/hw-cut-app-web/cutProduct/confirmPayment.do"
+
+//*****************收货地址*******************
+#define kOrderAddress               @"/hw-cut-app-web/cutProduct/showReceiveAddressByUser.do"
+//*****************删除地址*******************
+#define KDelAddress                 @"/hw-cut-app-web/cutProduct/delReceiveAddressByUser.do"
+//*****************新增地址*******************
+#define kAddAddress                 @"/hw-cut-app-web/cutProduct/addReceiveAddressByUser.do"
+//*****************编辑地址*******************
+#define kEditAddress                @"/hw-cut-app-web/cutProduct/editReceiveAddressByUser.do"
+
+//*****************晒订单**********************
+#define kShowOrder                  @"/hw-cut-app-web/cutProduct/createShowOrder.do"
+
+
+// *********************  V 1.2.1 **************************************
+
+// ************* 微信登录 **************
+
+#define kBindWeChat                 @"/hw-sq-app-web/weixin/bindMobileLogin.do"//验
+#define kWeixinSkip                 @"/hw-sq-app-web/weixin/skipBindLogin.do"   //验
+#define kOldUserBindWeChat          @"/hw-sq-app-web/weixin/bindWeixin.do"      //验
+#define kCheckWeiXinAuth            @"/hw-sq-app-web/weixin/checkWeixinGrant.do" //验
+#define kUnBindWeChat               @"/hw-sq-app-web/weixin/unbindWeixin.do"     //验
+
+// ************  1.21 个人动态接口 ********
+#define kDynamicIndex               @"/hw-sq-app-web/me/dynamicIndex.do" //验          //个人动态首页
+#define kAtDynamicIndex             @"/hw-sq-app-web/me/atDynamicIndex.do"              //个人动态-@我的
+#define kReplyDynamicIndex          @"/hw-sq-app-web/me/replyDynamicIndex.do"           //个人动态-评论
+#define kPraiseDynamicIndex         @"/hw-sq-app-web/me/praiseDynamicIndex.do"          //个人动态-赞
+#define kTopicDynamicIndex          @"/hw-sq-app-web/me/topicDynamicIndex.do"           //个人动态-主题
+#define kBindMobile                 @"/hw-sq-app-web/weixin/bindMobile.do"  //验
+#define kBindWeixin                 @"/hw-sq-app-web/weixin/bindWeixin.do"  //验     // 个人中心 绑定微信接口
+
+//  ********  话题  ****
+#define kHotChannel                 @"hw-sq-app-web/channel/hotlist.do"   //验
+#define kCHannelList                @"hw-sq-app-web/channel/index.do"     //验  // 话题 首页
+#define kSearchList                 @"hw-sq-app-web/channel/search.do"    //验  // 话题搜索
+#define kCreateChannel              @"hw-sq-app-web/channel/simpleAdd.do" //验      // 创建话题
+
+// **************** 福利社————游戏推广 **********************
+#define KGameSpreadRecordMoneyNum   @"/hw-game-app-web/commission/queryGeneralizeCommissionCount.do"  //验  //游戏推广记录－金额
+#define KGameSpreadRecordList       @"/hw-game-app-web/game/queryGeneralizeRecord.do"  //验                 //游戏推广记录－列表
+#define KFuLiSheHomePagePic         @"/hw-sq-app-web/welfare/index.do"             //验                     //福利社首页图片
+#define KGameSpreadVC               @"/hw-game-app-web/user/saveUserInfo.do"     //改                       //游戏推广首页
+#define KGameSpreadVCPic            @"/hw-game-app-web/game/queryGameGeneralizeBanner.do"   //验            //游戏推广首页图片
+#define KGameSpreadVCList           @"/hw-game-app-web/game/queryGameGeneralizeHomePage.do"  //验           //游戏推广首页列表
+#define KDailyCommissionDetail      @"/hw-game-app-web/commission/queryCommissionAmount.do"  //验           //游戏推广佣金明细
+#define KCommissionInfo             @"/hw-game-app-web/commission/queryCommissionInfo.do"    //验           //游戏推广佣金总览
+#define KYouXiDetail                @"/hw-game-app-web/game/queryGameInfo.do"       //验                    //游戏推广游戏详情
+#define kSingleGameSpread           @"/hw-game-app-web/quickmark/queryQuickMarkAndUrl.do"   //验             //个人游戏推广
+#define kOneClickSpread             @"/hw-game-app-web/quickmark/queryAllQuickMarkAndUrl.do"  //验           //一键推广
+#define kGameSpreadShare            @"/hw-game-app-web/share/saveGameShareInfo.do"      //验                 //点击游戏推广的-分享
+#define kInviteMoney                @"/hw-game-app-web/commission/queryRegisterCommission.do" //验
+
+// *****************    邻里圈    *************************
+#define kPraise                     @"/hw-sq-app-web/topic/praise.do"     //验      // 点赞/取消赞
+#define kCreateReply                @"/hw-sq-app-web/topic/createReply.do" //验     //发表评论（含话题）
+#define kChangeChannel              @"/hw-sq-app-web/topic/changeChanel.do"//验     //主题归到某一话题
+#define kDeleteReply                @"/hw-sq-app-web/topic/delReply.do" //验        //删除自己的评论
+
+// *************** 懒生活  首页
+#define kCutCount                   @"/hw-cut-app-web/cutProduct/prodctCount.do" //验
+
+#define kReadConfig                 @"/hw-sq-app-web/conf/readConfig.do"
+
+
+// *********************  V 1.3 **************************************
+#define kGuestLogin                 @"/hw-sq-app-web/guest/login.do"            //游客登录
+
+#define kGetRandomNickName          @"/hw-sq-app-web/reg/createNickName.do"     //随机生成昵称
+#define kVaildateMobile             @"/hw-sq-app-web/reg/validateMobile.do"     //判断手机号是否注册过考拉社区——之前老接口
+#define kGuestBindOldMobile         @"/hw-sq-app-web/guest/bindOldMobile.do"    //游客绑定老用户手机号
+#define kGuestBindNewMobile         @"/hw-sq-app-web/guest/bindNewMobile.do"    //游客绑定新用户手机号
+
+
+// *****************    邻里圈    *******************
+#define kNeighbourTopBanner                 @"/hw-sq-app-web/topic/topicBanner.do"   //邻里圈首页推荐顶图
+#define kNeighbourHomePageList              @"/hw-sq-app-web/topic/recommendChannelIndex.do" //邻里圈首页推荐列表
+#define kPastRecords                        @"/hw-sq-app-web/topic/footPrint.do"    //邻里圈首页足迹接口
+#define kMoreRecommendList                  @"/hw-sq-app-web/topic/recommendMoreChannel.do"     //更多推荐接口
+#define kChannelDetailList                  @"/hw-sq-app-web/channel/channelDetail.do"          //频道列表
+#define kNeighbourChuanChuanMen             @"/hw-sq-app-web/topic/neighbourSpeak.do"    //邻里圈串串门儿接口
+#define kNeighbourCitySpeak                 @"/hw-sq-app-web/topic/citySpeak.do"    //邻里圈同城说接口
+#define kPersonalHomePage                   @"/hw-sq-app-web/me/userIndex.do"       //个人主页
+#define kPersonalTheme                      @"/hw-sq-app-web/me/userTopicIndex.do"      //个人主页-主题
+#define kPersonalTopic                      @"/hw-sq-app-web/me/userChannelIndex.do"     //个人主页-话题
+
+
+// *************** 砍价 **************
+#define kCutProductList             @"/hw-cut-app-web/cutProduct/listIndex.do"          //砍价首页
+#define kCutProductDetail           @"/hw-cut-app-web/cutProduct/productDetail.do"      //砍价商品详情
+#define kCutProductOnlyPrice        @"/hw-cut-app-web/cutProduct/uniqueQuery.do"        //唯一出价查询
+#define kCutProductPrice            @"/hw-cut-app-web/cutProduct/listQuery.do"          //查询出价
+#define kCutRemainTimes             @"/hw-cut-app-web/cutProduct/remainTimes.do"        //查询剩余砍价次数
+#define kShareGetTimes              @"/hw-cut-app-web/cutProduct/cutShare.do"           //分享获得砍价次数
+
+// ******* 懒生活1.3.0 ********
+#define kServiceHome160             @"/hw-sq-app-web/serviceGather/1.6.0/index.do"      //在1.6.0版本做了版本区分: 由1.3.0改为1.6.0
+#define kSaleCenter                 @"/hw-sq-app-web/openId/getToken.do"                                //获得租售中心跳转URL及token
+#define kHomeCutDJS                 @"/hw-cut-app-web/cutProduct/djs.do"                //首页砍价倒计时
+
+
+// *********************  V 1.6.0 **************************************
+//扫二维码绑定小区
+#define KBindVillageForQRCode       @"/hw-sq-app-web/reg/queryVillageInfoByIp.do"  //扫二维码绑定小区
+
+//banner点击统计接口
+#define KBannerClickStatistical     @"/hw-sq-app-web/banner/clickActivityBanner.do"             //banner点击统计
+
+//服务汇
+#define KMyWuYeNotice               @"/hw-sq-app-web/tenementNotice/queryTenementNoticeInfo.do" //消息中心 我的物业消息
+#define KShopListByType             @"/hw-sq-app-web/serviceGather/shopList.do"                 //商店分类查询列表
+#define KServiceBannerForCompanyWY  @"/hw-sq-app-web/serviceGather/queryBanner.do"              //服务汇首页banner（合作物业展示）
+
+//icon相关
+#define KServiceIconCheck           @"/hw-sq-app-web/authenticateUserHome/listIcons.do"         //服务汇首页icon查询
+#define KServiceIconUpdate          @"/hw-sq-app-web/authenticateUserHome/updateIcon.do"        //首页icon更新上传（移动 删除 增加）
+#define KServiceMoreIcon            @"/hw-sq-app-web/authenticateUserHome/moreIcon.do"          //首页更多服务icon查询
+
+//物业
+//物业服务首页
+#define KWuYePublishNoticeList      @"/hw-sq-app-web/wy/queryTenementList.do"                   //物业公告列表
+#define KCallWuYeNum                @"/hw-sq-app-web/wy/queryCallTenementCount.do"               //已呼唤物业人数
+#define KCallWuYeForUnCompany       @"/hw-sq-app-web/wy/callTenement.do"                        //非合作小区无物业资料 呼唤物业
+#define KCheckWuYeInfo              @"/hw-sq-app-web/wy/queryWyDetailInfo.do"                   //查询物业公告
+#define KWuYeIconCheck              @"/hw-sq-app-web/authenticateUserHome/WyListIcons.do"       //物业首页icon查询
+
+//缴费
+#define KWuYeFeeIsOpen              @"/hw-sq-app-web/wyJF/findByIcon.do"                        //判断物业是否支持缴费
+#define KWuYeFeeInfo                @"/hw-sq-app-web/wyJF/propertyList.do"                      //物业费信息
+#define KWuYeFeeCreatOrder          @"/hw-sq-app-web/wyJF/createOrder.do"                       //物业费创建订单
+#define KWuYeAddHouseCheckInfo      @"/hw-sq-app-web/userCertification/queryBuildingInfo.do"    //物业缴费查询住房
+#define KWuYeAddHouse               @"/hw-sq-app-web/wyJF/addHouse.do"                          //物业缴费添加住房
+#define KWuYeDeleteHouse            @"/hw-sq-app-web/wyJF/deleteHouse.do"                       //物业缴费删除住房
+#define KWuYePayRecord              @"/hw-sq-app-web/wyJF/JfHis.do"                             //物业缴费历史
+
+//访客
+#define KInviteCustomCommit         @"/hw-sq-app-web/visitor/addVisitor.do"                     //邀请访客接口
+#define KInviteCustomHistory        @"/hw-sq-app-web/visitor/hisVisitor.do"                     //邀请访客记录
+#define KInviteCustomDelete         @"/hw-sq-app-web/visitor/deleteVisitor.do"                  //删除访客
+#define KInviteCustomYanChang       @"/hw-sq-app-web/visitor/modifyVisitor.do"                  //延长访客有效期
+#define KInviteCustomHistoryList    @"/hw-sq-app-web/visitor/findByDetailsList.do"              //验证记录
+
+//邮局
+#define KPostOfficeList             @"/hw-sq-app-web/express/expressList.do"                    //邮局待收列表
+#define KPostOfficeRecordList       @"/hw-sq-app-web/express/historyList.do"                    //邮局历史记录列表
+
+//报修
+#define KCommitPic                  @"/hw-sq-app-web/repair/uploadFile.do"                      //上传图片接口
+#define KPublishRepair              @"/hw-sq-app-web/repair/addRepair.do"                       //发布报修接口
+#define KPublishRepairListMine      @"/hw-sq-app-web/repair/queryMyRepair.do"                   //我的报修列表
+#define KPublishRepairListTotal     @"/hw-sq-app-web/repair/queryAllRepairByVillageId.do"       //全部报修（小区）
+#define KPublishRepairEvaluate      @"/hw-sq-app-web/repair/evaluateRepair.do"                  //报修评价
+
+//投诉
+#define KPerpotyComplaintList       @"/hw-sq-app-web/complaint/complaintList.do"                //物业投诉列表
+#define KPerpotyComplaintEvaluate   @"/hw-sq-app-web/complaint/addComplaintResult.do"           //物业投诉评价
+#define KPerpotyComplaintAgain      @"/hw-sq-app-web/complaint/complaintAgain.do"               //物业再次发起投诉
+#define KPerpotyComplain            @"/hw-sq-app-web/complaint/addComplaint.do"                 //物业发起投诉
+
+//上门服务
+#define KHomeServiceInfo            @"/hw-sq-app-web/comeDoorService/showComeServiceInfo.do"    //上门服务服务查询页
+#define KHomeServiceUserInfoCheck   @"/hw-sq-app-web/comeDoorService/showUserInfo.do"           //上门服务用户信息查询
+#define KHomeServiceCommit          @"/hw-sq-app-web/comeDoorService/createComeServiceOrder.do" //上门服务请求提交
+
+//我的订单
+#define kServiceList                @"/hw-sq-app-web/serveOrder/queryServeOrderList.do"         //服务订单列表
+#define kServiceListDetail          @"/hw-sq-app-web/serveOrder/queryServeOrderDetail.do"       //服务订单详情
+#define kEvaluateServeOrder         @"/hw-sq-app-web/serveOrder/evaluateServeOrder.do"          //服务订单评价
+#define kQueryServeOrderEvaluate    @"/hw-sq-app-web/serveOrder/queryServeOrderEvaluate.do"     //服务订单-已评价
+#define kDelServeOrder              @"/hw-sq-app-web/serveOrder/delServeOrder.do"               //服务订单 删除
+#define kCancelServeOrder           @"/hw-sq-app-web/serveOrder/cancelServeOrder.do"            //服务订单 取消
+#define kQueryConsumerDetails       @"/hw-sq-app-web/serveOrder/queryConsumerDetails.do"        //服务订单 支付收银台详情
+
+//个人设置
+#define kVerifyUserAddress          @"/hw-sq-app-web/userCertification/queryBuildingInfo.do"        //认证门牌信息查询 同KWuYeAddHouseCheckInfo
+#define kSubmitNotAuthentication    @"/hw-sq-app-web/userCertification/submitNotAuthentication.do"  //提交未认证
+#define kApplyForAuthentication     @"/hw-sq-app-web/userCertification/applyForAuthentication.do"   //申请认证
+#define kQueryVillageAddress        @"/hw-sq-app-web/userCertification/queryVillageAddress.do"      //查询地址信息
+#define kQueryAuthenticationInfo    @"/hw-sq-app-web/userCertification/queryAuthenticationInfo.do"  //查询认证详情
+#define kCancelForAuthentication    @"/hw-sq-app-web/userCertification/cancelForAuthentication.do"  //取消认证
+#define kConfirmForAuthentication   @"/hw-sq-app-web/userCertification/confirmForAuthentication.do" //验证认证
+#define kMeIndex                    @"/hw-sq-app-web/me/index.do"                                   //个人资料-主页
+
+// *********************  V 1.7.0 **************************************
+
+//后置登录
+#define KReLoginRegist              @"/hw-sq-app-web/reg/commit2.do"                            //后置登录 注册接口
+
+//物业认证相关
+#define KWuYeAuthenticate           @"/hw-sq-app-web/userCertification/shortcutAuthenticationApply.do"       //物业认证
+#define KWuYeAuthenticateConfirm    @"/hw-sq-app-web/userCertification/shortcutAuthentication.do"  //物业认证验证码验证
+
+//天天团订单
+#define KTianTianTuanOrderList      @"/hw-sq-app-web/grpBuyOrder/orderList.do"                  //天天团订单列表
+#define KTianTianTuanDetail         @"/hw-sq-app-web/grpBuyOrder/orderDetail.do"                //天天团详情
+#define KTianTianTuanCancleOrder    @"/hw-sq-app-web/grpBuyOrder/cancelGrpBuyOrder.do"          //天天团取消订单
+
+
+// 获取天天团列表
+#define kTianTianTuanQueryCommondityList           @"/hw-sq-app-web/grpBuyGoods/getGrpBuyGoodsList.do"
+
+// 获取天天团商品详情
+
+#define kTianTianTuanQueryCommondityDetails        @"/hw-sq-app-web/grpBuyGoods/getGrpBuyGoodDetail.do"
+
+// 查询商品库存
+#define kTianTianTuanCommonditySurplusStock         @"hw-sq-app-web/grpBuyGoods/getGrpBuyGoodSurplusStock.do"
+//  获取天天团提交订单
+#define kTianTianTuanSubmitOrder                   @"hw-sq-app-web/grpBuyOrder/submitOrder.do?"
+
+//  收货地址管理(增、删、查、改)
+#define kTianTianTuanShowReceiveAddressByUser     @"hw-sq-app-web/user/showReceiveAddressByUser.do"
+#define kTianTianTuanAddReceiveAddressByUser      @"hw-sq-app-web/user/addReceiveAddressByUser.do"
+#define kTianTianTuanEditReceiveAddressByUser      @"hw-sq-app-web/user/editReceiveAddressByUser.do"
+#define kTianTianTuanDelReceiveAddressByUser      @"hw-sq-app-web/user/delReceiveAddressByUser.do"
+
+// 查询订单
+#define kTianTianTuanQueryOrder    @"hw-sq-app-web/grpBuyOrder/queryOrder.do"
+
+// 支付
+#define kTianTianTuanConfirmPayment          @"/hw-sq-app-web/grpBuyOrder/confirmPay.do"
+#endif

@@ -1,0 +1,278 @@
+//
+//  HWReLoginLoginVC.m
+//  Community
+//
+//  Created by niedi on 15/8/3.
+//  Copyright (c) 2015年 caijingpeng. All rights reserved.
+//
+
+#import "HWReLoginLoginVC.h"
+#import "HWInputBackView.h"
+#import "HWCustomGuideAlertView.h"
+#import "HWReLoginForgetFirstVC.h"
+
+@interface HWReLoginLoginVC ()<UITextFieldDelegate>
+{
+    UIButton *_loginBtn;
+    UITextField *_passwordTF;
+}
+@end
+
+@implementation HWReLoginLoginVC
+
+- (void)viewDidLoad
+{
+    [super viewDidLoad];
+    // Do any additional setup after loading the view.
+    self.navigationItem.titleView = [Utility navTitleView:@"登录"];
+    self.navigationItem.leftBarButtonItem = [Utility navLeftBackBtn:self action:@selector(backMethod)];
+    
+    self.navigationController.navigationBarHidden = NO;
+    
+    DView *backV = [DView viewFrameX:0 y:10.0f w:kScreenWidth h:CONTENT_HEIGHT - 10];
+    backV.backgroundColor = [UIColor whiteColor];
+    [self.view addSubview:backV];
+    
+    DView *tFBackV = [DView viewFrameX:25.0f y:25.0f w:kScreenWidth - 2 * 25 h:45.0f];
+    tFBackV.layer.borderColor = THEME_COLOR_LINE.CGColor;
+    tFBackV.layer.cornerRadius = 2.5f;
+    tFBackV.layer.borderWidth = 0.5f;
+    [backV addSubview:tFBackV];
+    
+    _passwordTF = [[HWTextField alloc] initWithFrame:CGRectMake(10, 0, kScreenWidth - 2 * 25 - 2 * 10, 45)];
+    _passwordTF.placeholder = @"输入密码";
+    _passwordTF.font = [UIFont fontWithName:FONTNAME size:THEME_FONT_BIG];
+    _passwordTF.textColor = THEME_COLOR_SMOKE;
+    _passwordTF.secureTextEntry = YES;
+    _passwordTF.keyboardType = UIKeyboardTypeDefault;
+    _passwordTF.delegate = self;
+    _passwordTF.returnKeyType = UIReturnKeyDone;
+    _passwordTF.clearButtonMode = UITextFieldViewModeWhileEditing;
+    [tFBackV addSubview:_passwordTF];
+    
+    _loginBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+    _loginBtn.frame = CGRectMake(15, CGRectGetMaxY(_passwordTF.frame) + 40, kScreenWidth - 30, 45);
+    [_loginBtn setButtonOrangeStyle];
+    [_loginBtn setTitle:@"登录" forState:UIControlStateNormal];
+    [_loginBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+    [_loginBtn addTarget:self action:@selector(doLogin:) forControlEvents:UIControlEventTouchUpInside];
+    [backV addSubview:_loginBtn];
+    [_loginBtn setInactiveState];
+    
+    NSMutableAttributedString *string = [[NSMutableAttributedString alloc]initWithString:@"忘记密码 ?"];
+    [string addAttribute:NSForegroundColorAttributeName value:(id)THEME_COLOR_TEXT range:NSMakeRange(0, [string length])];
+    [string addAttribute:NSUnderlineStyleAttributeName value:(id)[NSNumber numberWithInt:NSUnderlineStyleSingle] range:NSMakeRange(0, [string length])];
+    //    [string addAttribute:NSFontAttributeName value:(id)[UIFont fontWithName:FONTNAME size:14.0f] range:NSMakeRange(0, [string length])];
+    [string addAttribute:NSFontAttributeName value:(id)[UIFont systemFontOfSize:14.0] range:NSMakeRange(0, [string length])];
+    UILabel *forgetLab = [[UILabel alloc] initWithFrame:CGRectMake(17, CGRectGetMaxY(_loginBtn.frame) + 15, 100, 25)];
+    forgetLab.backgroundColor = [UIColor clearColor];
+    forgetLab.attributedText = string;
+    [self.view addSubview:forgetLab];
+    
+    UIButton *forgetBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+    forgetBtn.frame = forgetLab.frame;
+    [forgetBtn addTarget:self action:@selector(doForget:) forControlEvents:UIControlEventTouchUpInside];
+    [self.view addSubview:forgetBtn];
+    
+    UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(doTap:)];
+    [self.view addGestureRecognizer:tap];
+    
+    if (self.telephone != nil)
+    {
+        [_passwordTF becomeFirstResponder];
+    }
+}
+
+#pragma mark -
+#pragma mark Private method
+
+- (void)backMethod
+{
+    [MobClick event:@"login_click_back"];//1.7
+    [super backMethod];
+}
+
+- (void)doTap:(id)sender
+{
+    [self.view endEditing:YES];
+}
+
+- (void)doLogin:(id)sender
+{
+    [MobClick event:@"login_click_login"];//1.7
+    
+    [self.view endEditing:YES];
+    if(_passwordTF.text.length < 6)
+    {
+        [Utility showToastWithMessage:@"密码长度不能小于6位" inView:self.view];
+        return;
+    }
+    [Utility showMBProgress:self.view message:@"登录中"];
+    HWHTTPRequestOperationManager *manager = [HWHTTPRequestOperationManager manager];
+    NSMutableDictionary *dict = [NSMutableDictionary dictionary];
+    [dict setPObject:self.telephone forKey:@"mobileNumber"];
+    [dict setPObject:_passwordTF.text forKey:@"password"];
+    [manager POST:kLogin parameters:dict queue:nil success:^(id responseObject){
+        //普通登录 关闭新手游客引导
+        NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+        [defaults setInteger:-1 forKey:kGuideStep];
+        [defaults synchronize];
+        // 保存key [dict objectForKey:@"key"];
+        [Utility hideMBProgress:self.view];
+        NSDictionary *dataDic = (NSDictionary *)[responseObject objectForKey:@"data"];
+        //用户数据保存本地
+        [[HWUserLogin currentUserLogin] handleLoginInfo:dataDic operationController:self];
+        
+        
+    }failure:^(NSString *code, NSString *error) {
+        [Utility hideMBProgress:self.view];
+        
+        if ([error isEqual: @"密码输入错误"])
+        {
+            [Utility showToastMBProgress:self.view message:error imageName:@"login_error"];
+        }
+        else if ([error isEqual:@"您今日已经连续5次输入密码错误，该账号已被冻结，请在明日尝试登录或者点击“忘记密码”"])
+        {
+            HWCustomGuideAlertView *alert = [[HWCustomGuideAlertView alloc]initWithAlertType:2];
+            [alert showCustomGuideAlertViewWithCompleteBlock:^(NSInteger buttonTag) {
+                
+            }];
+        }
+        else
+        {
+            [Utility showToastWithMessage:error inView:self.view];
+        }
+        
+        NSLog(@"error %@",error);
+    }];
+    
+}
+
+- (void)doForget:(id)sender
+{
+    [MobClick event:@"login_click_forgetpassword"];//1.7
+    
+    NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
+    NSDate *lastSMSDate = [ud objectForKey:KLastSMSDate];
+    if (lastSMSDate)
+    {
+        NSTimeInterval interval = [[NSDate date] timeIntervalSinceDate:lastSMSDate];
+        if (interval < 60)
+        {
+            [Utility showToastWithMessage:@"爱卿~60秒内只能验证一次哟" inView:self.view];
+            return;
+        }
+    }
+    else
+    {
+        [ud setObject:[NSDate date] forKey:KLastSMSDate];
+        [ud synchronize];
+    }
+    
+    [self.view endEditing:YES];
+    [MobClick event:@"click_get_code"];
+    [Utility showMBProgress:self.view message:@"正在发送验证码"];
+    HWHTTPRequestOperationManager *manager = [HWHTTPRequestOperationManager manager];
+    NSMutableDictionary *dict = [NSMutableDictionary dictionary];
+    [dict setPObject:self.telephone forKey:@"mobileNumber"];
+    [dict setPObject:[Utility getUUID] forKey:@"mac"];
+    [dict setPObject:@"1" forKey:@"smsType"];
+    [manager POST:kForgetSendVertify parameters:dict queue:nil success:^(id responseObject){
+        
+        [Utility hideMBProgress:self.view];
+        [ud setObject:[NSDate date] forKey:KLastSMSDate];
+        
+        if (responseObject)
+        {
+            NSDictionary *dicTemp = (NSDictionary *)responseObject;
+            NSString *shangxingMessagePhoneStr = [dicTemp objectForKey:@"data"];
+            NSString *status = [dicTemp objectForKey:@"status"];
+            if ([status isEqualToString:@"1"]) {
+                [self sendCode:self.telephone shangXingMessagePhone:shangxingMessagePhoneStr];
+                
+            }
+        }
+        
+    } failure:^(NSString *code, NSString *error) {
+        [Utility hideMBProgress:self.view];
+        [Utility showToastWithMessage:error inView:self.view];
+    }];
+}
+
+- (void)sendCode:(NSString *)phoneNum shangXingMessagePhone:(NSString *)shangxingPhoneNum
+{
+    HWReLoginForgetFirstVC *firstVC = [[HWReLoginForgetFirstVC alloc] init];
+    firstVC.telephoneNum = phoneNum;
+    firstVC.shangxingMessagePhone = shangxingPhoneNum;
+    [self.navigationController pushViewController:firstVC animated:YES];
+}
+
+#pragma mark -
+#pragma mark textfield delegate
+
+- (BOOL)textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string
+{
+    if(textField == _passwordTF)
+    {
+        NSMutableString *text = [textField.text mutableCopy];
+        [text replaceCharactersInRange:range withString:string];
+        if (self.telephone.length != 11 && IOS7)
+        {
+            [_loginBtn setInactiveState];
+        }
+        else if (![Utility validateMobile:self.telephone])
+        {
+            [_loginBtn setInactiveState];
+        }
+        else if (text.length == 0)
+        {
+            [_loginBtn setInactiveState];
+        }
+        else
+        {
+            [_loginBtn setActiveState];
+        }
+        
+        if ([textField.text length] >= 20 &&range.length==0)
+        {
+            return NO;
+        }
+    }
+    return YES;
+}
+
+- (BOOL)textFieldShouldReturn:(UITextField *)textField
+{
+    [_passwordTF resignFirstResponder];
+    return YES;
+}
+
+- (BOOL)textFieldShouldClear:(UITextField *)textField
+{
+    return YES;
+}
+
+- (BOOL)textFieldShouldBeginEditing:(UITextField *)textField
+{
+    [MobClick event:@"login_get_focus_password"];//1.7
+    
+    return YES;
+}
+
+
+- (void)didReceiveMemoryWarning {
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
+}
+
+/*
+#pragma mark - Navigation
+
+// In a storyboard-based application, you will often want to do a little preparation before navigation
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+    // Get the new view controller using [segue destinationViewController].
+    // Pass the selected object to the new view controller.
+}
+*/
+
+@end

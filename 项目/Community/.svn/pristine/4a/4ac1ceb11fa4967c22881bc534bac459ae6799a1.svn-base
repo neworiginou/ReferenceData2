@@ -1,0 +1,624 @@
+//
+//  ModifyPersonInfoViewController.m
+//  Community
+//
+//  Created by gusheng on 14-9-1.
+//  Copyright (c) 2014年 caijingpeng. All rights reserved.
+//
+//  功能描述：编辑资料 修改个人信息
+//
+//  修改记录：
+//      姓名         日期               修改内容
+//     蔡景鹏     2015-01-14           添加绑定手机号、绑定微信 修改文件结构
+//     陆晓波     2015-04-16           退出登录 新手及游客引导 步骤设为0
+//
+
+#import "HWModifyPersonInfoViewController.h"
+#import "ChangNameViewController.h"
+#import "HWInterestViewController.h"
+#import "HWSelectSexViewController.h"
+#import "HWHomePageViewController.h"
+#import "HWModifyUserInfoView.h"
+#import "AppDelegate.h"
+#import "HWNewUserBindViewController.h"
+#import "HWBindFinishedViewController.h"
+#import "HWAuthenticateViewController.h"
+#import "HWAuthenticateWaitMailViewController.h"
+#import "HWAuthenticateConfirmViewController.h"
+#import "HWAuthenticateStressAddressViewController.h"
+#import "APService.h"
+#import "HWWuYeAuthenticateFirstVC.h"
+#import "HWWuYeAuthenticateScdVC.h"
+
+@interface HWModifyPersonInfoViewController ()<UIAlertViewDelegate, HWModifyUserInfoViewDelegate>
+{
+    HWModifyUserInfoView *modifyView;
+}
+
+@end
+
+@implementation HWModifyPersonInfoViewController
+@synthesize ipc;
+- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
+{
+    self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
+    if (self)
+    {
+        
+    }
+    return self;
+}
+
+- (void)viewDidLoad
+{
+    [super viewDidLoad];
+    
+    self.navigationItem.leftBarButtonItem = [Utility navLeftBackBtn:self action:@selector(backMethod)];
+    self.navigationItem.titleView = [Utility navTitleView:@"个人资料设置"];
+    
+    modifyView = [[HWModifyUserInfoView alloc] initWithFrame:CGRectMake(0, 0, kScreenWidth, CONTENT_HEIGHT)];
+    modifyView.delegate = self;
+    [self.view addSubview:modifyView];
+    
+}
+
+- (void)viewWillAppear:(BOOL)animated
+{
+    if (modifyView != nil)
+    {
+        [modifyView refreshUserInfo];
+    }
+}
+
+- (void)backMethod
+{
+    [self.navigationController popViewControllerAnimated:YES];
+    [[NSNotificationCenter defaultCenter]postNotificationName:RELOAD_APP_DATA object:nil];
+}
+
+#pragma mark -
+#pragma mark            Private Method
+
+/**
+ *	@brief	检查微信授权 如果未授权 去绑定微信
+ *
+ *	@param 	account 	授权返回实体
+ *
+ *	@return
+ */
+- (void)checkAuth:(UMSocialAccountEntity *)account
+{
+    [Utility showMBProgress:self.view message:@"授权中"];
+    HWHTTPRequestOperationManager *manager = [HWHTTPRequestOperationManager manager];
+    NSMutableDictionary *dict = [NSMutableDictionary dictionary];
+    [dict setPObject:account.openId forKey:@"openid"];
+    
+    [manager POST:kCheckWeiXinAuth parameters:dict queue:nil success:^(id responseObject) {
+        [Utility hideMBProgress:self.view];
+        [Utility showToastWithMessage:@"您的微信帐号已经是考拉帐号，不能绑定" inView:self.view];
+        
+    } failure:^(NSString *code, NSString *error) {
+        [Utility hideMBProgress:self.view];
+        if (code.intValue == 0)
+        {
+            //            // 未授权过
+            [self bindWeChat:account];
+        }
+        else
+        {
+            [Utility showToastWithMessage:error inView:self.view];
+        }
+    }];
+}
+
+/**
+ *	@brief	绑定微信
+ *
+ *	@param 	snsAccount 	微信授权实体
+ *
+ *	@return
+ */
+- (void)bindWeChat:(UMSocialAccountEntity *)snsAccount
+{
+    [[UMSocialDataService defaultDataService] requestSnsInformation:UMShareToWechatSession  completion:^(UMSocialResponseEntity *response){
+        
+        NSLog(@"SnsInformation is %@",response.data);
+        
+        HWWeChatAccountModel *wechatAccount = [[HWWeChatAccountModel alloc] init];
+        wechatAccount.userName = snsAccount.userName;
+        wechatAccount.gender = [response.data stringObjectForKey:@"gender"];
+        wechatAccount.accessToken = snsAccount.accessToken;
+        wechatAccount.openId = snsAccount.openId;
+        wechatAccount.unionId = snsAccount.usid;
+        wechatAccount.location = [response.data stringObjectForKey:@"location"];
+        wechatAccount.headIconUrl = [response.data stringObjectForKey:@"profile_image_url"];
+        
+        /*
+         接口名称：/hw-sq-app-web/weixin/bindWeixin.do
+         输入参数：
+         userId： 社区用户ID
+         openid： 普通用户的标识，对当前开发者帐号唯一
+         unionid： 用户统一标识。针对一个微信开放平台帐号下的应用，同一用户的unionid是唯一的。
+         nickname： 普通用户昵称
+         sex： 普通用户性别，1为男性，2为女性
+         headimgurl：用户头像，最后一个数值代表正方形头像大小（有0、46、64、96、132数值可 选，0代表640*640正方形头像），用户没有头像时该项为空
+         location： 微信用户所在位置
+         */
+        HWUserLogin *userLogin = [HWUserLogin currentUserLogin];
+        
+        [Utility showMBProgress:self.view message:@"绑定中"];
+        
+        HWHTTPRequestOperationManager *manager = [HWHTTPRequestOperationManager manager];
+        NSMutableDictionary *param = [NSMutableDictionary dictionary];
+        [param setPObject:userLogin.userId forKey:@"userId"];
+        [param setPObject:snsAccount.openId forKey:@"openid"];
+        [param setPObject:snsAccount.usid forKey:@"unionid"];
+        [param setPObject:snsAccount.userName forKey:@"nickname"];
+        [param setPObject:[response.data stringObjectForKey:@"gender"] forKey:@"sex"];
+        [param setPObject:[response.data stringObjectForKey:@"profile_image_url"] forKey:@"headimgurl"];
+        [param setPObject:[response.data stringObjectForKey:@"location"] forKey:@"location"];
+        [param setPObject:[HWUserLogin currentUserLogin].key forKey:@"key"];
+        
+        [manager POST:kBindWeixin parameters:param queue:nil success:^(id responese) {
+            
+            [Utility hideMBProgress:self.view];
+            [Utility showToastWithMessage:@"绑定成功" inView:self.view];
+            
+            NSDictionary *dataDic = (NSDictionary *)[responese objectForKey:@"data"];
+            [[HWUserLogin currentUserLogin] initUserLogin:dataDic];
+            [HWCoreDataManager saveUserInfo];
+            
+            [modifyView refreshUserInfo];
+            
+        } failure:^(NSString *code, NSString *error) {
+            [Utility hideMBProgress:self.view];
+            [Utility showToastWithMessage:error inView:self.view];
+        }];
+        
+        
+    }];
+}
+
+#pragma mark -
+#pragma mark            HWModifyUserInfoView Delegate
+
+#warning 绑定手机号   修改个人资料
+
+/**
+ *	@brief	编辑头像 回调
+ *
+ *	@return
+ */
+- (void)userInfoViewEditHeadPhoto
+{
+    [MobClick event:@"click_change_headportrait"];
+    
+    if ([HWUserLogin verifyBindMobileWithPopVC:self showAlert:YES])
+    {
+        UIActionSheet *sheet = [[UIActionSheet alloc] initWithTitle:nil delegate:self cancelButtonTitle:@"取消" destructiveButtonTitle:nil otherButtonTitles:@"拍照",@"从相册中选择", nil];
+        AppDelegate *appDel = (AppDelegate *)SHARED_APP_DELEGATE;
+        [sheet showInView:appDel.window];
+        
+    }
+    
+    
+}
+
+/**
+ *	@brief	认证 回调
+ *
+ *	@return
+ */
+- (void)didSelectAuthenticate:(NSString *)type isWuYeAuth:(BOOL)isWuYeAuth
+{
+    if (type.length == 0 || [type isEqual:@"3"])    //未认证 及 已填写门牌号 都重新开始填写门牌号
+    {
+        //去申请认证
+        HWAuthenticateViewController *vc = [[HWAuthenticateViewController alloc] init];
+        [self.navigationController pushViewController:vc animated:YES];
+    }
+    else if ([type isEqual:@"0"])
+    {
+        if (isWuYeAuth)
+        {
+            HWWuYeAuthenticateScdVC *svc = [[HWWuYeAuthenticateScdVC alloc] init];
+            [self.navigationController pushViewController:svc animated:YES];
+        }
+        else
+        {
+            //审核中 等待审核
+            HWAuthenticateWaitMailViewController *vc = [[HWAuthenticateWaitMailViewController alloc] init];
+            [self.navigationController pushViewController:vc animated:YES];
+        }
+    }
+    else if ([type isEqual:@"1"])
+    {
+        if (isWuYeAuth)
+        {
+            HWWuYeAuthenticateScdVC *svc = [[HWWuYeAuthenticateScdVC alloc] init];
+            [self.navigationController pushViewController:svc animated:YES];
+        }
+        else
+        {
+            //已审核 填写验证码
+            HWAuthenticateConfirmViewController *vc = [[HWAuthenticateConfirmViewController alloc] init];
+            [self.navigationController pushViewController:vc animated:YES];
+        }
+    }
+    else if ([type isEqual:@"2"])
+    {
+        //已认证
+    }
+//    else if ([type isEqual:@"3"])
+//    {
+//        //未认证
+//        HWAuthenticateStressAddressViewController *vc = [[HWAuthenticateStressAddressViewController alloc] init];
+//        [self.navigationController pushViewController:vc animated:YES];
+//    }
+}
+
+/**
+ *	@brief	退出登录 回调
+ *
+ *	@return
+ */
+- (void)didSelectLogout
+{
+    [Utility showAlertWithMessageAndSureCancelBtn:@"是否退出登录？" delegate:self];
+}
+
+/**
+ *	@brief	修改昵称 回调
+ *
+ *	@return
+ */
+- (void)didSelectChangeNickname
+{
+    [MobClick event:@"click_change_nickname"];
+    if ([HWUserLogin verifyBindMobileWithPopVC:self showAlert:YES])
+    {
+        ChangNameViewController *changNameView = [[ChangNameViewController alloc]init];
+        [self.navigationController pushViewController:changNameView animated:YES];
+    }
+    
+}
+
+/**
+ *	@brief	修改性别 回调
+ *
+ *	@return
+ */
+- (void)didSelectChangeGender
+{
+    if ([HWUserLogin verifyBindMobileWithPopVC:self showAlert:YES])
+    {
+        HWSelectSexViewController *selectView = [[HWSelectSexViewController alloc]init];
+        [self.navigationController pushViewController:selectView animated:YES];
+        
+    }
+    
+}
+
+/**
+ *	@brief	修改爱好 回调
+ *
+ *	@return
+ */
+- (void)didSelectChangeFavorate
+{
+    [MobClick event:@"click_hobby"];
+    if ([HWUserLogin verifyBindMobileWithPopVC:self showAlert:YES])
+    {
+        HWInterestViewController *interestView = [[HWInterestViewController alloc]init];
+        [self.navigationController pushViewController:interestView animated:YES];
+        
+    }
+    
+}
+
+/**
+ *	@brief	绑定微信 回调
+ *
+ *	@return
+ */
+- (void)didSelectBindWeixin:(HWModifyUserInfoView *)modifyUserInfoView isBindTel:(BOOL)isBindTel
+{
+    HWBindFinishedViewController *bindFinishedVC = [[HWBindFinishedViewController alloc] init];
+    
+    if ([[HWUserLogin currentUserLogin].isBindWeixin isEqualToString:@"1"])
+    {
+        if ([[HWUserLogin currentUserLogin].isBindMobile isEqualToString:@"1"])
+        {
+            // 已绑定
+            bindFinishedVC.isBindTel = YES;
+        }
+        else
+        {
+            bindFinishedVC.isBindTel = NO;
+        }
+        [self.navigationController pushViewController:bindFinishedVC animated:YES];
+        
+    }
+    else
+    {
+        // 未绑定
+        if (![Utility isInstalledWX])
+        {
+            return;
+        }
+        
+        UMSocialSnsPlatform *snsPlatform = [UMSocialSnsPlatformManager getSocialPlatformWithName:UMShareToWechatSession];
+        snsPlatform.loginClickHandler(self,[UMSocialControllerService defaultControllerService],YES,^(UMSocialResponseEntity *response){
+            //          获取用户名、uid、token等
+            
+            if (response.responseCode == UMSResponseCodeSuccess)
+            {
+                UMSocialAccountEntity *snsAccount = [[UMSocialAccountManager socialAccountDictionary] valueForKey:UMShareToWechatSession];
+                
+                NSLog(@"username is %@, uid is %@, token is %@ url is %@",snsAccount.userName,snsAccount.usid,snsAccount.accessToken,snsAccount.iconURL);
+                // 调用接口 判断是否已授权过
+                [self checkAuth:snsAccount];
+            }
+            else
+            {
+                [Utility showToastWithMessage:@"授权失败" inView:self.view];
+            }
+            
+        });
+    }
+}
+
+/**
+ *	@brief	绑定手机号 回调
+ *
+ *	@return
+ */
+- (void)didSelectBindMobile
+{
+    if (![HWUserLogin currentUserLogin].telephoneNum.length > 0)
+    {
+        HWNewUserBindViewController *bindMobileVC = [[HWNewUserBindViewController alloc] init];
+        bindMobileVC.isBind = YES;
+        if([Utility isGuestLogin] == YES && [[HWUserLogin currentUserLogin].isBindMobile  isEqual: @"0"])
+        {
+            bindMobileVC.isGuest = YES;
+        }
+        bindMobileVC.bindPopViewController = self;
+        [self.navigationController pushViewController:bindMobileVC animated:YES];
+    }
+}
+
+#pragma mark -
+#pragma mark        发送请求头像的请求
+
+/**
+ *	@brief	上传头像
+ *
+ *	@param 	image 	头像图片
+ *
+ *	@return
+ */
+- (void)modifyAvatarRequest:(UIImage *)image
+{
+    [Utility showMBProgress:self.view message:@"上传头像"];
+    
+    HWHTTPRequestOperationManager *manager = [HWHTTPRequestOperationManager manager];
+    NSMutableDictionary *dict = [NSMutableDictionary dictionary];
+    NSData *avatarImageData = UIImageJPEGRepresentation(image, 1.0);
+    [dict setPObject:avatarImageData forKey:@"file"];
+    [manager POSTAvatarImage:kModifyAvatar parameters:dict queue:nil success:^(id responseObject) {
+        
+        [Utility hideMBProgress:self.view];
+        NSDictionary *dic = (NSDictionary *)responseObject;
+        [HWUserLogin currentUserLogin].avatar = [dic stringObjectForKey:@"data"];
+        [[HWUserLogin currentUserLogin] getUserPhotoImage:[dic stringObjectForKey:@"data"]];
+        [HWCoreDataManager saveUserInfo];
+        [modifyView refreshUserInfo];
+        
+    } failure:^(NSString *error) {
+        [Utility hideMBProgress:self.view];
+        [Utility showToastWithMessage:error inView:self.view];
+    }];
+}
+
+#pragma mark -
+#pragma mark        UIAlertView Delegate
+
+- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
+{
+    if (buttonIndex == 1)
+    {
+        [MobClick event:@"click_logout"];
+        
+        [self toGuestLogin];
+    }
+}
+
+-(void)toGuestLogin
+{
+    [Utility showMBProgress:self.view message:@"退出登录中..."];
+    HWHTTPRequestOperationManager *manager = [HWHTTPRequestOperationManager manager];
+    NSMutableDictionary *dict = [NSMutableDictionary dictionary];
+    [dict setPObject:[Utility getUUIDWithoutSymbol] forKey:@"deviceId"];
+    //[dict setPObject:@"38219034811044" forKey:@"deviceId"];
+    [dict setPObject:[[UIDevice currentDevice]name] forKey:@"deviceName"];
+    [dict setPObject:[[UIDevice currentDevice]systemName] forKey:@"osName"];
+    [dict setPObject:[[UIDevice currentDevice]systemVersion] forKey:@"osVersion"];
+    
+    [manager POST:kGuestLogin parameters:dict queue:nil success:^(id responseObject) {
+        
+        NSDictionary *dataDic = (NSDictionary *)[responseObject objectForKey:@"data"];
+        NSLog(@"游客登录==%@",dataDic);
+        
+        if ([[dataDic stringObjectForKey:@"villageId"] length] > 0)
+        {
+            [Utility hideMBProgress:self.view];
+            //用户数据保存本地
+            [[HWUserLogin currentUserLogin]userLogout];
+            [HWCoreDataManager clearUserInfo]; // 清空数据库
+            
+            //退出登录 新手及游客引导 步骤设为0
+            NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+            [userDefaults setInteger:0 forKey:kGuideStep];
+            [userDefaults synchronize];
+            
+            //用户数据保存本地
+            [[HWUserLogin currentUserLogin] initUserLogin:dataDic];
+            [HWCoreDataManager saveUserInfo];
+            
+            [[NSNotificationCenter defaultCenter] postNotificationName:RELOAD_APP_DATA object:nil];
+            [[NSNotificationCenter defaultCenter]postNotificationName:RELOAD_PRIVILEDGELIST object:nil];
+            [APService setTags:[NSSet set] alias:@"" callbackSelector:nil object:nil];
+            [APService setTags:[NSSet setWithObjects:[Utility getCityNameById:[HWUserLogin currentUserLogin].cityId], [HWUserLogin currentUserLogin].villageId, nil]  alias:[HWUserLogin currentUserLogin].telephoneNum callbackSelector:nil object:nil];
+            
+            [self.navigationController popViewControllerAnimated:YES];
+        }
+        else
+        {
+            HWUserLogin *tmpUser = [[HWUserLogin alloc] init];
+            [tmpUser initUserLogin:dataDic];
+            [self bindToLastLoginUserVillage:tmpUser];
+        }
+        
+        if ([Utility isGuestLogin] == YES)
+        {
+            //当前手机号 不大于0时 为未绑定
+            if (!([HWUserLogin currentUserLogin].telephoneNum.length > 0))//[[HWUserLogin currentUserLogin].isBindMobile isEqual: @"0"]
+            {
+                [[NSNotificationCenter defaultCenter]postNotificationName:KshowRedPoint object:nil];
+                AppDelegate *app = SHARED_APP_DELEGATE;
+                [app.tabBarVC showTabbarMineDot];
+            }
+        }
+    } failure:^(NSString *code, NSString *error) {
+        [Utility hideMBProgress:self.view];
+        [Utility showToastWithMessage:@"网络打瞌睡了，稍后再试" inView:self.view];
+    }];
+}
+
+- (void)bindToLastLoginUserVillage:(HWUserLogin *)tmpUser
+{
+    HWHTTPRequestOperationManager *manager = [HWHTTPRequestOperationManager manager];
+    NSMutableDictionary *dict = [NSMutableDictionary dictionary];
+    [dict setPObject:[HWUserLogin currentUserLogin].villageId forKey:@"villageId"];
+    [dict setPObject:tmpUser.key forKey:@"key"];
+    [dict setPObject:tmpUser.telephoneNum forKey:@"mobileNumber"];
+    [dict setPObject:[HWUserLogin currentUserLogin].cityId forKey:@"cityId"];
+    [manager POST:kSelectCommunity parameters:dict queue:nil settimeout:60 success:^(id responseObject){
+        [Utility hideMBProgress:self.view];
+        
+        //用户数据保存本地
+        [[HWUserLogin currentUserLogin]userLogout];
+        [HWCoreDataManager clearUserInfo]; // 清空数据库
+        
+        //退出登录 新手及游客引导 步骤设为0
+        NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+        [userDefaults setInteger:0 forKey:kGuideStep];
+        [userDefaults synchronize];
+        
+        //用户数据保存本地
+        NSDictionary *dataDic = (NSDictionary *)[responseObject objectForKey:@"data"];
+        [[HWUserLogin currentUserLogin] initUserLogin:dataDic];
+        [HWCoreDataManager saveUserInfo];
+        
+        [[NSNotificationCenter defaultCenter] postNotificationName:RELOAD_APP_DATA object:nil];
+        [[NSNotificationCenter defaultCenter]postNotificationName:RELOAD_PRIVILEDGELIST object:nil];
+        [APService setTags:[NSSet set] alias:@"" callbackSelector:nil object:nil];
+        [APService setTags:[NSSet setWithObjects:[Utility getCityNameById:[HWUserLogin currentUserLogin].cityId], [HWUserLogin currentUserLogin].villageId, nil]  alias:[HWUserLogin currentUserLogin].telephoneNum callbackSelector:nil object:nil];
+        
+        [self.navigationController popViewControllerAnimated:YES];
+        
+    }failure:^(NSString *code, NSString *error) {
+        [Utility hideMBProgress:self.view];
+        
+        [Utility showToastWithMessage:@"网络打瞌睡了，稍后再试" inView:self.view];
+    }];
+}
+
+- (void)logout
+{
+    //退出登录
+    [Utility showMBProgress:self.view message:@"退出登录中..."];
+    NSMutableDictionary *dic = [[NSMutableDictionary alloc]init];
+    [dic setPObject:[HWUserLogin currentUserLogin].key forKey:@"key"];
+    HWHTTPRequestOperationManager *manager = [HWHTTPRequestOperationManager manager];
+    [manager POST:kLogout parameters:dic queue:nil success:^(id responese)
+     {
+         [Utility hideMBProgress:self.view];
+         
+         //用户数据保存本地
+         [[HWUserLogin currentUserLogin]userLogout];
+         [HWCoreDataManager clearUserInfo]; // 清空数据库
+         
+         //退出登录 新手及游客引导 步骤设为0
+         NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+         [userDefaults setInteger:0 forKey:kGuideStep];
+         [userDefaults synchronize];
+         
+         //登出成功 跳转界面
+         HWHomePageViewController *homePage = [[HWHomePageViewController alloc]init];
+         HWBaseNavigationController *homePageNav = [[HWBaseNavigationController alloc]initWithRootViewController:homePage];
+         [self presentViewController:homePageNav animated:YES completion:nil];
+         
+     } failure:^(NSString *code, NSString *error) {
+         [Utility hideMBProgress:self.view];
+         [Utility showToastWithMessage:error inView:self.view];
+     }];
+}
+
+#pragma mark -
+#pragma mark            UIActionSheet Delegate
+
+- (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex
+{
+    if (buttonIndex == 0)
+    {
+        self.ipc = [[UIImagePickerController alloc] init];
+        ipc.delegate = self;
+        ipc.sourceType =  UIImagePickerControllerSourceTypeCamera;
+        ipc.allowsEditing = YES;
+        ipc.modalPresentationStyle = UIModalPresentationCurrentContext;
+        [self presentViewController:ipc animated:YES completion:nil];
+    }
+    else if (buttonIndex == 1)
+    {
+        self.ipc = [[UIImagePickerController alloc] init];
+        ipc.delegate = self;
+        ipc.sourceType =  UIImagePickerControllerSourceTypePhotoLibrary;
+        ipc.allowsEditing = YES;
+        ipc.modalPresentationStyle = UIModalPresentationCurrentContext;
+        [self presentViewController:ipc animated:YES completion:nil];
+    }
+    
+}
+
+#pragma mark -
+#pragma mark        UIImagePickerController delegate
+
+- (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker
+{
+    [self dismissViewControllerAnimated:YES completion:nil];
+}
+- (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)info
+{
+    //nslog(@"image info:%@",info);
+    UIImage *image = [info objectForKey:UIImagePickerControllerEditedImage];
+    [self dismissViewControllerAnimated:YES completion:nil];
+    
+    if (image != nil)
+    {
+        [self modifyAvatarRequest:image];
+    }
+    else
+    {
+        [Utility showToastWithMessage:@"修改失败" inView:self.view];
+    }
+}
+
+- (void)didReceiveMemoryWarning
+{
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
+}
+
+@end

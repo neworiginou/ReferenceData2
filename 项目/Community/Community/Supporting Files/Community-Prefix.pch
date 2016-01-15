@@ -1,0 +1,58 @@
+//
+//  Prefix header
+//
+//  The contents of this file are implicitly included at the beginning of every source file.
+//  姓名        时间       内容
+//  杨庆龙     15-01-16   增加 UIButton+WebCache
+
+#import <Availability.h>
+
+#ifndef __IPHONE_3_0
+#warning "This project uses features only available in iOS SDK 3.0 and later."
+#endif
+
+#ifdef __OBJC__
+    #import <UIKit/UIKit.h>
+    #import <Foundation/Foundation.h>
+    #import <CoreData/CoreData.h>
+    #import "HWUserLogin.h"
+    #import "Define.h"
+    #import "Utility.h"
+    #import "Category.h"
+    #import "HWBaseNavigationController.h"
+    #import "UIImage+GKImage.h"
+    #import "UIImageView+WebCache.h"
+    #import "HWHTTPRequestOperationManager.h"
+    #import "HWRequestConfig.h"
+    #import "HWCallDetectCenter.h"
+    #import "UMSocial.h"
+    #import "MobClick.h"
+    #import <AudioToolbox/AudioToolbox.h>
+    #import "HWBaseTableViewCell.h"
+    #import "JPBaseTableView.h"
+    #import "HWTextField.h"
+    #import "UIViewExt.h"
+    #import "UIView+Addtions.h"
+    #import "UIView+AutoLayout.h"
+    #import "HWWeChatAccountModel.h"
+    #import "HWNeighbourDefine.h"
+    #import "UIButton+WebCache.h"
+    #import "HWGeneralControl.h"
+    #import "Reachability.h"
+    #import <AlipaySDK/AlipaySDK.h>
+    #import "DView.h"
+#endif
+
+#ifndef __OPTIMIZE__
+//#define NSLog(fmt, ...) NSLog((@"[文件名:%s]\n" "[函数名:%s]\n" "[行号:%d] \n" fmt"\n\n"), __FILE__, __FUNCTION__, __LINE__, ##__VA_ARGS__)
+#else
+#define NSLog(...) {}
+#endif
+
+#define kCardHeight (kScreenWidth - 2 * 9) * 0.67f
+#define kDetailCardHeight (kScreenWidth - 2 * 9) * 0.67f
+
+#define kBottomHeight 45
+#define kIntervalHeight 10
+
+

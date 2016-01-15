@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IDESourceControlProjectFavoriteDictionaryKey</key>
+	<false/>
+	<key>IDESourceControlProjectIdentifier</key>
+	<string>AA366306-63F0-4726-8502-595CA91F2C11</string>
+	<key>IDESourceControlProjectName</key>
+	<string>PUClient</string>
+	<key>IDESourceControlProjectOriginsDictionary</key>
+	<dict>
+		<key>a84d271c-7f24-4d71-ba95-d745e63059a5++5148</key>
+		<string>svn://42.96.184.91/rrmj/client/ios/trunk</string>
+	</dict>
+	<key>IDESourceControlProjectPath</key>
+	<string>PUClient/PUClient.xcworkspace</string>
+	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
+	<dict>
+		<key>a84d271c-7f24-4d71-ba95-d745e63059a5++5148</key>
+		<string>../..</string>
+	</dict>
+	<key>IDESourceControlProjectRepositoryRootDictionary</key>
+	<dict>
+		<key>a84d271c-7f24-4d71-ba95-d745e63059a5++5148</key>
+		<string>svn://42.96.184.91/rrmj</string>
+	</dict>
+	<key>IDESourceControlProjectURL</key>
+	<string>svn://42.96.184.91/rrmj/client/ios/trunk/PUClient/PUClient.xcworkspace</string>
+	<key>IDESourceControlProjectVersion</key>
+	<integer>111</integer>
+	<key>IDESourceControlProjectWCCIdentifier</key>
+	<string>a84d271c-7f24-4d71-ba95-d745e63059a5++5148</string>
+	<key>IDESourceControlProjectWCConfigurations</key>
+	<array>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.subversion</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>a84d271c-7f24-4d71-ba95-d745e63059a5++5148</string>
+			<key>IDESourceControlWCCName</key>
+			<string>ios</string>
+		</dict>
+	</array>
+</dict>
+</plist>

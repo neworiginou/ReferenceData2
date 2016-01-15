@@ -1,0 +1,29 @@
+//
+//  PUClient.pch
+//  PUClient
+//
+//  Created by RRLhy on 15/7/17.
+//  Copyright (c) 2015年 RRLhy. All rights reserved.
+//
+
+#ifndef PUClient_PUClient_pch
+#define PUClient_PUClient_pch
+
+// Include any system framework and library headers here that should be included in all compilation units.
+// You will also need to set the Prefix Header build setting of one or more of your targets to reference this file.
+#import "ACMacros.h"
+#import "UMSocial.h"
+#import "IanAlert.h"
+#import "UMessage.h"
+#import "MobClick.h"
+#import "JsonModel.h"
+#import "UserHeaderView.h"
+#import "SINGLETONGCD.h"
+#import "NSString+TF.h"
+#import "NSString+ZY.h"
+#import <YTKRequest.h>
+#import <MJExtension.h>
+#import "UserInfoConfig.h"
+#import "UIImage+ResizeImage.h"
+#import <UIImageView+WebCache.h>
+#endif

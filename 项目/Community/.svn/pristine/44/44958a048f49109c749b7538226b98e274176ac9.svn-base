@@ -1,0 +1,165 @@
+//
+//  HWTianTianTuanListCell.m
+//  Community
+//
+//  Created by niedi on 15/7/31.
+//  Copyright (c) 2015年 caijingpeng. All rights reserved.
+//
+
+#import "HWTianTianTuanListCell.h"
+
+@interface HWTianTianTuanListCell ()
+{
+    HWTianTianTuanListModel *_model;
+    
+    DLable *orderNumLab;
+    DLable *orderStatusLab;
+    DImageV *goodsImgV;
+    DLable *goodsNameLab;
+    DLable *priceNumLab;
+    DLable *moneyAmountLab;
+    DButton *payBtn;
+}
+@end
+
+@implementation HWTianTianTuanListCell
+
+- (instancetype)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier
+{
+    if (self = [super initWithStyle:style reuseIdentifier:reuseIdentifier])
+    {
+        self.contentView.backgroundColor = BACKGROUND_COLOR;
+        
+        DView *whiteBackV = [DView viewFrameX:0 y:0 w:kScreenWidth h:180.0f];
+        whiteBackV.backgroundColor = [UIColor whiteColor];
+        [self.contentView addSubview:whiteBackV];
+        
+        orderNumLab = [DLable LabTxt:@"订单编号" txtFont:TF15 txtColor:THEME_COLOR_TEXT frameX:15 y:0 w:kScreenWidth h:45.0f];
+        [whiteBackV addSubview:orderNumLab];
+        
+        orderStatusLab = [DLable LabTxt:@"状态" txtFont:TF15 txtColor:THEME_COLOR_ORANGE frameX:0 y:0 w:kScreenWidth - 15 h:45.0f];
+        orderStatusLab.textAlignment = NSTextAlignmentRight;
+        [whiteBackV addSubview:orderStatusLab];
+        
+        CALayer *middleLine = [DView layerFrameX:0 y:45.0f w:kScreenWidth h:0.5f];
+        [whiteBackV.layer addSublayer:middleLine];
+        
+        goodsImgV = [DImageV imagV:nil frameX:15 y:CGRectGetMaxY(middleLine.frame) + 18.5f w:60 h:55.0f];
+        goodsImgV.backgroundColor = IMAGE_DEFAULT_COLOR;
+        [whiteBackV addSubview:goodsImgV];
+        
+        goodsNameLab = [DLable LabTxt:@"商品名" txtFont:TF16 txtColor:THEME_COLOR_SMOKE frameX:CGRectGetMaxX(goodsImgV.frame) + 10 y:CGRectGetMinY(goodsImgV.frame) w:kScreenWidth - (CGRectGetMaxX(goodsImgV.frame) + 10) - 85.0f h:55.0f];
+        [whiteBackV addSubview:goodsNameLab];
+        
+        priceNumLab = [DLable LabTxt:@"￥price*num" txtFont:TF16 txtColor:THEME_COLOR_SMOKE frameX:kScreenWidth - 85.0f y:CGRectGetMinY(goodsNameLab.frame) w:70.0f h:55.0f];
+        priceNumLab.textAlignment = NSTextAlignmentRight;
+        [whiteBackV addSubview:priceNumLab];
+        
+        moneyAmountLab = [DLable LabTxt:@"总价：￥" txtFont:TF16 txtColor:THEME_COLOR_SMOKE frameX:15 y:CGRectGetMaxY(priceNumLab.frame) + 30 w:kScreenWidth - 2 * 15 h:20.0f];
+        [whiteBackV addSubview:moneyAmountLab];
+        
+        payBtn = [DButton btnTxt:@"付款" txtFont:TF16 frameX:kScreenWidth - 20.0f - 50.0f y:145.0f w:50.0f h:25.0f target:self action:@selector(payBtnClick)];
+        [payBtn setStyle:DBtnStyleYellow];
+        [whiteBackV addSubview:payBtn];
+    }
+    return self;
+}
+
+- (void)payBtnClick
+{
+    if (self.delegate && [self.delegate respondsToSelector:@selector(cellPayBtnClick:)])
+    {
+        [self.delegate cellPayBtnClick:_model];
+    }
+}
+
+- (void)fillDataWithModel:(HWTianTianTuanListModel *)model
+{
+    _model = model;
+    
+    orderNumLab.text = @"原产递订单";
+    
+    payBtn.hidden = YES;
+    if ([model.orderStatus isEqualToString:@"0"]) //0未支付，1已支付未发货，2订单已退款，3已发货，4订单已关闭
+    {
+        orderStatusLab.text = @"待付款";
+        orderStatusLab.textColor = THEME_COLOR_RED;
+        payBtn.hidden = NO;
+    }
+    else if ([model.orderStatus isEqualToString:@"1"])
+    {
+        orderStatusLab.text = @"待发货";
+        orderStatusLab.textColor = THEBUTTON_YELLOW_NORMAL;
+    }
+    else if ([model.orderStatus isEqualToString:@"2"])
+    {
+        orderStatusLab.text = @"已退款";
+        orderStatusLab.textColor = THEME_COLOR_ORANGE;
+    }
+    else if ([model.orderStatus isEqualToString:@"3"])
+    {
+        orderStatusLab.text = @"已发货";
+        orderStatusLab.textColor = THEME_COLOR_GREEN;
+    }
+    else if ([model.orderStatus isEqualToString:@"4"])
+    {
+        orderStatusLab.text = @"已关闭";
+        orderStatusLab.textColor = THEME_COLOR_BLUE;
+    }
+    
+    __weak UIImageView *weakImgV = goodsImgV;
+    [goodsImgV setImageWithURL:[NSURL URLWithString:[Utility imageDownloadWithMongoDbKey:model.orderImg]] placeholderImage:[UIImage imageNamed:IMAGE_PLACE] completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType) {
+        if (error == nil)
+        {
+            weakImgV.image = image;
+        }
+        else
+        {
+            weakImgV.image = [UIImage imageNamed:IMAGE_BREAK_CUBE];
+        }
+    }];
+    
+    goodsNameLab.text = model.goodsName;
+    priceNumLab.text = [NSString stringWithFormat:@"￥%@*%@", model.sellPrice, model.goodsCount];
+    NSString *moneyAmountStr;
+    if (model.postage.length != 0)
+    {
+        NSString *postageStr = model.postage;
+        if ([postageStr isEqualToString:@"0"])
+        {
+            postageStr = @"";
+        }
+        else
+        {
+            postageStr = [NSString stringWithFormat:@"(邮费: ￥%@)", postageStr];
+        }
+        
+        if ([model.orderStatus isEqualToString:@"2"])
+        {
+            moneyAmountStr = [NSString stringWithFormat:@"实付金额: ￥%@ %@    退款: ￥%@", model.orderAmount, postageStr, model.returnAmount];
+        }
+        else
+        {
+            moneyAmountStr = [NSString stringWithFormat:@"实付金额: ￥%@ %@", model.orderAmount, postageStr];
+        }
+    }
+    else
+    {
+        if ([model.orderStatus isEqualToString:@"2"])
+        {
+            moneyAmountStr = [NSString stringWithFormat:@"实付金额: ￥%@    退款: ￥%@", model.orderAmount, model.returnAmount];
+        }
+        else
+        {
+            moneyAmountStr = [NSString stringWithFormat:@"实付金额: ￥%@", model.orderAmount];
+        }
+    }
+    moneyAmountLab.text = moneyAmountStr;
+}
+
+- (CGFloat)cellHeight
+{
+    return 190.0f;
+}
+
+@end

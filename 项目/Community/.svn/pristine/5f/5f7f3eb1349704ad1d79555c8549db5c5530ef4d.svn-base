@@ -1,0 +1,122 @@
+//
+//  HWCommondityDetailModel.h
+//  Community
+//
+//  Created by ryder on 7/31/15.
+//  Copyright (c) 2015 caijingpeng. All rights reserved.
+//
+
+#import <Foundation/Foundation.h>
+
+@interface HWCommondityDetailModel : NSObject
+
+@property (nonatomic, strong) NSString *bigImg;
+@property (nonatomic, strong) NSString *brand;
+@property (nonatomic, strong) NSString *brandUrl;
+@property (nonatomic, strong) NSString *buyGoodsCount;
+@property (nonatomic, strong) NSString *costPrice;
+@property (nonatomic, strong) NSString *createTime;
+@property (nonatomic, strong) NSString *creater;
+@property (nonatomic, strong) NSString *currentTime;
+@property (nonatomic, strong) NSString *disabled;
+@property (nonatomic, strong) NSString *endTime;
+@property (nonatomic, strong) NSString *freePostageAmount;
+@property (nonatomic, strong) NSString *freePostageNum;
+@property (nonatomic, strong) NSString *freePostageType;
+@property (nonatomic, strong) NSString *goodsId;
+@property (nonatomic, strong) NSString *goodsInfo;
+@property (nonatomic, strong) NSString *goodsName;
+@property (nonatomic, strong) NSString *goodsRemark;
+@property (nonatomic, strong) NSString *isAuthBuy;
+@property (nonatomic, strong) NSString *limitCount;
+@property (nonatomic, strong) NSString *marketPrice;
+@property (nonatomic, strong) NSString *modifier;
+@property (nonatomic, strong) NSString *modifyTime;
+@property (nonatomic, strong) NSString *orderImg;
+@property (nonatomic, strong) NSString *postage;
+@property (nonatomic, strong) NSString *reduceStockType;
+@property (nonatomic, strong) NSString *sellPrice;
+@property (nonatomic, strong) NSString *showDistanceEndTime;
+@property (nonatomic, strong) NSString *showDistanceStartTime;
+@property (nonatomic, strong) NSString *showSurplus;
+@property (nonatomic, strong) NSString *smallImg;
+@property (nonatomic, strong) NSString *startTime;
+@property (nonatomic, strong) NSString *status;
+@property (nonatomic, strong) NSString *stock;
+@property (nonatomic, strong) NSString *surplusStock;
+@property (nonatomic, strong) NSString *version;
+
+- (instancetype)initWithdictionary:(NSDictionary *)dictionary;
+
+@end
+
+/*
+ {
+ data =     {
+ bigImg = "<null>";
+ brand = bbbbbbbbbb;
+ brandUrl = "www.163.com";
+ buyGoodsCount = "<null>";
+ costPrice = "<null>";
+ createTime = "<null>";
+ creater = "<null>";
+ currentTime = 1438744153959;
+ disabled = 0;
+ endTime = 1438813800000;
+ freePostageAmount = "<null>";
+ freePostageNum = 1;
+ freePostageType = 1;
+ goodsId = 10418261722;
+ goodsInfo = "<span style=\"font-style: italic;\">show me the money</span><span style=\"font-style: italic; line-height: 17.142858505249px;\">show me the money</span><span style=\"font-style: italic; line-height: 17.142858505249px;\">show me the money</span>";
+ goodsName = "\U96fe\U96e8\U9b54\U7406\U6c99";
+ goodsRemark = "\U8ba8\U538c\U7684\U9b54\U7406\U6c99";
+ isAuthBuy = 0;
+ limitCount = 999;
+ marketPrice = "0.8";
+ modifier = "<null>";
+ modifyTime = "<null>";
+ orderImg = 55c1679de4b08a51b9ebb9e6;
+ postage = "0.5";
+ reduceStockType = "<null>";
+ sellPrice = "0.11";
+ showDistanceEndTime = 1;
+ showDistanceStartTime = 1;
+ showSurplus = "<null>";
+ smallImg = 55c16799e4b08a51b9ebb9d5;
+ startTime = 1438741378000;
+ status = 1;
+ stock = "<null>";
+ surplusStock = 999999;
+ version = "<null>";
+ };
+ detail = "\U8bf7\U6c42\U6570\U636e\U6210\U529f!";
+ key = "62a453b9-c5b8-40de-80af-4eb22ee3b90b";
+ status = 1;
+ }*/
+
+/*输出参数说明：
+ 
+ goodsId：商品id
+ goodsName：商品名称
+ goodsRemark：商品描述
+ goodsInfo：商品简介
+ smallImg：app端展示商品详情图片
+ marketPrice：市场参考价
+ sellPrice：出售价格
+ showDistanceEndTime：是否显示剩余倒计时(0:否 1：是)
+ showDistanceStartTime：是否显示开始倒计时(0:否 1：是)
+ startTime：开始上架时间
+ endTime：下架时间
+ currentTime：当前后台服务器系统时间
+ isAuthBuy：是否认证购买 (0:否 1：是)
+ buyGoodsCount：已经售出数量
+ limitCount：限购数量
+ postage：邮费
+ freePostageType：免邮类型(0金额， 1分数， 2不免邮)
+ freePostageNum：免邮份数
+ freePostageAmount：免邮金额
+ brand：品牌商
+ brandUrl：品牌商连接
+ status：当前商品状态(0即将开始,1进行中,2已售完，3已下架，4未知状态)
+ surplusStock:剩余库存*/
+

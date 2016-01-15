@@ -1,0 +1,1109 @@
+//
+//  HWUserLogin.m
+//  Community
+//
+//  Created by caijingpeng.haowu on 14-8-27.
+//  Copyright (c) 2014年 caijingpeng. All rights reserved.
+//
+//  功能描述：用户登录信息单例
+//
+//  修改记录：
+//      姓名         日期               修改内容
+//     蔡景鹏     2015-01-20           添加 验证是否绑定过手机号 类方法
+//
+//
+
+#import "HWUserLogin.h"
+#import "SFHFKeychainUtils.h"
+#import "APService.h"
+#import "HWCoreDataManager.h"
+#import "AppDelegate.h"
+#import "HWRegisterFourthViewController.h"
+#import "HWNewUserBindViewController.h"
+#import "TuiGuangYuanUI.h"
+#import "HWNetWorkManager.h"
+#import "HWAuthenticateViewController.h"
+#import "HWAuthenticateWaitMailViewController.h"
+#import "HWAuthenticateConfirmViewController.h"
+#import "HWReLoginViewController.h"
+#import "HWWuYeAuthenticateScdVC.h"
+
+static HWUserLogin *userLogin = nil;
+
+@implementation HWUserLogin
+@synthesize username;
+@synthesize password;
+@synthesize sessionKey;
+@synthesize gender;
+@synthesize nickname;
+@synthesize favorite;
+@synthesize avatar;
+@synthesize cities;
+@synthesize key;
+@synthesize cityId;
+@synthesize villageId;
+@synthesize villageName;
+@synthesize tenementId;
+@synthesize shopId;
+@synthesize latitude;
+@synthesize longitude;
+@synthesize areaId;
+@synthesize telephoneNum;
+@synthesize totalMoney;
+@synthesize dataVersion;//版本号
+@synthesize cityName;
+@synthesize residendId;
+@synthesize userId;
+@synthesize manager;
+@synthesize address;
+@synthesize shopAvatar;
+@synthesize hotArry;
+@synthesize acceptNotify;
+@synthesize propertyNotify;
+@synthesize shopNotify;
+@synthesize soundNotify;
+@synthesize shakeNotify;
+@synthesize villageAddress;
+@synthesize notificationOnOrOff;
+@synthesize locationFailureFlag;
+@synthesize changeCity;
+@synthesize saveFrontGpsCityIdStr;
+@synthesize isSettingPayPasswardFlag;
+@synthesize openId;
+@synthesize weixinNickname;
+@synthesize isBindMobile;
+@synthesize isBindWeixin;
+@synthesize headImage;
+@synthesize deviceId;
+@synthesize alertTimeArray;
+
+ /* 
+   override init() {
+    super.init()
+  self.key = nil
+  self.address = nil
+  self.favorite = nil
+  self.gender = nil
+  self.nickname = nil
+  self.dataVersion = nil
+  self.notificationOnOrOff = "0"
+  self.isSettingPayPasswardFlag = "0"
+  self.totalMoney = "0"
+}
+*/
+- (id)init
+{
+    if (self = [super init])
+    {
+        self.cities = [[NSMutableArray alloc] init];
+        hotArry = [[NSMutableArray alloc]init];
+        self.key = nil;
+        self.address = nil;
+        self.favorite = nil;
+        self.gender = nil;
+        self.nickname = nil;
+        self.dataVersion = nil;
+        notificationOnOrOff = @"0";
+        isSettingPayPasswardFlag = @"0";
+        totalMoney = @"0";
+    }
+    return self;
+}
+/*
+  @IBOutlet weak var userLogin:  HWUserLogin!
+ 
+ func currentUserLogin() ->HWUserLogin
+ {
+ if userLogin == nil
+ {
+ let userLogin = HWUserLogin()
+ }
+ 
+ return userLogin
+ }
+ */
+
++ (HWUserLogin *)currentUserLogin
+{
+    if (userLogin == nil)
+    {
+        userLogin = [[HWUserLogin alloc] init];
+    }
+    return userLogin;
+}
+/*
+ func initUserLogin(user:NSDictionary)
+ {
+  self.avatar = user .objectForKey("avatarUrl") as NSString
+  self.nickname = user .objectForKey("nickname") as NSString
+  self.gender = user .objectForKey("gender") as NSString
+  self.favorite = user .objectForKey("favorite") as NSString
+  self.key = user .objectForKey("avatarUrl") as NSString
+  self.cityId = user .objectForKey("cityId") as NSString
+  self.villageId = user .objectForKey("villageId") as NSString
+  self.villageName = user .objectForKey("villageName") as NSString
+  self.villageAddress = user .objectForKey("villageAddress") as NSString
+  self.tenementId = user .objectForKey("tenementId") as NSString
+  self.shopId = user .objectForKey("shopId") as NSString
+  self.telephoneNum = user .objectForKey("telephoneNum") as NSString
+ 
+  self.residendId = user .objectForKey("residentId") as NSString
+  self.userId = user .objectForKey("userId") as NSString
+  self.dataVersion = user .objectForKey("dataVersion") as NSString
+  self.acceptNotify = user .objectForKey("isReceiveMsg") as NSString
+  self.propertyNotify = user .objectForKey("isRecevieWy") as NSString
+  self.shopNotify = user .objectForKey("isRecevieShop") as NSString
+  self.soundNotify = user .objectForKey("isVoiceOn") as NSString
+ 
+ self.shakeNotify = user .objectForKey("isShakeOn") as NSString
+ self.cityName = user .objectForKey("cityName") as NSString
+ self.openId = user .objectForKey("openid") as NSString
+ self.weixinNickname = user .objectForKey("weixinNickname") as NSString
+ self.isBindMobile = user .objectForKey("isBindMobile") as NSString
+ self.isBindWeixin = user .objectForKey("isBindWeixin") as NSString
+ 
+ }
+ 
+ */
+-(void)initUserLogin:(NSDictionary *)user
+{
+    self.avatar = [user stringObjectForKey:@"avatarUrl"];
+    self.nickname = [user stringObjectForKey:@"nickname"];
+    self.gender =  [user stringObjectForKey:@"gender"];
+    self.favorite = [user stringObjectForKey:@"favorite"];
+    self.key = [user stringObjectForKey:@"key"];
+    self.cityId = [user stringObjectForKey:@"cityId"];
+    self.villageId = [user stringObjectForKey:@"villageId"];
+    self.villageName = [user stringObjectForKey:@"villageName"];
+    self.villageAddress = [user stringObjectForKey:@"villageAddress"];
+    self.tenementId = [user stringObjectForKey:@"tenementId"];
+    self.shopId = [user stringObjectForKey:@"shopId"];
+    self.telephoneNum = [user stringObjectForKey:@"telephoneNum"];
+    self.residendId = [user stringObjectForKey:@"residentId"];
+    self.userId = [user stringObjectForKey:@"userId"];
+    self.dataVersion = [user stringObjectForKey:@"dataVersion"];
+    self.acceptNotify = [user stringObjectForKey:@"isReceiveMsg"];
+    self.propertyNotify = [user stringObjectForKey:@"isRecevieWy"];
+    self.shopNotify = [user stringObjectForKey:@"isRecevieShop"];
+    self.soundNotify = [user stringObjectForKey:@"isVoiceOn"];
+    self.shakeNotify = [user stringObjectForKey:@"isShakeOn"];
+    self.cityName = [user stringObjectForKey:@"cityName"];
+    self.openId = [user stringObjectForKey:@"openid"];
+    self.weixinNickname = [user stringObjectForKey:@"weixinNickname"];
+    self.coStatus = [user stringObjectForKey:@"coStatus"];
+    self.isAuth = [user stringObjectForKey:@"isAuth"];
+    self.isBindMobile = [user stringObjectForKey:@"isBindMobile"];
+    self.isBindWeixin = [user stringObjectForKey:@"isBindWeixin"];
+    self.deviceId = [user stringObjectForKey:@"deviceId"];
+    self.source = [user stringObjectForKey:@"source"];
+}
+/*
+ 第三方的库
+ class func clearLastLogin()
+ {
+ 
+ 
+ }
+*/
++ (void)clearLastLogin
+{
+    [SFHFKeychainUtils deleteItemForUsername:kHWKeychainAccount andServiceName:kHWKeychainServiceName error:nil];
+    [SFHFKeychainUtils deleteItemForUsername:kHWKeychainPassword andServiceName:kHWKeychainServiceName error:nil];
+}
+
+/*
+ 
+ func setkey(akey:NSString)
+ {
+    self.key = akey
+ }
+ 
+*/
+
+- (void)setKey:(NSString *)akey
+{
+    key = akey;
+    
+}
+
+- (BOOL)getLastLogin
+{
+    NSString *account = [SFHFKeychainUtils getPasswordForUsername:kHWKeychainAccount andServiceName:kHWKeychainServiceName error:nil];
+    NSString *pwd = [SFHFKeychainUtils getPasswordForUsername:kHWKeychainPassword andServiceName:kHWKeychainServiceName error:nil];
+    
+    if (account == nil || pwd == nil)
+    {
+        return NO;
+    }
+    
+    self.username = account;
+    self.password = pwd;
+    return YES;
+}
+
+- (void)updateLastLogin
+{
+    if (self.username != nil && self.password != nil)
+    {
+        [SFHFKeychainUtils storeUsername:kHWKeychainAccount andPassword:self.username forServiceName:kHWKeychainServiceName updateExisting:YES error:nil];
+        [SFHFKeychainUtils storeUsername:kHWKeychainPassword andPassword:self.password forServiceName:kHWKeychainServiceName updateExisting:YES error:nil];
+    }
+}
+
+/**
+ *	@brief	验证是否绑定过手机号
+ *
+ *	@param 	viewController 	绑定成功后 返回的viewcontroller
+ *  @param  isShow          是否显示alert 提示
+ *
+ *	@return  是否绑定过
+ */
+
+/*
+ class func verifyBindMobileWithPopVC(viewController:UIViewController, isShow:Bool) ->Bool  
+ 
+ {
+ var currentUserLogin  = HWUserLogin()
+ if currentUserLogin.usernameField .isEqualToString("1")
+ {
+ return true
+ }
+ if isShow
+ {
+ var alert:UIAlertView = UIAlertView(title: "提示", message: "未绑定手机号，是否绑定", delegate: nil, cancelButtonTitle: "取消", otherButtonTitles: "确定", nil...)
+ 
+ 下面是回调还没写。。。。。。。。
+ 
+ 
+ }
+ }
+*/
+
+#pragma mark - 是否绑定手机号校验
++ (BOOL)verifyBindMobileWithPopVC:(UIViewController *)viewController showAlert:(BOOL)isShow
+{
+    
+    if ([[HWUserLogin currentUserLogin].isBindMobile isEqualToString:@"1"])
+    {
+        return YES;
+    }
+    
+    if (![Utility isWeiXinUser])
+    {
+        return YES;
+    }
+
+    if (isShow)
+    {
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"提示" message:@"需要绑定手机才能继续，是否绑定" delegate:nil cancelButtonTitle:@"取消" otherButtonTitles:@"确定", nil];
+        [alert showAlertViewWithCompleteBlock:^(NSInteger buttonIndex) {
+            
+            if (buttonIndex == 1)
+            {
+                HWNewUserBindViewController *bindMobileVC = [[HWNewUserBindViewController alloc] init];
+                bindMobileVC.isBind = YES;
+                if([Utility isGuestLogin] == YES && [[HWUserLogin currentUserLogin].isBindMobile  isEqual: @"0"])
+                {
+                    bindMobileVC.isGuest = YES;
+                }
+                bindMobileVC.bindPopViewController = viewController;
+                [viewController.navigationController pushViewController:bindMobileVC animated:YES];
+            }
+            
+        }];
+    }
+    else
+    {
+        HWNewUserBindViewController *bindMobileVC = [[HWNewUserBindViewController alloc] init];
+        bindMobileVC.isBind = YES;
+        bindMobileVC.bindPopViewController = viewController;
+        [viewController.navigationController pushViewController:bindMobileVC animated:YES];
+    }
+    
+    return NO;
+}
+
+#pragma mark - 是否登录校验
++ (BOOL)verifyIsLoginWithPresentVC:(UIViewController *)viewController toViewController:(UIViewController *)toViewController
+{
+    if (![Utility isGuestLogin])
+    {
+        return YES;
+    }
+    
+    HWReLoginViewController *reLoginVC = [[HWReLoginViewController alloc] init];
+    if (toViewController)
+    {
+        [reLoginVC addChildViewController:toViewController];
+    }
+    
+//    CATransition *animation = [CATransition animation];
+//    [animation setDuration:0.4];
+//    [animation setType: kCATransitionMoveIn];
+//    [animation setSubtype: kCATransitionFromTop];
+//    [animation setTimingFunction:[CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionDefault]];
+//    [viewController.navigationController pushViewController:reLoginVC animated:NO];
+//    [viewController.navigationController.view.layer addAnimation:animation forKey:nil];
+    
+    HWBaseNavigationController *nav = [[HWBaseNavigationController alloc] initWithRootViewController:reLoginVC];
+    [viewController.navigationController presentViewController:nav animated:YES completion:nil];
+    
+    return NO;
+}
+
+#pragma mark - 认证权限校验
++ (BOOL)verifyIsAuthenticationWithPopVC:(UIViewController *)viewController showAlert:(BOOL)isShow
+{
+    if ([[HWUserLogin currentUserLogin].coStatus isEqualToString:@"0"]) //在合作物业
+    {
+        if ([[HWUserLogin currentUserLogin].isAuth isEqualToString:@"1"])   //未认证
+        {
+            [self queryForAuthStatus:viewController isShow:isShow];
+            
+            return NO;
+        }
+        else
+        {
+            return YES;
+        }
+    }
+    else
+    {
+        return YES;
+    }
+}
+
++ (void)queryForAuthStatus:(UIViewController *)currentVC isShow:(BOOL)isShow
+{
+    /*URL：me/index.do
+     入参：
+     key 用户key
+     返回参数：
+     在原有的基础上添加【authStatus】（authStatus：0：审核中；1：已审核；2：已认证、3：未认证）*/
+    
+    NSMutableDictionary *parame = [[NSMutableDictionary alloc] init];
+    [parame setPObject:[HWUserLogin currentUserLogin].key forKey:@"key"];
+    
+    HWHTTPRequestOperationManager *queryManager = [HWHTTPRequestOperationManager manager];
+    [queryManager POST:kMeIndex parameters:parame queue:nil success:^(id responese)
+     {
+         NSLog(@"%@",responese);
+         NSDictionary *dataDict = [responese dictionaryObjectForKey:@"data"];
+         NSString *authStatus = [dataDict stringObjectForKey:@"authStatus"];
+         
+         NSString *applyAddress = [dataDict stringObjectForKey:@"applyAddress"];
+         BOOL isWuYeAuth = NO;
+         if (applyAddress.length == 0)
+         {
+             isWuYeAuth = YES;
+         }
+         else
+         {
+             isWuYeAuth = NO;
+         }
+         
+         NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+         [defaults setObject:[dataDict stringObjectForKey:@"buildingNo"] forKey:kAuthBuildingNo];
+         [defaults setObject:[dataDict stringObjectForKey:@"unitNo"] forKey:kAuthUnitNo];
+         [defaults setObject:[dataDict stringObjectForKey:@"roomNo"] forKey:kAuthRoomNo];
+         [defaults setObject:[dataDict stringObjectForKey:@"applyId"] forKey:kAuthApplyId];
+         [defaults synchronize];
+         
+         [self authAciton:currentVC authStatus:authStatus isWuYeAuth:isWuYeAuth isShow:isShow];
+         
+     } failure:^(NSString *code, NSString *error) {
+         
+         AppDelegate *delegate = (AppDelegate *)SHARED_APP_DELEGATE;
+         [Utility showToastWithMessage:error inView:delegate.window];
+         
+     }];
+}
+
++ (void)authAciton:(UIViewController *)currentVC authStatus:(NSString *)authStatus isWuYeAuth:(BOOL)isWuYeAuth isShow:(BOOL)isShow
+{
+    if (authStatus.length == 0 || [authStatus isEqual:@"3"])//（authStatus：0：审核中；1：已审核；2：已认证、3：未认证）
+    {
+        if (isShow)
+        {
+            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"提示" message:@"您还未认证为本小区业主，是否认证？" delegate:nil cancelButtonTitle:@"取消" otherButtonTitles:@"认证", nil];
+            [alert showAlertViewWithCompleteBlock:^(NSInteger buttonIndex) {
+                
+                if (buttonIndex == 1)
+                {
+                    //去申请认证
+                    HWAuthenticateViewController *vc = [[HWAuthenticateViewController alloc] init];
+                    [currentVC.navigationController pushViewController:vc animated:YES];
+                }
+            }];
+        }
+        else
+        {
+            //去申请认证
+            HWAuthenticateViewController *vc = [[HWAuthenticateViewController alloc] init];
+            [currentVC.navigationController pushViewController:vc animated:YES];
+        }
+    }
+    else if ([authStatus isEqual:@"0"])
+    {
+        if (isShow)
+        {
+            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"提示" message:@"您的认证申请正在审核，请耐心等待" delegate:nil cancelButtonTitle:@"取消" otherButtonTitles:@"认证", nil];
+            [alert showAlertViewWithCompleteBlock:^(NSInteger buttonIndex) {
+                
+                if (buttonIndex == 1)
+                {
+                    if (isWuYeAuth)
+                    {
+                        HWWuYeAuthenticateScdVC *svc = [[HWWuYeAuthenticateScdVC alloc] init];
+                        [currentVC.navigationController pushViewController:svc animated:YES];
+                    }
+                    else
+                    {
+                        //审核中 等待审核
+                        HWAuthenticateWaitMailViewController *vc = [[HWAuthenticateWaitMailViewController alloc] init];
+                        [currentVC.navigationController pushViewController:vc animated:YES];
+                    }
+                }
+            }];
+        }
+        else
+        {
+            if (isWuYeAuth)
+            {
+                HWWuYeAuthenticateScdVC *svc = [[HWWuYeAuthenticateScdVC alloc] init];
+                [currentVC.navigationController pushViewController:svc animated:YES];
+            }
+            else
+            {
+                //审核中 等待审核
+                HWAuthenticateWaitMailViewController *vc = [[HWAuthenticateWaitMailViewController alloc] init];
+                [currentVC.navigationController pushViewController:vc animated:YES];
+            }
+        }
+    }
+    else if ([authStatus isEqual:@"1"])
+    {
+        if (isShow)
+        {
+            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"提示" message:@"认证资料已寄出，请及时查收提交验证码" delegate:nil cancelButtonTitle:@"取消" otherButtonTitles:@"认证", nil];
+            [alert showAlertViewWithCompleteBlock:^(NSInteger buttonIndex) {
+                
+                if (buttonIndex == 1)
+                {
+                    if (isWuYeAuth)
+                    {
+                        HWWuYeAuthenticateScdVC *svc = [[HWWuYeAuthenticateScdVC alloc] init];
+                        [currentVC.navigationController pushViewController:svc animated:YES];
+                    }
+                    else
+                    {
+                        //已审核 填写验证码
+                        HWAuthenticateConfirmViewController *vc = [[HWAuthenticateConfirmViewController alloc] init];
+                        [currentVC.navigationController pushViewController:vc animated:YES];
+                    }
+                }
+            }];
+        }
+        else
+        {
+            if (isWuYeAuth)
+            {
+                HWWuYeAuthenticateScdVC *svc = [[HWWuYeAuthenticateScdVC alloc] init];
+                [currentVC.navigationController pushViewController:svc animated:YES];
+            }
+            else
+            {
+                //已审核 填写验证码
+                HWAuthenticateConfirmViewController *vc = [[HWAuthenticateConfirmViewController alloc] init];
+                [currentVC.navigationController pushViewController:vc animated:YES];
+            }
+        }
+    }
+    else if ([authStatus isEqual:@"1"])
+    {
+        [HWUserLogin currentUserLogin].isAuth = @"0";
+    }
+}
+
+#pragma mark -
+/**
+ *	@brief	注销用户
+ *
+ *	@return	N/A
+ */
+/*
+ func userLogout()
+ {
+    self.headImage = nil
+    调用方法没写。。。。。。
+ self.username = nil
+ self.password = nil
+ self.key = nil
+ NSUserDefaults .standardUserDefaults() .removeObjectForKey("写的参数")
+ NSUserDefaults .standardUserDefaults() .removeObjectForKey("写的参数")
+ NSUserDefaults .standardUserDefaults() .removeObjectForKey("写的参数")
+ HWCoreDataManager .clearNeighbourList()
+ HWCoreDataManager .clearPropertyData()
+ HWCoreDataManager .clearPropertyList()
+ HWCoreDataManager .clearShopList()
+ HWCoreDataManager .clearUserInfo()
+ HWCoreDataManager .removeAllDynamic()
+ var currentManager = HWNetWorkManager()
+ currentManager .clearRequest()
+ 推送没写。。。。。。
+ var aa = NSUserDefaults()
+ aa .setObject("0", forKey: "自己定义的")
+ aa .setObject("0", forKey: "自己定义的")
+ }
+ 
+ 
+ 
+ */
+- (void)userLogout
+{
+    [HWUserLogin currentUserLogin].headImage = nil; //亦或者使用默认头像？
+    [HWUserLogin clearLastLogin];
+    [HWUserLogin currentUserLogin].totalMoney = @"0";
+    [HWUserLogin currentUserLogin].alertTimeArray = [[NSMutableArray alloc] init];
+    self.username = nil;
+    self.password = nil;
+    self.key = nil;
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:kFirstRent];
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:kHaveDialing];
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:kFirstGetMoney];
+    
+    [HWCoreDataManager clearNeighbourList];
+    [HWCoreDataManager clearPropertyData];
+    [HWCoreDataManager clearPropertyList];
+    [HWCoreDataManager clearShopList];
+    [HWCoreDataManager clearUserInfo];
+    [HWCoreDataManager removeAllAlertItme];
+    [HWCoreDataManager removeAllChannelItemForPastRecords];
+    [HWCoreDataManager removeAllChannelItemForRecommend];
+    [HWCoreDataManager removeAllBannerModel];
+    
+    
+    [[HWNetWorkManager currentManager] clearRequest];   //清空赞
+    
+    [APService setTags:[NSSet set] alias:@"" callbackSelector:nil object:nil];
+    
+    NSUserDefaults *userDefault = [NSUserDefaults standardUserDefaults];
+    [userDefault setObject:@"0" forKey:kFirstCheckTouchID];
+    [userDefault setObject:@"0" forKey:kAgreeProtocol];
+    [userDefault setObject:@"0" forKey:@"villageTalkCount"];    //邻居说清空
+    [userDefault setObject:@"0" forKey:@"cityTalkCount"];   //同城说清空
+}
+
+- (void)loadUserAlertTime
+{
+    self.alertTimeArray = (NSMutableArray *)[HWCoreDataManager searchAllAlertTime];
+}
+
+- (void)saveUserAlertTime:(HWAlertModel *)model
+{
+    HWAlertModel *result = nil;
+    for (int i = 0; i < self.alertTimeArray.count; i++)
+    {
+        HWAlertModel *alertModel = [self.alertTimeArray objectAtIndex:i];
+        if ([alertModel.goodsId isEqualToString:model.goodsId])
+        {
+            result = alertModel;
+            break;
+        }
+    }
+    
+    if (result != nil)
+    {
+        [self.alertTimeArray removeObject:result];
+    }
+    
+    [self.alertTimeArray addObject:model];
+    [HWCoreDataManager addAlertTime:self.alertTimeArray];
+}
+
++ (BOOL)isExistAlertByGoodsId:(NSString *)goodsId
+{
+    HWUserLogin *user = [HWUserLogin currentUserLogin];
+    if (user.alertTimeArray != nil)
+    {
+        HWAlertModel *result = nil;
+        for (int i = 0; i < user.alertTimeArray.count; i++)
+        {
+            HWAlertModel *alertModel = [user.alertTimeArray objectAtIndex:i];
+            if ([alertModel.goodsId isEqualToString:goodsId])
+            {
+                result = alertModel;
+                break;
+            }
+        }
+        if (result != nil)
+        {
+            return YES;
+        }
+        
+    }
+    return NO;
+}
+
+- (void)removeAlertItemById:(NSString *)goodsId
+{
+    // shan  memory
+    [HWCoreDataManager removeAlertItmeByGoodsId:goodsId];
+    HWUserLogin *user = [HWUserLogin currentUserLogin];
+    if (user.alertTimeArray != nil)
+    {
+//        HWAlertModel *result = nil;
+        for (int i = 0; i < user.alertTimeArray.count; i++)
+        {
+            HWAlertModel *alertModel = [user.alertTimeArray objectAtIndex:i];
+            if ([alertModel.goodsId isEqualToString:goodsId])
+            {
+                [user.alertTimeArray removeObjectAtIndex:i];
+                break;
+            }
+        }
+    }
+}
+
+#pragma mark - Locate
+#pragma mark - Locate
+/*
+ func startLocating()
+ {
+   这是第三方库的，，没写。。。。。。
+ 
+ }
+ 
+ 
+*/
+- (void)startLocating
+{
+    
+    //    //nslog(@"%d",[CLLocationManager authorizationStatus]);
+    
+    if([CLLocationManager locationServicesEnabled]) {
+        self.manager = [[CLLocationManager alloc] init];
+        if ([self.manager respondsToSelector:@selector(requestWhenInUseAuthorization)]) {
+            [self.manager requestWhenInUseAuthorization];
+        }
+        //设置定位的精度
+        [self.manager setDesiredAccuracy:kCLLocationAccuracyNearestTenMeters];
+        self.manager.delegate = self;
+        if (IOS8)
+        {
+//            [self.manager requestAlwaysAuthorization];
+            [self.manager requestWhenInUseAuthorization];
+        }
+        
+
+        //开始实时定位
+        [self.manager startUpdatingLocation];
+    }
+}
+/*
+
+func locationManager(manager:CLLocationManager, locations:NSArray)
+ {
+ 
+ var location = CLLocation()
+ location =  locations .lastObject
+  导入第三方的库就没有写了。。。。。。
+ 
+ }
+ 
+ 
+ 
+*/
+- (void)locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray *)locations {
+    CLLocation *location = [locations lastObject];
+    CLLocationCoordinate2D coordinate = location.coordinate;
+    [HWUserLogin currentUserLogin].longitude = coordinate.longitude;
+    [HWUserLogin currentUserLogin].latitude = coordinate.latitude;
+    
+    
+    CLGeocoder *geocoder = [[CLGeocoder alloc] init];
+    [geocoder reverseGeocodeLocation:location
+                   completionHandler:^(NSArray *placemarks, NSError *error){
+                       
+                       if (error)
+                       {
+                           
+                           NSLog(@"location is error");
+                       }
+                       for (CLPlacemark *place in placemarks)
+                       {
+                           NSString *city = place.locality;
+//                           if (city == nil)
+//                           {
+                               city = [place.addressDictionary objectForKey:@"State"];
+//                           }
+                           NSString *area = [place.addressDictionary objectForKey:@"SubLocality"];
+//                           NSString *cityIdTemp = [Utility getCityId:city];
+                           [HWUserLogin currentUserLogin].saveFrontGpsCityIdStr = [Utility getCityId:city];
+                           [HWCoreDataManager saveUserInfo];
+                           NSString *areaIdTemp = [Utility getCityAreaId:area city:city];
+                           //保存本地
+                           //[HWUserLogin currentUserLogin].cityName = city;
+                           [HWUserLogin currentUserLogin].gpsCityName = city;
+                           //[HWUserLogin currentUserLogin].cityId = cityIdTemp;
+                           [HWUserLogin currentUserLogin].areaId = areaIdTemp;
+                            [[NSNotificationCenter defaultCenter] postNotificationName:pLocatedCityChanged object:nil];
+                           NSLog(@"当前城市ID是%@,区域id是%@",cityId,areaId);
+                       }
+                   }];
+    [self.manager stopUpdatingLocation];
+}
+
+#pragma mark -
+#pragma mark        登录后操作  保存登录信息等
+/*
+ 
+ func handleLoginInfo(dataDic:NSDictionary, ctrl:UIViewController)
+ {
+ 
+    self .initUserLogin(dataDic)
+    NSNotificationCenter .defaultCenter() .postNotificationName("这里写自己定义的名字", object: nil)
+ 
+  这是oc的语言
+  AppDelegate *appDel = (AppDelegate *)SHARED_APP_DELEGATE;
+ [appDel.tabBarVC.navigationController popToRootViewControllerAnimated:YES];
+ [appDel.tabBarVC setSelectedIndex:0];
+ HWCoreDataManager .saveUserInfo()
+ self .getCityNewestList()
+ self .judgePopAreaPage(dataDic, ctrl)
+ self .getWalletMoney()
+ let str  =  dataDic .objectForKey("avatarUrl") as String
+  self .getUserPhotoImage(str)
+ }
+  */
+
+- (void)handleLoginInfo:(NSDictionary *)dataDic operationController:(UIViewController *)ctrl
+{
+    [[HWUserLogin currentUserLogin] userLogout];
+    
+    [[HWUserLogin currentUserLogin] initUserLogin:dataDic];
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:RELOAD_APP_DATA object:nil];
+    
+    AppDelegate *appDel = (AppDelegate *)SHARED_APP_DELEGATE;
+    [appDel.tabBarVC.navigationController popToRootViewControllerAnimated:YES];
+    [appDel.tabBarVC setSelectedIndex:0];
+    [HWCoreDataManager saveUserInfo]; // 保存数据库
+    [self getCityNewestList];
+    [self judgePopAreaPage:dataDic operationController:ctrl];
+    [self getWalletMoney];
+    [self getUserPhotoImage:[dataDic stringObjectForKey:@"avatarUrl"]];
+}
+
+#pragma - mark - 获得用户头像
+/*
+func getUserPhotoImage(avatarUrlStr:NSString)
+ {
+  NSError *error;
+  NSData *data = [NSData dataWithContentsOfURL:[NSURL URLWithString:[Utility imageDownloadUrl:avatarUrlStr]] options:0 error:&error];
+ if data.length>0
+ {
+ var image  = UIImage(data: data)
+ self.headImage = image
+ }
+ else
+ {
+ self.headImage = UIImage(named: "head_placeholder")
+ }
+ 
+ }
+ }
+ */
+- (void)getUserPhotoImage:(NSString *)avatarUrlStr
+{
+    NSError *error;
+    NSData *data = [NSData dataWithContentsOfURL:[NSURL URLWithString:[Utility imageDownloadUrl:avatarUrlStr]] options:0 error:&error];
+//    NSLog(@"image data = %@",data);
+//    NSLog(@"error = %@",error);
+    if (data.length > 0)
+    {
+        UIImage *image = [UIImage imageWithData:data];
+        [HWUserLogin currentUserLogin].headImage = image;
+    }
+    else
+    {
+        [HWUserLogin currentUserLogin].headImage = [UIImage imageNamed:@"head_placeholder"];
+    }
+}
+
+#pragma - mark 获取钱包余额
+
+/*
+ 
+ func getWalletMoney()
+ {
+   这是请求的，没有写了。。。。
+ 
+ }
+ 
+ */
+- (void)getWalletMoney
+{
+    HWHTTPRequestOperationManager *manage = [HWHTTPRequestOperationManager accountManager];
+    NSMutableDictionary *dict = [[NSMutableDictionary alloc] init];
+    [dict setPObject:self.key forKey:@"key"];
+    
+    [manage POST:kWalletRemainMoney parameters:dict queue:nil success:^(id responseObject) {
+        NSDictionary *respDic = (NSDictionary *)[responseObject dictionaryObjectForKey:@"data"];
+        [HWUserLogin currentUserLogin].totalMoney = [respDic stringObjectForKey:@"amount"];
+        NSString * _walletMoneyStr = [respDic stringObjectForKey:@"amount"];
+        if([_walletMoneyStr length]==0)
+        {
+            _walletMoneyStr = @"0";
+            [HWUserLogin currentUserLogin].totalMoney = _walletMoneyStr;
+        }
+        else
+        {
+            [HWUserLogin currentUserLogin].totalMoney = _walletMoneyStr;
+        }
+    } failure:^(NSString *code, NSString *error) {
+        [HWUserLogin currentUserLogin].totalMoney = @"0";
+    }];
+}
+
+//获取城市列表
+/*
+ 
+ func getCityNewestList()
+ {
+ 
+ oc 的语言--------*******---------
+ NSString *documentsDirectory = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject];
+ NSString *filePath = [documentsDirectory stringByAppendingPathComponent:@"city.txt"];
+ 
+ -------------***********--------
+  if NSFileManager .defaultManager() .fileExistsAtPath(filePath)
+ {
+   var fileDataArry  = NSMutableArray (contentsOfFile: filePath)
+   self .handleDataWithArry(fileDataArry)
+ }
+ 
+ else
+ {
+ var path = NSBundle .mainBundle() .pathForResource("city", ofType: "txt")
+ 
+ var fileDataArry  = NSMutableArray (contentsOfFile: filePath)
+ self .handleDataWithArry(fileDataArry)
+
+ }
+  oc的-----------******--------
+ HWHTTPRequestOperationManager *managerTemp = [HWHTTPRequestOperationManager manager];
+ NSMutableDictionary *dict = [NSMutableDictionary dictionary];
+ NSString *dataVersionStr  =  [HWUserLogin currentUserLogin].dataVersion;
+ if ([dataVersionStr isEqualToString:@""]) {
+ [dict setPObject:@"0" forKey:@"dateVersion"];
+ }
+ else
+ {
+ [dict setPObject:dataVersionStr forKey:@"dateVersion"];
+ }
+ [HWUserLogin currentUserLogin].dataVersion = dataVersionStr;
+ [dict setPObject:[HWUserLogin currentUserLogin].key forKey:@"key"];
+ [managerTemp POST:kGetCityList parameters:dict queue:nil success:^(id responseObject){
+ NSDictionary *dataDic = (NSDictionary*)[responseObject objectForKey:@"data"];     NSMutableArray *allCitys = [dataDic objectForKey:@"cityList"];
+ [self handleDataWithArry:allCitys];
+ 
+ dispatch_queue_t queue = dispatch_queue_create("com.dispatch.concurrent", NULL);
+ dispatch_async(queue, ^{
+ 
+ NSString *documentsDirectory = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject];
+ NSString *savedPath=[documentsDirectory stringByAppendingPathComponent:@"city.txt"];
+ [allCitys writeToFile:savedPath atomically:YES];
+ NSString *cityId = [Utility getCityId:[HWUserLogin currentUserLogin].gpsCityName];
+ [HWUserLogin currentUserLogin].gpsCityId = cityId;
+ [HWCoreDataManager saveUserInfo];
+ });
+ 
+ [HWUserLogin currentUserLogin].dataVersion = [dataDic stringObjectForKey:@"dataVersion"];
+ [HWCoreDataManager saveUserInfo];
+ } failure:^(NSString *code, NSString *error) {
+ NSLog(@"error");
+ //[self startLocating];
+ }];
+
+ --------------************-----------------
+ 
+
+ }
+ 
+ 
+ */
+-(void)getCityNewestList
+{
+    //获取所在城市的区域
+    NSString *documentsDirectory = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject];
+    NSString *filePath = [documentsDirectory stringByAppendingPathComponent:@"city.txt"];
+    if ([[NSFileManager defaultManager] fileExistsAtPath:filePath])
+    {
+        NSMutableArray *fileDataArry = [NSMutableArray arrayWithContentsOfFile:filePath];
+        [self handleDataWithArry:fileDataArry];
+    }
+    else
+    {
+        NSString *path = [[NSBundle mainBundle] pathForResource:@"city" ofType:@"txt"];
+        NSMutableArray *fileDataArry = [NSMutableArray arrayWithContentsOfFile:path];
+        [self handleDataWithArry:fileDataArry];
+    }
+    HWHTTPRequestOperationManager *managerTemp = [HWHTTPRequestOperationManager manager];
+    NSMutableDictionary *dict = [NSMutableDictionary dictionary];
+    NSString *dataVersionStr  =  [HWUserLogin currentUserLogin].dataVersion;
+    if ([dataVersionStr isEqualToString:@""]) {
+        [dict setPObject:@"0" forKey:@"dateVersion"];
+    }
+    else
+    {
+        [dict setPObject:dataVersionStr forKey:@"dateVersion"];
+    }
+    [HWUserLogin currentUserLogin].dataVersion = dataVersionStr;
+    [dict setPObject:[HWUserLogin currentUserLogin].key forKey:@"key"];
+    [managerTemp POST:kGetCityList parameters:dict queue:nil success:^(id responseObject){
+        NSDictionary *dataDic = (NSDictionary*)[responseObject objectForKey:@"data"];     NSMutableArray *allCitys = [dataDic objectForKey:@"cityList"];
+        [self handleDataWithArry:allCitys];
+        
+        dispatch_queue_t queue = dispatch_queue_create("com.dispatch.concurrent", NULL);
+        dispatch_async(queue, ^{
+            
+            NSString *documentsDirectory = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject];
+            NSString *savedPath=[documentsDirectory stringByAppendingPathComponent:@"city.txt"];
+            [allCitys writeToFile:savedPath atomically:YES];
+            NSString *cityId = [Utility getCityId:[HWUserLogin currentUserLogin].gpsCityName];
+            [HWUserLogin currentUserLogin].gpsCityId = cityId;
+            [HWCoreDataManager saveUserInfo];
+        });
+        
+        [HWUserLogin currentUserLogin].dataVersion = [dataDic stringObjectForKey:@"dataVersion"];
+        [HWCoreDataManager saveUserInfo];
+    } failure:^(NSString *code, NSString *error) {
+        NSLog(@"error");
+        //[self startLocating];
+    }];
+}
+
+
+/*
+   func handleDataWithArry(dataArry:NSMutableArray)
+ 
+ {
+  var allCity = NSMutableArray()
+  var hotCity = NSMutableArray()
+ 
+ for var i = 0 ;i < ary.count; i++
+ {
+ var cityDic = ary .objectAtIndex(i) as NSDictionary
+ 
+ oc 的---------******-----------
+    HWCityClass *cityClass = [[HWCityClass alloc] initWithDictionary:cityDic];
+   --------********-------------
+  allCity .addObject(cityClass)
+ if cityClass.hotStr .isEqualToString("1")
+ {
+    hotCity .addObject(cityClass)
+
+
+ }
+ 
+ }
+  self.cities = allCity
+   self.hotArry = hotCity
+
+ 
+ }
+ 
+*/
+- (void)handleDataWithArry:(NSMutableArray *)dataArry
+{
+    NSMutableArray *allCity = [NSMutableArray array];
+    NSMutableArray *hotCity = [NSMutableArray array];
+    for (int j = 0; j < dataArry.count; j++)
+    {
+        NSDictionary *cityDic = [dataArry pObjectAtIndex:j];
+        HWCityClass *cityClass = [[HWCityClass alloc] initWithDictionary:cityDic];
+        [allCity addObject:cityClass];
+        
+        if ([cityClass.hotStr isEqualToString:@"1"]) {
+            [hotCity addObject:cityClass];
+        }
+    }
+    [HWUserLogin currentUserLogin].cities = allCity;
+    [HWUserLogin currentUserLogin].hotArry = hotCity;
+}
+
+//判断是否跳出选择区域页面（上行短信是没有选择的）
+
+/*
+ func judgePopAreaPage(dic:NSDictionary, ctrl:UIViewController)
+ {
+   var user = HWUserLogin()
+   if user.nickname .isEqualToString("")
+ {
+   let nickVC = HWRegisterFourthViewController()
+   nickVC.telephoneNum = user.telephoneNum
+   ctrl.navigationController .pushViewController:communityView animated:true
+ }
+ else if user.villageId .isEqualToString("")
+ {  
+     let communityView = HWLocationChangeViewController()
+     communityView.locationChangeFlag = true
+     communityView.navigationController .pushViewController:communityView animated:true
+ }
+ 
+ else
+ 
+ {
+ --------------***********---------------
+ [APService setTags:[NSSet set] alias:@"" callbackSelector:nil object:nil];
+ [APService setTags:[NSSet setWithObjects:[Utility getCityNameById:[HWUserLogin currentUserLogin].cityId], [HWUserLogin currentUserLogin].villageId, nil] alias:[HWUserLogin currentUserLogin].telephoneNum callbackSelector:@selector(tagsAliasCallback:tags:alias:) object:self];
+ [ctrl dismissViewControllerAnimated:YES completion:nil];
+ --------------**********---------------
+ }
+ }
+ 
+ 
+ 
+ */
+- (void)judgePopAreaPage:(NSDictionary *)dic operationController:(UIViewController *)ctrl
+{
+    HWUserLogin *user = [HWUserLogin currentUserLogin];
+    
+    if ([user.nickname isEqualToString:@""])
+    {
+        HWRegisterFourthViewController *nickVC = [[HWRegisterFourthViewController alloc] init];
+        nickVC.telephoneNum = user.telephoneNum;
+        [ctrl.navigationController pushViewController:nickVC animated:YES];
+    }
+    else if ([user.villageId isEqualToString:@""])
+    {
+        HWLocationChangeViewController *communityView = [[HWLocationChangeViewController alloc]init];
+        communityView.locationChangeFlag = NO;
+        communityView.isCheckIPBindVillageId = YES;
+        [ctrl.navigationController pushViewController:communityView animated:YES];
+    }
+    else
+    {
+        [APService setTags:[NSSet set] alias:@"" callbackSelector:nil object:nil];
+        [APService setTags:[NSSet setWithObjects:[Utility getCityNameById:[HWUserLogin currentUserLogin].cityId], [HWUserLogin currentUserLogin].villageId, nil] alias:[HWUserLogin currentUserLogin].telephoneNum callbackSelector:@selector(tagsAliasCallback:tags:alias:) object:self];
+        if ([ctrl childViewControllers].count > 0 && self.isLoginToWeiXin == NO)
+        {
+            [(UINavigationController *)[[(AppDelegate *)SHARED_APP_DELEGATE window] rootViewController] pushViewController:[[ctrl childViewControllers] pObjectAtIndex:0] animated:YES];
+        }
+        [ctrl dismissViewControllerAnimated:YES completion:nil];
+    }
+}
+
+- (void)tagsAliasCallback:(int)iResCode tags:(NSSet*)tags alias:(NSString*)alias {
+    NSLog(@"rescode: %d, \ntags: %@, \nalias: %@\n", iResCode, tags , alias);
+}
+
+
+- (void)registSucceed
+{
+    [TuiGuangYuanUI customEventWithAppKey:TuiGuangYuan_APP_KEY AndAppScrect:TuiGuangYuan_APP_SECRECT AndEventCode:@"register" AndAmount:nil AndContent:nil];
+}
+
+
+@end

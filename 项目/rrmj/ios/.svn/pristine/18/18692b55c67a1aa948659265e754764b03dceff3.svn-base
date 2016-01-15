@@ -1,0 +1,177 @@
+//
+//  BaseViewController.m
+//  PUClient
+//
+//  Created by RRLhy on 15/7/17.
+//  Copyright (c) 2015年 RRLhy. All rights reserved.
+//
+
+#import "BaseViewController.h"
+#import "MyPageVC.h"
+#import "LoginVC.h"
+@interface BaseViewController ()<UIGestureRecognizerDelegate,UINavigationControllerDelegate>
+{
+    NSArray * colorArray;
+}
+@end
+
+@implementation BaseViewController
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    // Do any additional setup after loading the view.
+    
+   colorArray = @[RGBCOLOR(0.020, 0.745, 1.000),
+                   RGBCOLOR(0.133, 0.133, 0.133),
+                   RGBCOLOR(0.941, 0.188, 0.506),
+                   RGBCOLOR(0.624, 0.377, 0.753),
+                   RGBCOLOR(0.314, 0.153, 0.643),
+                   RGBCOLOR(0.149, 0.416, 0.620),
+                   RGBCOLOR(0.373, 0.620, 0.627),
+                   RGBCOLOR(0.180, 0.522, 0.373),
+                   RGBCOLOR(0.467, 0.584, 0.341),
+                   RGBCOLOR(0.576, 0.424, 0.353),
+                   RGBCOLOR(0.659, 0.580, 0.427),
+                   RGBCOLOR(0.573, 0.565, 0.545)];
+    NSInteger index = [[[NSUserDefaults standardUserDefaults] objectForKey:ColorIndex] integerValue];
+
+    self.navImage = [[UIImageView alloc]initWithFrame:CGRectMake(0, 0, Main_Screen_Width, kStatusBarHeight + kTopBarHeight)];
+//    self.navImage.image = [UIImage stretchImageWithName:@"nav_bg_me"];
+    self.navImage.backgroundColor = colorArray[index];
+    self.navImage.userInteractionEnabled = YES;
+    [self.view addSubview:self.navImage];
+    
+    self.leftBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+    [self.leftBtn setFrame:CGRectMake(0, 20, 44, 44)];
+    [self.leftBtn setImage:[UIImage imageNamed:@"nav_btn_back_n"] forState:UIControlStateNormal];
+    [self.leftBtn setImage:[UIImage imageNamed:@"nav_back_me_h"] forState:UIControlStateHighlighted];
+    [self.leftBtn addTarget:self action:@selector(popViewController) forControlEvents:UIControlEventTouchUpInside];
+    [self.leftBtn.imageView setContentMode:UIViewContentModeScaleAspectFit];
+    [self.navImage addSubview:self.leftBtn];
+    
+    self.rightBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+    [self.rightBtn setFrame:CGRectMake((Main_Screen_Width - 54), 20, 44, 44)];
+    [self.rightBtn addTarget:self action:@selector(rightBtnClick) forControlEvents:UIControlEventTouchUpInside];
+    [self.rightBtn.imageView setContentMode:UIViewContentModeScaleAspectFit];
+    [self.rightBtn setHidden:YES];
+    [self.rightBtn.titleLabel setFont:BOLDSYSTEMFONT(16)];
+    [self.navImage addSubview:self.rightBtn];
+    
+    self.titleLabel = [[UILabel alloc]initWithFrame:CGRectMake(80, 20, (Main_Screen_Width - 160), 44)];
+    self.titleLabel.font = BOLDSYSTEMFONT(18);
+    self.titleLabel.textAlignment = NSTextAlignmentCenter;
+    self.titleLabel.textColor = [UIColor whiteColor];
+    [self.navImage addSubview:self.titleLabel];
+    
+    self.titleImage = [[UIImageView alloc ]init];
+    self.titleImage.center = self.titleLabel.center;
+    self.titleImage.contentMode = UIViewContentModeScaleAspectFit;
+    [self.navImage addSubview:self.titleImage];
+
+    
+//    self.navigationItem.leftBarButtonItem =  [[UIBarButtonItem alloc]initWithImage:[UIImage imageNamed:@"nav_back_me_n"] style:UIBarButtonItemStylePlain target:self action:@selector(popViewController)];
+    
+    self.navigationController.interactivePopGestureRecognizer.delegate = self;
+    self.navigationController.interactivePopGestureRecognizer.enabled = YES;
+    self.automaticallyAdjustsScrollViewInsets = NO;
+
+    [[AFNetworkReachabilityManager sharedManager] startMonitoring];
+    [self netWorkReachabilityStatus];
+    
+    self.view.backgroundColor = [UIColor whiteColor];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(changeNavImage) name:@"changeColor" object:nil];
+}
+
+- (void)changeNavImage
+{
+    NSInteger index = [[[NSUserDefaults standardUserDefaults] objectForKey:ColorIndex] integerValue];
+    self.navImage.backgroundColor = colorArray[index];
+}
+
+#pragma mark 监听网络变化
+- (void)netWorkReachabilityStatus {
+    
+    __block BOOL reachable;
+    
+    [[AFNetworkReachabilityManager sharedManager] setReachabilityStatusChangeBlock:^(AFNetworkReachabilityStatus status) {
+        
+        switch (status) {
+            case AFNetworkReachabilityStatusNotReachable:
+                NSLog(@"No Internet Connection");
+                reachable = NO;
+                [IanAlert showLoading:@"网络已断开"];
+                break;
+            case AFNetworkReachabilityStatusReachableViaWiFi:
+                NSLog(@"WIFI");
+                
+                reachable = YES;
+                break;
+            case AFNetworkReachabilityStatusReachableViaWWAN:
+                NSLog(@"3G");
+                reachable = YES;
+                break;
+            default:
+                NSLog(@"Unkown network status");
+                reachable = NO;
+                break;
+                
+        }
+    }];
+}
+
+#pragma mark 返回上一个视图控制器
+- (void)popViewController
+{
+    [self.navigationController popViewControllerAnimated:YES];
+}
+
+#pragma mark 返回到根视图控制器
+- (void)popRootViewController
+{
+    NSArray * array = self.navigationController.viewControllers;
+    MyPageVC * myPage = (MyPageVC*)array[0];
+    [myPage reloadUIData];
+    [self.navigationController popToViewController:array[0] animated:YES];
+}
+
+#pragma mark 跳转登录界面
+- (void)skipToLoginVc
+{
+    UIStoryboard * storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
+    LoginVC * loginVC = [storyboard instantiateViewControllerWithIdentifier:@"loginVC"];
+    [self.navigationController pushViewController:loginVC animated:YES];
+}
+
+#pragma mark 请求数据
+- (void)requestData
+{
+    
+}
+
+- (void)rightBtnClick
+{
+    
+}
+
+- (UIStatusBarStyle)preferredStatusBarStyle
+{
+    return UIStatusBarStyleLightContent;
+}
+
+- (void)didReceiveMemoryWarning {
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
+}
+
+/*
+#pragma mark - Navigation
+
+// In a storyboard-based application, you will often want to do a little preparation before navigation
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+    // Get the new view controller using [segue destinationViewController].
+    // Pass the selected object to the new view controller.
+}
+*/
+
+@end

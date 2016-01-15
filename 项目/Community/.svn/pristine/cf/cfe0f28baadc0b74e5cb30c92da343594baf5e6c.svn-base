@@ -1,0 +1,269 @@
+//
+//  HWFuLiSheView.m
+//  Community
+//
+//  Created by wuxiaohong on 15/1/15.
+//  Copyright (c) 2015年 caijingpeng. All rights reserved.
+//
+//  功能描述：福利社首页 View
+//
+//  修改记录：
+//      姓名          日期                      修改内容
+//      吴晓红        2015-1-13                 创建文件
+//      聂迪          2015-1-16                 添加接口
+//      聂迪          2015－1-17                修改内容
+//      蔡景鹏         2015-1-17                接口对接
+//      魏远林        2015-01-20                给tabelView的header增添line
+
+#import "HWFuLiSheView.h"
+#import "WXImageView.h"
+#import "AppDelegate.h"
+#import "HWTreasureRuleViewController.h"
+#import "HWGoodsListViewController.h"
+#import "DCycleBanner.h"
+
+@implementation HWFuLiSheView
+@synthesize delegate;
+
+- (id)initWithFrame:(CGRect)frame
+{
+    self = [super initWithFrame:frame];
+    if (self)
+    {
+        [self initDataArr];
+        
+        [self queryListData];
+    }
+    return self;
+}
+
+- (void)queryListData
+{
+    /*
+     接口描述：福利社首页banner图查询
+     接口url：hw-sq-app-web/welfare/index.do
+     入参：villageId 小区id（必填）
+     publishModule 0懒生活，1福利社（必填）
+     
+     {"status":"1","data":{"content":[
+     {"activityId":1055629575,"activityURL":"www.baidu.com","activityName":"hhhhhhhhh","activityPictureURL":"hw-sq-app-web/banner/getBannerPicture.do?pictureId=5486ea12e4b04f63f5595958"}
+     ],"totalElements":1,"totalPages":1,"sort":null,"numberOfElements":1,"lastPage":true,"firstPage":true,"size":0,"number":0},"detail":"请求数据成功!","key":"3e801f50-10d8-44d7-9ce7-83e57fe582f1"}
+     */
+    
+    isLastPage = YES;
+    
+    HWHTTPRequestOperationManager *manage = [HWHTTPRequestOperationManager manager];
+    
+    NSMutableDictionary *dict = [[NSMutableDictionary alloc] init];
+    [dict setPObject:[HWUserLogin currentUserLogin].key forKey:@"key"];
+    [dict setPObject:[HWUserLogin currentUserLogin].villageId forKey:@"villageId"];
+    [dict setPObject:@"1" forKey:@"publishModule"];
+    [dict setPObject:@"1.7.0" forKey:@"appVersion"];//新版如果修改需要定数值
+    
+    [manage POST:KFuLiSheHomePagePic parameters:dict queue:nil success:^(id responseObject)
+     {
+         NSLog(@"%@",responseObject);
+         
+         NSArray *tempArr = [[responseObject dictionaryObjectForKey:@"data"] arrayObjectForKey:@"content"];
+         
+         self.baseListArr = [NSMutableArray array];
+         for (int i = 0; i < tempArr.count; i++)
+         {
+             [self.baseListArr addObject:[[HWActivityModel alloc] initWithAcitivity:[tempArr pObjectAtIndex:i]]];
+         }
+         
+         [self doneLoadingTableViewData];
+         
+         if (self.baseListArr.count == 0)
+         {
+             return ;
+         }
+         else
+         {
+             [self initTableViewHeadView];
+         }
+          
+         
+     } failure:^(NSString *code, NSString *error) {
+         
+         NSLog(@"error %@",error);
+         [self doneLoadingTableViewData];
+     }];
+}
+
+- (void)initDataArr
+{
+    AppDelegate *appDel = SHARED_APP_DELEGATE;
+    if ([appDel.gameBanner isEqualToString:@"0"])
+    {
+        _titleArr = @[@"优惠券", @"红包", @"无底线"];
+        _subTitleArr = @[@"商家优惠免费领", @"千万红包等你抢", @"1分钱起  抢好礼"];
+        _imgArr = @[@"fulishe_1", @"fulishe_2", @"fulishe_4"];
+    }
+    else
+    {
+        _titleArr = @[@"优惠券", @"红包", @"游戏推广", @"无底线"];
+        _subTitleArr = @[@"商家优惠免费领", @"千万红包等你抢", @"找好友，玩游戏，赚佣金", @"1分钱起  抢好礼"];
+        _imgArr = @[@"fulishe_1", @"fulishe_2", @"fulishe_3", @"fulishe_4"];
+    }
+}
+    
+/**
+ *	@brief	加载上边的图片墙
+ *
+ *	@return
+ */
+- (void)initTableViewHeadView
+{
+    UIView * tableViewHeaderView = [[UIView alloc]initWithFrame:CGRectMake(0, 0, kScreenWidth, 165 * kScreenRate)];
+    [self addSubview:tableViewHeaderView];
+    self.baseTable.tableHeaderView = tableViewHeaderView;
+    
+    //轮播banner
+    DCycleBanner *banner = [DCycleBanner cycleBannerWithFrame:CGRectMake(0, 0, kScreenWidth, 165 * kScreenRate) bannerImgCount:self.baseListArr.count];
+    [banner setImageViewAtIndex:^(UIImageView *bannerImageView, NSUInteger indexAtBanner) {
+        HWActivityModel *model = [self.baseListArr pObjectAtIndex:indexAtBanner];
+        bannerImageView.backgroundColor = IMAGE_DEFAULT_COLOR;
+        __weak UIImageView *weakImgV = bannerImageView;
+        [bannerImageView setImageWithURL:[NSURL URLWithString:[Utility imageDownloadWithUrl:model.activityPictureURL]] placeholderImage:[UIImage imageNamed:IMAGE_PLACE] completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType) {
+            if (error == nil)
+            {
+                weakImgV.image = image;
+            }
+            else
+            {
+                weakImgV.image = [UIImage imageNamed:IMAGE_BREAK_CUBE];
+            }
+        }];
+    }];
+    [banner setImageTapAction:^(NSUInteger indexAtBanner) {
+        
+        [MobClick event:@"click_benefitbanner"];  //maidian_1.2.1
+        NSLog(@"点击图片");
+        
+        if (delegate && [delegate respondsToSelector:@selector(didSelectBanner:)])
+        {
+            HWActivityModel *model = [self.baseListArr pObjectAtIndex:indexAtBanner];
+            [delegate didSelectBanner: model];
+            [self bannerClickStatisticalWithModel:model];
+        }
+    }];
+    [banner setTimerFire:YES];
+    [tableViewHeaderView addSubview:banner];
+    
+    UIView * line =[[UIView alloc]initWithFrame:CGRectMake(0, CGRectGetHeight(tableViewHeaderView.frame) - 0.5, kScreenWidth, 0.5)];
+    line.backgroundColor = THEME_COLOR_LINE;
+    [tableViewHeaderView addSubview:line];
+    
+}
+
+//banner点击统计
+- (void)bannerClickStatisticalWithModel:(HWActivityModel *)activityModel
+{
+    NSMutableDictionary *param = [[NSMutableDictionary alloc]init];
+    [param setPObject:[HWUserLogin currentUserLogin].key forKey:@"key"];
+    [param setPObject:[HWUserLogin currentUserLogin].userId forKey:@"userId"];
+    [param setPObject:activityModel.activityId forKey:@"activityId"];
+    
+    HWHTTPRequestOperationManager *manager = [HWHTTPRequestOperationManager manager];
+    [manager POST:KBannerClickStatistical parameters:param queue:nil success:^(id responese)
+     {
+         NSLog(@"banner统计 responese ========================= %@",responese);
+         
+     } failure:^(NSString *code, NSString *error) {
+         NSLog(@"banner统计错误 %@", error);
+     }];
+}
+
+- (void)pushVC:(UIViewController *)vc
+{
+    
+    if (self.delegate && [self.delegate respondsToSelector:@selector(cellSelectedPushVC:)])
+    {
+        [self.delegate cellSelectedPushVC:vc];
+    }
+    
+}
+
+- (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView
+{
+    if (scrollView.tag == 2432) {
+        
+        _pageCtr.currentPage = scrollView.contentOffset.x / kScreenWidth;
+    }
+}
+
+#pragma mark -
+#pragma mark            UITableView Delegate DataSource
+
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
+{
+    return _titleArr.count;
+}
+
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    HWFulLiSheTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"cellIdentifier"];
+    if (!cell)
+    {
+        cell = [[HWFulLiSheTableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"cellIdentifier"];
+    }
+    
+    cell.headImageView.image = [UIImage imageNamed:[_imgArr pObjectAtIndex:indexPath.row]];
+    cell.nameLable.text = [_titleArr pObjectAtIndex:indexPath.row];
+    cell.detailLable.text = [_subTitleArr pObjectAtIndex:indexPath.row];
+    
+    return cell;
+}
+
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    return [HWFulLiSheTableViewCell getCellHeight];
+}
+
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    [tableView deselectRowAtIndexPath:indexPath animated:YES];
+    
+    HWBaseViewController *vc = nil;
+    if (indexPath.row == 0)
+    {
+        vc = [[HWDiscountViewController alloc] init];
+    }
+    else if (indexPath.row == 1)
+    {
+        vc = [[HWShareViewController alloc] init];
+    }
+    else if (indexPath.row == 2)
+    {
+        AppDelegate *appDel = SHARED_APP_DELEGATE;
+        if ([appDel.gameBanner isEqualToString:@"0"])
+        {
+            [self tableView:self.baseTable didSelectRowAtIndexPath:[NSIndexPath indexPathForRow:3 inSection:0]];
+        }
+        else
+        {
+            [MobClick event:@"click_listgamespread"];   //maidian_1.2.1
+            
+            vc = [[HWGameSpreadVC alloc] init];
+        }
+    }
+    else if (indexPath.row == 3)
+    {
+        NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+        NSString *agreeFlag = [userDefaults objectForKey:kAgreeProtocol];
+        if (agreeFlag == nil || [agreeFlag isEqualToString:@"0"])
+        {
+            HWTreasureRuleViewController *tvc = [[HWTreasureRuleViewController alloc] init];
+            tvc.isAgree = YES;
+            vc = tvc;
+        }
+        else
+        {
+            vc = [[HWGoodsListViewController alloc] init];
+        }
+    }
+    [self pushVC:vc];
+}
+
+@end

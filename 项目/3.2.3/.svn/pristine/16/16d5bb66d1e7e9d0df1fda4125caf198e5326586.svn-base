@@ -1,0 +1,259 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<style>
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+blockquote {
+    margin: 0;
+    padding: 0;
+}
+body {
+    font-family: "Helvetica Neue", Helvetica, "Hiragino Sans GB", Arial, sans-serif;
+    font-size: 13px;
+    line-height: 18px;
+    color: #737373;
+    background-color: white;
+    margin: 10px 13px 10px 13px;
+}
+table {
+	margin: 10px 0 15px 0;
+	border-collapse: collapse;
+}
+td,th {	
+	border: 1px solid #ddd;
+	padding: 3px 10px;
+}
+th {
+	padding: 5px 10px;	
+}
+
+a {
+    color: #0069d6;
+}
+a:hover {
+    color: #0050a3;
+    text-decoration: none;
+}
+a img {
+    border: none;
+}
+p {
+    margin-bottom: 9px;
+}
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    color: #404040;
+    line-height: 36px;
+}
+h1 {
+    margin-bottom: 18px;
+    font-size: 30px;
+}
+h2 {
+    font-size: 24px;
+}
+h3 {
+    font-size: 18px;
+}
+h4 {
+    font-size: 16px;
+}
+h5 {
+    font-size: 14px;
+}
+h6 {
+    font-size: 13px;
+}
+hr {
+    margin: 0 0 19px;
+    border: 0;
+    border-bottom: 1px solid #ccc;
+}
+blockquote {
+    padding: 13px 13px 21px 15px;
+    margin-bottom: 18px;
+    font-family:georgia,serif;
+    font-style: italic;
+}
+blockquote:before {
+    content:"\201C";
+    font-size:40px;
+    margin-left:-10px;
+    font-family:georgia,serif;
+    color:#eee;
+}
+blockquote p {
+    font-size: 14px;
+    font-weight: 300;
+    line-height: 18px;
+    margin-bottom: 0;
+    font-style: italic;
+}
+code, pre {
+    font-family: Monaco, Andale Mono, Courier New, monospace;
+}
+code {
+    background-color: #fee9cc;
+    color: rgba(0, 0, 0, 0.75);
+    padding: 1px 3px;
+    font-size: 12px;
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    border-radius: 3px;
+}
+pre {
+    display: block;
+    padding: 14px;
+    margin: 0 0 18px;
+    line-height: 16px;
+    font-size: 11px;
+    border: 1px solid #d9d9d9;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+pre code {
+    background-color: #fff;
+    color:#737373;
+    font-size: 11px;
+    padding: 0;
+}
+sup {
+    font-size: 0.83em;
+    vertical-align: super;
+    line-height: 0;
+}
+* {
+	-webkit-print-color-adjust: exact;
+}
+@media screen and (min-width: 914px) {
+    body {
+        width: 854px;
+        margin:10px auto;
+    }
+}
+@media print {
+	body,code,pre code,h1,h2,h3,h4,h5,h6 {
+		color: black;
+	}
+	table, pre {
+		page-break-inside: avoid;
+	}
+}
+</style>
+<title>1. 产品介绍</title>
+
+</head>
+<body>
+<h2>1. 产品介绍</h2>
+
+<p>友盟社交统计SDK可以非常详尽地统计应用中发生的各种社交行为。<br/>
+如果您自己实现了分享功能，也不想切换到友盟的社会化组件，但是想使用友盟的社交统计功能，您可以采用这个非常轻量级的这个SDK，只需要调用一行代码，便可享用到丰富的社交行为和社交用户分析报表。</p>
+
+<h2>2. 集成方法</h2>
+
+<h3>1，准备社交数据</h3>
+
+<p>在你需要用统计的文件引用头文件。<code>#import "MobClickSocialAnalytics.h"</code>。当你发送微博完成之后把微博类型、拿到的微博id、用户id等字段初始化一条微博，例如下面的写法</p>
+
+<pre><code>MobClickSocialWeibo *weibo=[[MobClickSocialWeibo alloc] initWithPlatformType:@"renren" weiboId:@"1234" usid:@"67890" param:nil];
+</code></pre>
+
+<h3>2，发送社交数据</h3>
+
+<p>把微博数据发送出去，例如下面的写法：</p>
+
+<pre><code>[MobClickSocialAnalytics postWeiboCounts:@[weibo] appKey:UMENG_APPKEY topic:@"NICE DAY" completion:nil];
+</code></pre>
+
+<p><span style='color: rgb(70, 14, 248);'>至此，您的社交统计功能集成完毕，可以登录您的账号看到应用报表。</span></p>
+
+<h2>3. 方法说明</h2>
+
+<p>在你发送微博完成之后调用微博初始化方法</p>
+
+<pre><code>-(id)initWithPlatformType:(MobClickSocialTypeString)platformType weiboId:(NSString *)weiboId usid:(NSString *)usid param:(NSDictionary *)param;
+</code></pre>
+
+<table>
+<thead>
+<tr>
+<th>形参   </th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>platformType </td>
+<td>  微博平台名</td>
+</tr>
+<tr>
+<td>weiboId</td>
+<td>发送微博完成后，得到的微博id，可以设置为nil</td>
+</tr>
+<tr>
+<td>usid</td>
+<td>微博的用户id，可以设置为nil</td>
+</tr>
+<tr>
+<td>param</td>
+<td>微博相关参数，可以设置为nil</td>
+</tr>
+</tbody>
+</table>
+
+
+<p>发送微博的方法</p>
+
+<pre><code>+(void)postWeiboCounts:(NSArray *)weibos appKey:(NSString *)appKey topic:(NSString *)topic completion:(MobClickSocialAnalyticsCompletion)completion;
+</code></pre>
+
+<table>
+<thead>
+<tr>
+<th>形参   </th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>weibos </td>
+<td>  要统计的微博数组</td>
+</tr>
+<tr>
+<td>appKey</td>
+<td>友盟appkey</td>
+</tr>
+<tr>
+<td>topic</td>
+<td>话题，或者是你发送微博内容，可以设置为nil</td>
+</tr>
+<tr>
+<td>completion</td>
+<td>回调Block对象，可以设置为nil</td>
+</tr>
+</tbody>
+</table>
+
+
+<p>回调方法的使用例如传入下面的回调对象：</p>
+
+<pre><code>MobClickSocialAnalyticsCompletion completion = ^(NSDictionary *result, NSError *error) {
+    NSLog(@"result is %@",result);
+    //result里面包含分别为key为st、msg、data，分别代表错误码、错误描述、返回数据
+    //error代表网络连接等错误
+};
+</code></pre>
+</body>
+</html>

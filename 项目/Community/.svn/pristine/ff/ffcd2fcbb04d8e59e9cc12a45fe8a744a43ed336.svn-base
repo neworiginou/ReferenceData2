@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<model userDefinedModelVersionIdentifier="" type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="6244" systemVersion="13F34" minimumToolsVersion="Automatic" macOSVersion="Automatic" iOSVersion="Automatic">
+    <entity name="HWActivityItem" representedClassName="HWActivityItem" syncable="YES">
+        <attribute name="activityId" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="activityName" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="activityPictureUrl" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="activityUrl" optional="YES" attributeType="String" syncable="YES"/>
+    </entity>
+    <entity name="HWApplicationItem" representedClassName="HWApplicationItem" syncable="YES">
+        <attribute name="applicationId" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="appOrFolderIndex" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="iconMongodbKey" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="iconUrl" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="isShelves" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="name" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="type" optional="YES" attributeType="String" syncable="YES"/>
+    </entity>
+    <entity name="HWCurrentTag" representedClassName="HWCurrentTag" syncable="YES">
+        <attribute name="cardId" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="tagContent" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="tagCount" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="tagId" optional="YES" attributeType="String" syncable="YES"/>
+        <relationship name="currenttag" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="HWNeighbour" inverseName="currentTag" inverseEntity="HWNeighbour" syncable="YES"/>
+    </entity>
+    <entity name="HWNeighbour" representedClassName="HWNeighbour" syncable="YES">
+        <attribute name="anonymity" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="audioURL" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="author" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="callId" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="callName" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="callNumber" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="callTime" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="cardID" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="cardType" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="commentCount" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="content" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="coStatus" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="createCity" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="createDate" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="createId" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="createName" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="creater" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="headUrl" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="isShowReport" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="phoneHistoryId" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="pictureURL" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="shopId" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="sortId" optional="YES" attributeType="Integer 16" defaultValueString="0" syncable="YES"/>
+        <attribute name="title" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="viewRange" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="villageId" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="villageName" optional="YES" attributeType="String" syncable="YES"/>
+        <relationship name="currentTag" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="HWCurrentTag" inverseName="currenttag" inverseEntity="HWCurrentTag" syncable="YES"/>
+        <relationship name="tag" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="HWTag" inverseName="tag" inverseEntity="HWTag" syncable="YES"/>
+    </entity>
+    <entity name="HWNotification" representedClassName="HWNotification" syncable="YES">
+        <attribute name="date" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="notifyId" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="notifyname" optional="YES" attributeType="String" syncable="YES"/>
+    </entity>
+    <entity name="HWPersionDynamic" representedClassName="HWPersionDynamic" syncable="YES">
+        <attribute name="isAnonymous" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="latestReplyContent" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="latestReplyTime" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="notReadReplyCount" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="releaseType" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="replyContent" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="replyId" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="replyTime" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="replyUserIcon" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="replyUserName" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="sortId" optional="YES" attributeType="Integer 16" defaultValueString="0" syncable="YES"/>
+        <attribute name="topicAttachUrl" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="topicContent" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="topicCreater" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="topicId" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="topicPubTime" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="topicUserIcon" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="topicUserName" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="topTitle" optional="YES" attributeType="String" syncable="YES"/>
+    </entity>
+    <entity name="HWPriviledgeItem" representedClassName="HWPriviledgeItem" syncable="YES">
+        <attribute name="couponId" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="listPic" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="sortKey" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="status" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="timestr" optional="YES" attributeType="String" syncable="YES"/>
+    </entity>
+    <entity name="HWPriviledgeList" representedClassName="HWPriviledgeList" syncable="YES">
+        <attribute name="priviledgeId" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="priviledgeNum" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="priviledgeUrl" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="sortKey" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="status" optional="YES" attributeType="String" syncable="YES"/>
+    </entity>
+    <entity name="HWPropertyDetailData" representedClassName="HWPropertyDetailData" syncable="YES">
+        <attribute name="address" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="callTimes" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="intro" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="name" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="openTime" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="serviceCatagory" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="tenementId" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="tenementTel" optional="YES" attributeType="String" syncable="YES"/>
+        <relationship name="tenementTopicDtoList" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="HWPropertyDynamic" inverseName="list" inverseEntity="HWPropertyDynamic" syncable="YES"/>
+    </entity>
+    <entity name="HWPropertyDynamic" representedClassName="HWPropertyDynamic" syncable="YES">
+        <attribute name="content" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="creater" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="createTime" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="fileName" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="releaseType" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="sortId" optional="YES" attributeType="Integer 16" defaultValueString="0" syncable="YES"/>
+        <attribute name="systemTime" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="timeDistance" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="topic" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="topicId" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="url" optional="YES" attributeType="String" syncable="YES"/>
+        <relationship name="list" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="HWPropertyDetailData" inverseName="tenementTopicDtoList" inverseEntity="HWPropertyDetailData" syncable="YES"/>
+    </entity>
+    <entity name="HWPropertyItem" representedClassName="HWPropertyItem" syncable="YES">
+        <attribute name="dialCount" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="iconUrl" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="phoneNumber" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="propertyId" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="propertyName" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="publicInform" optional="YES" attributeType="String" syncable="YES"/>
+    </entity>
+    <entity name="HWShareItem" syncable="YES">
+        <attribute name="activityContent" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="activityId" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="activityTitle" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="freezeRemainMillis" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="haiwaiCountry" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="houseAddress" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="houseAvgPrice" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="houseId" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="houseName" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="housePic" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="housePromo" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="lastTime" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="localPhone" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="restMoney" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="sharedMoney" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="sharedTime" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="shareLinkTitle" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="shareState" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="shareUrl" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="sortKey" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="started" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="startTime" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="totalMoney" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="totalSharedAmount" optional="YES" attributeType="String" syncable="YES"/>
+    </entity>
+    <entity name="HWShopItem" representedClassName="HWShopItem" syncable="YES">
+        <attribute name="auditStatus" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="dialCount" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="iconUrl" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="mobileNumber" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="outSell" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="outSellPic" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="phoneNumber" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="shopId" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="shopName" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="sourceType" optional="YES" attributeType="String" syncable="YES"/>
+    </entity>
+    <entity name="HWTag" representedClassName="HWTag" syncable="YES">
+        <attribute name="cardId" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="sortId" optional="YES" attributeType="Integer 16" defaultValueString="0" syncable="YES"/>
+        <attribute name="tagContent" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="tagCount" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="tagId" optional="YES" attributeType="String" syncable="YES"/>
+        <relationship name="tag" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="HWNeighbour" inverseName="tag" inverseEntity="HWNeighbour" syncable="YES"/>
+    </entity>
+    <entity name="HWUser" representedClassName="HWUser" syncable="YES">
+        <attribute name="acceptNotify" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="avatarUrl" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="cityId" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="cityName" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="dataVersion" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="favorite" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="gender" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="gpsCityId" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="gpsCityName" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="gpsLocation" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="key" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="latitude" optional="YES" attributeType="Float" defaultValueString="0.0" syncable="YES"/>
+        <attribute name="longitude" optional="YES" attributeType="Float" defaultValueString="0.0" syncable="YES"/>
+        <attribute name="nickname" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="propertyNotify" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="residentId" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="saveFrontGpsCityId" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="shakeNotify" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="shopId" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="shopNotify" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="soundNotify" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="telephoneNum" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="tenementId" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="userId" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="villageAddress" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="villageId" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="villageName" optional="YES" attributeType="String" syncable="YES"/>
+    </entity>
+    <elements>
+        <element name="HWCurrentTag" positionX="-36" positionY="144" width="128" height="118"/>
+        <element name="HWNeighbour" positionX="-54" positionY="54" width="128" height="480"/>
+        <element name="HWNotification" positionX="-54" positionY="27" width="128" height="90"/>
+        <element name="HWPersionDynamic" positionX="-45" positionY="135" width="128" height="328"/>
+        <element name="HWPriviledgeItem" positionX="-189" positionY="162" width="128" height="118"/>
+        <element name="HWPriviledgeList" positionX="-225" positionY="126" width="128" height="118"/>
+        <element name="HWPropertyDetailData" positionX="-45" positionY="135" width="128" height="178"/>
+        <element name="HWPropertyDynamic" positionX="-36" positionY="144" width="128" height="223"/>
+        <element name="HWPropertyItem" positionX="-36" positionY="144" width="128" height="133"/>
+        <element name="HWShareItem" positionX="-45" positionY="135" width="128" height="405"/>
+        <element name="HWShopItem" positionX="-27" positionY="153" width="128" height="195"/>
+        <element name="HWTag" positionX="-425" positionY="9" width="128" height="133"/>
+        <element name="HWUser" positionX="-63" positionY="-18" width="128" height="450"/>
+        <element name="HWApplicationItem" positionX="-225" positionY="126" width="128" height="150"/>
+        <element name="HWActivityItem" positionX="-216" positionY="135" width="128" height="105"/>
+    </elements>
+</model>

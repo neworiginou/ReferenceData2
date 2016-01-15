@@ -1,0 +1,62 @@
+//
+//  MyTaskVC.m
+//  PUClient
+//
+//  Created by RRLhy on 15/8/4.
+//  Copyright (c) 2015年 RRLhy. All rights reserved.
+//
+
+#import "MyTaskVC.h"
+
+@interface MyTaskVC ()<UIWebViewDelegate>
+@property (weak, nonatomic) IBOutlet UIWebView *taskWeb;
+
+@end
+
+@implementation MyTaskVC
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    // Do any additional setup after loading the view.
+    
+    self.titleLabel.text = @"我的等级";
+    
+    NSString * token = [UserInfoConfig sharedUserInfoConfig].userInfo.token;
+    NSString * url = [NSString stringWithFormat:@"http://42.96.184.91:8080/v2/page/myTask?token=%@",token];
+    NSURLRequest *request = [NSURLRequest requestWithURL:URL(url)];
+    _taskWeb.delegate = self;
+    [_taskWeb loadRequest:request];
+
+}
+
+- (void)webViewDidStartLoad:(UIWebView *)webView
+{
+     NSLog(@"开始加载");
+}
+
+- (void)webViewDidFinishLoad:(UIWebView *)webView
+{
+    NSLog(@"加载完成");
+}
+
+- (void)webView:(UIWebView *)webView didFailLoadWithError:(NSError *)error
+{
+    NSLog(@"%@",error);
+}
+
+- (void)didReceiveMemoryWarning {
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
+}
+
+/*
+#pragma mark - Navigation
+
+// In a storyboard-based application, you will often want to do a little preparation before navigation
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+    // Get the new view controller using [segue destinationViewController].
+    // Pass the selected object to the new view controller.
+}
+*/
+
+@end
