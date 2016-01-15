@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IDESourceControlProjectFavoriteDictionaryKey</key>
+	<false/>
+	<key>IDESourceControlProjectIdentifier</key>
+	<string>196269A2-A4EF-4B2F-97CE-8BF0E28A7318</string>
+	<key>IDESourceControlProjectName</key>
+	<string>无忧云车司机</string>
+	<key>IDESourceControlProjectOriginsDictionary</key>
+	<dict>
+		<key>8CC27FE21B7E8892EE0E5DC97B2E27CE57F362F0</key>
+		<string>http://192.168.2.100:8080/scm/git/ios/wyycDriver</string>
+	</dict>
+	<key>IDESourceControlProjectPath</key>
+	<string>无忧云车司机.xcodeproj</string>
+	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
+	<dict>
+		<key>8CC27FE21B7E8892EE0E5DC97B2E27CE57F362F0</key>
+		<string>../..</string>
+	</dict>
+	<key>IDESourceControlProjectURL</key>
+	<string>http://192.168.2.100:8080/scm/git/ios/wyycDriver</string>
+	<key>IDESourceControlProjectVersion</key>
+	<integer>111</integer>
+	<key>IDESourceControlProjectWCCIdentifier</key>
+	<string>8CC27FE21B7E8892EE0E5DC97B2E27CE57F362F0</string>
+	<key>IDESourceControlProjectWCConfigurations</key>
+	<array>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>8CC27FE21B7E8892EE0E5DC97B2E27CE57F362F0</string>
+			<key>IDESourceControlWCCName</key>
+			<string>%E6%97%A0%E5%BF%A7%E4%BA%91%E8%BD%A6%E5%8F%B8%E6%9C%BA</string>
+		</dict>
+	</array>
+</dict>
+</plist>

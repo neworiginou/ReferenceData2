@@ -1,0 +1,10 @@
+[core]
+	repositoryformatversion = 0
+	filemode = true
+	bare = false
+	logallrefupdates = true
+	ignorecase = true
+	precomposeunicode = true
+[remote "origin"]
+	url = http://luosai:luosai@192.168.2.100:8080/scm/git/ios/wyycDriver
+	fetch = +refs/heads/*:refs/remotes/origin/*
