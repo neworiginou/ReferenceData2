@@ -1,0 +1,8 @@
+
+通过修改图片layer层的transform来动态改变图片的显示效果
+其中需要注意的是：
+对transform修改m11(x的缩放)，m41(x的位移
+同时修改----m41是为了达到scrollView滚动的时候，imageView跟着改变，使得相对于屏幕的位置不变，m11使为了，使当前所在页面的ImageView与下一个imageView的两端在移动的过程中相对位置不变，
+
+动画形成的思想：
+只需要考虑两个imageView随着滚动而变化。
