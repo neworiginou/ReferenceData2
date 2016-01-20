@@ -7,12 +7,17 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		292E536A1C4CD4FD008F3FED /* HWPersonalHeadView.m in Sources */ = {isa = PBXBuildFile; fileRef = 292E53691C4CD4FD008F3FED /* HWPersonalHeadView.m */; };
+		292E536D1C4CE134008F3FED /* HWPersonSegmentCtrl.m in Sources */ = {isa = PBXBuildFile; fileRef = 292E536C1C4CE134008F3FED /* HWPersonSegmentCtrl.m */; };
+		292E536F1C4CE370008F3FED /* bg2@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 292E536E1C4CE370008F3FED /* bg2@2x.png */; };
+		292E53711C4CE3D1008F3FED /* contacts@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 292E53701C4CE3D1008F3FED /* contacts@2x.png */; };
 		29996BC61C48CEED00D3D1B6 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 29996BC51C48CEED00D3D1B6 /* main.m */; };
 		29996BC91C48CEED00D3D1B6 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 29996BC81C48CEED00D3D1B6 /* AppDelegate.m */; };
 		29996BCF1C48CEED00D3D1B6 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 29996BCD1C48CEED00D3D1B6 /* Main.storyboard */; };
 		29996BD11C48CEED00D3D1B6 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 29996BD01C48CEED00D3D1B6 /* Assets.xcassets */; };
 		29996BD41C48CEED00D3D1B6 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 29996BD21C48CEED00D3D1B6 /* LaunchScreen.storyboard */; };
 		29996BDD1C48D39500D3D1B6 /* HWPersonalCenterVC.m in Sources */ = {isa = PBXBuildFile; fileRef = 29996BDC1C48D39500D3D1B6 /* HWPersonalCenterVC.m */; };
+		29A99E261C4F5C0200D12E1D /* HWAlertView.m in Sources */ = {isa = PBXBuildFile; fileRef = 29A99E251C4F5C0200D12E1D /* HWAlertView.m */; };
 		29DF49361C49D68900B4262F /* HWHomePageVC.m in Sources */ = {isa = PBXBuildFile; fileRef = 29DF49351C49D68900B4262F /* HWHomePageVC.m */; };
 		29DF49391C49D6D300B4262F /* HWHomePageView.m in Sources */ = {isa = PBXBuildFile; fileRef = 29DF49381C49D6D300B4262F /* HWHomePageView.m */; };
 		29DF493D1C49D72100B4262F /* UIView+AutoLayout.m in Sources */ = {isa = PBXBuildFile; fileRef = 29DF493C1C49D72100B4262F /* UIView+AutoLayout.m */; };
@@ -35,6 +40,12 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		292E53681C4CD4FD008F3FED /* HWPersonalHeadView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HWPersonalHeadView.h; sourceTree = "<group>"; };
+		292E53691C4CD4FD008F3FED /* HWPersonalHeadView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HWPersonalHeadView.m; sourceTree = "<group>"; };
+		292E536B1C4CE134008F3FED /* HWPersonSegmentCtrl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HWPersonSegmentCtrl.h; sourceTree = "<group>"; };
+		292E536C1C4CE134008F3FED /* HWPersonSegmentCtrl.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HWPersonSegmentCtrl.m; sourceTree = "<group>"; };
+		292E536E1C4CE370008F3FED /* bg2@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "bg2@2x.png"; sourceTree = "<group>"; };
+		292E53701C4CE3D1008F3FED /* contacts@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "contacts@2x.png"; sourceTree = "<group>"; };
 		29996BC11C48CEED00D3D1B6 /* 合伙人V3.3.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "合伙人V3.3.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		29996BC51C48CEED00D3D1B6 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		29996BC71C48CEED00D3D1B6 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -45,6 +56,8 @@
 		29996BD51C48CEED00D3D1B6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		29996BDB1C48D39500D3D1B6 /* HWPersonalCenterVC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HWPersonalCenterVC.h; sourceTree = "<group>"; };
 		29996BDC1C48D39500D3D1B6 /* HWPersonalCenterVC.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HWPersonalCenterVC.m; sourceTree = "<group>"; };
+		29A99E241C4F5C0200D12E1D /* HWAlertView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HWAlertView.h; sourceTree = "<group>"; };
+		29A99E251C4F5C0200D12E1D /* HWAlertView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HWAlertView.m; sourceTree = "<group>"; };
 		29DF49341C49D68900B4262F /* HWHomePageVC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HWHomePageVC.h; sourceTree = "<group>"; };
 		29DF49351C49D68900B4262F /* HWHomePageVC.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HWHomePageVC.m; sourceTree = "<group>"; };
 		29DF49371C49D6D300B4262F /* HWHomePageView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HWHomePageView.h; sourceTree = "<group>"; };
@@ -96,11 +109,27 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		292E53671C4CD4DB008F3FED /* PersonalView */ = {
+			isa = PBXGroup;
+			children = (
+				29A99E241C4F5C0200D12E1D /* HWAlertView.h */,
+				29A99E251C4F5C0200D12E1D /* HWAlertView.m */,
+				292E53681C4CD4FD008F3FED /* HWPersonalHeadView.h */,
+				292E53691C4CD4FD008F3FED /* HWPersonalHeadView.m */,
+				292E536B1C4CE134008F3FED /* HWPersonSegmentCtrl.h */,
+				292E536C1C4CE134008F3FED /* HWPersonSegmentCtrl.m */,
+				292E536E1C4CE370008F3FED /* bg2@2x.png */,
+				292E53701C4CE3D1008F3FED /* contacts@2x.png */,
+			);
+			name = PersonalView;
+			sourceTree = "<group>";
+		};
 		298CD24F1C4A466D008B1989 /* PersonalCenter */ = {
 			isa = PBXGroup;
 			children = (
 				29996BDB1C48D39500D3D1B6 /* HWPersonalCenterVC.h */,
 				29996BDC1C48D39500D3D1B6 /* HWPersonalCenterVC.m */,
+				292E53671C4CD4DB008F3FED /* PersonalView */,
 			);
 			name = PersonalCenter;
 			sourceTree = "<group>";
@@ -266,7 +295,9 @@
 				29DF496C1C4A088300B4262F /* phone@3x.png in Resources */,
 				29996BD41C48CEED00D3D1B6 /* LaunchScreen.storyboard in Resources */,
 				29996BD11C48CEED00D3D1B6 /* Assets.xcassets in Resources */,
+				292E53711C4CE3D1008F3FED /* contacts@2x.png in Resources */,
 				29996BCF1C48CEED00D3D1B6 /* Main.storyboard in Resources */,
+				292E536F1C4CE370008F3FED /* bg2@2x.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -280,13 +311,16 @@
 				29996BC91C48CEED00D3D1B6 /* AppDelegate.m in Sources */,
 				29DF49681C49F76400B4262F /* FLAdView.m in Sources */,
 				29DF495D1C49E51100B4262F /* SDWebImageManager.m in Sources */,
+				292E536A1C4CD4FD008F3FED /* HWPersonalHeadView.m in Sources */,
 				29DF49581C49E51100B4262F /* SDImageCache.m in Sources */,
 				29DF496A1C49F76400B4262F /* TapImageView.m in Sources */,
 				29DF495C1C49E51100B4262F /* SDWebImageDownloaderOperation.m in Sources */,
 				29DF49601C49E51100B4262F /* UIImageView+WebCache.m in Sources */,
 				29DF49571C49E51100B4262F /* MKAnnotationView+WebCache.m in Sources */,
 				29DF496F1C4A08BD00B4262F /* HWHomeHeadView.m in Sources */,
+				29A99E261C4F5C0200D12E1D /* HWAlertView.m in Sources */,
 				29DF495F1C49E51100B4262F /* UIButton+WebCache.m in Sources */,
+				292E536D1C4CE134008F3FED /* HWPersonSegmentCtrl.m in Sources */,
 				29DF493D1C49D72100B4262F /* UIView+AutoLayout.m in Sources */,
 				29DF495E1C49E51100B4262F /* SDWebImagePrefetcher.m in Sources */,
 				29DF495B1C49E51100B4262F /* SDWebImageDownloader.m in Sources */,

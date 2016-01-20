@@ -11,13 +11,34 @@
 #define CD_BackGroundColor     UIColorFromRGB(0xf5f5f5)
 
 #import "HWPersonalCenterVC.h"
+#import "HWPersonalHeadView.h"
+#import "HWAlertView.h"
 @interface HWPersonalCenterVC ()
-
+@property (nonatomic, strong)HWPersonalHeadView *headView;
 @end
 
 @implementation HWPersonalCenterVC
+- (HWPersonalHeadView *)headView{
+    if(_headView == nil){
+        _headView = [[HWPersonalHeadView alloc]init];
+    }
+    return _headView;
+}
 - (void)viewWillAppear:(BOOL)animated{
     self.navigationController.navigationBarHidden = YES;
+    [self.view addSubview:self.headView];
+    
+    UIButton *btn = [UIButton buttonWithType:UIButtonTypeCustom];
+    btn.frame = CGRectMake(30, CGRectGetMaxY(self.headView.frame)+50, 50, 30);
+    [btn setTitle:@"点我" forState:UIControlStateNormal];
+    btn.backgroundColor = [UIColor whiteColor];
+    [btn setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
+    [self.view addSubview:btn];
+    [btn addTarget:self action:@selector(showAction) forControlEvents:UIControlEventTouchUpInside];
+}
+- (void)showAction{
+    HWAlertView *alert = [[HWAlertView alloc]init];
+    [alert show];
 }
 -(void)viewDidLoad{
     self.view.backgroundColor = CD_BackGroundColor;
