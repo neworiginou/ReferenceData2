@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>SchemeUserState</key>
+	<dict>
+		<key>Pods-FSCalendar-FSCalendar.xcscheme</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>2</integer>
+		</dict>
+		<key>Pods-FSCalendar-SSLunarDate.xcscheme</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>3</integer>
+		</dict>
+		<key>Pods-FSCalendar.xcscheme</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>1</integer>
+		</dict>
+		<key>Pods-Tests-FSCalendar.xcscheme</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>5</integer>
+		</dict>
+		<key>Pods-Tests.xcscheme</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>4</integer>
+		</dict>
+	</dict>
+	<key>SuppressBuildableAutocreation</key>
+	<dict>
+		<key>24AF8511DA2259934475DC15</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>6B10B1DF04CB647324AFB06B</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>92CE509205615E2EAD493316</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>9EBBFEF4F0B87F2A11ED3E1E</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>A045C0B805698E04B2EE56A9</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+	</dict>
+</dict>
+</plist>
