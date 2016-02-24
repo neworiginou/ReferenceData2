@@ -76,7 +76,7 @@ class DOFavoriteButton: UIButton {
         }
     }
     
-    override init() {
+    init() {
         super.init(frame: CGRectZero)
         createLayers(image: UIImage(named: "star"), imageFrame: frame)
     }
@@ -100,7 +100,7 @@ class DOFavoriteButton: UIButton {
         //layoutLayers()
     }
     
-    func createLayers(#image: UIImage!, imageFrame: CGRect) {
+    func createLayers(image image: UIImage!, imageFrame: CGRect) {
         
         let imgCenterPoint = CGPointMake(imageFrame.origin.x + imageFrame.width / 2, imageFrame.origin.y + imageFrame.height / 2)
         let lineFrame = CGRectMake(imageFrame.origin.x - imageFrame.width / 4, imageFrame.origin.y - imageFrame.height / 4 , imageFrame.width * 1.5, imageFrame.height * 1.5)
