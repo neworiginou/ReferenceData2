@@ -68,6 +68,7 @@ typedef NS_ENUM(NSInteger, XMDownloadStatus) {
 
 - (void)addVideoDownloadWithVideoDic:(NSDictionary *)videoDic
 {
+    [RACSignal combineLatest:<#(id<NSFastEnumeration>)#> reduce:<#^id(void)reduceBlock#>];
         [self downloader_addDownloadToSqeue:videoDic];
 }
 - (void)downloader_addDownloadToSqeue: (NSDictionary *)videoDic

@@ -53,6 +53,8 @@ static NSString *const path = @"Downloads";
     if (![[NSUserDefaults standardUserDefaults] objectForKey:@"videoDownloadQuality"]) {
         [[NSUserDefaults standardUserDefaults] setObject:@"normal" forKey:@"videoDownloadQuality"];
     }
+    //MagicalRecord借用了Ruby on Rails中的Active Record模式，使得你可以非常容易的添加、查找、删除数据。
+    //MagicalRecord的出现在一定程度上缓解了这个问题，降低了CoreData的使用门槛
     [MagicalRecord setupCoreDataStackWithStoreNamed:@"XMHelper.sqlite"];
     [[UINavigationBar appearance] setTintColor:[UIColor colorWithHexString:@"E64A19"]];
     [[UITabBar appearance] setTintColor:[UIColor colorWithHexString:@"E64A19"]];
